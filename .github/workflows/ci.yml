@@ -1,0 +1,58 @@
+name: CI Pipeline with Docker Hub
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: conik-ecr  # ECR 리포지토리 이름으로 변경
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 리포지토리 체크아웃
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. application.yml 파일 생성
+      - name: Create application.yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML_CLOUD }}" > ./src/main/resources/application-cloud.yml
+          echo "${{ secrets.APPLICATION_YML_SWAGGER }}" > ./src/main/resources/application-swagger.yml          
+
+      # 3. AWS 자격 증명 설정
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-and-push
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Docker 이미지 빌드 (deploy 폴더의 Multistage.Dockerfile 사용)
+          docker build -f deploy/Multistage.Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker build -f deploy/Multistage.Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          
+          # ECR에 푸시
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+          
+          # 이미지 정보 출력
+          echo "Image pushed to $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "Image pushed to $ECR_REGISTRY/$ECR_REPOSITORY:latest"
