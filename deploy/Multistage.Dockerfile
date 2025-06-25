@@ -1,10 +1,10 @@
 # 빌드 단계
 FROM openjdk:21-jdk-slim AS builder
 WORKDIR /app
-COPY ../gradlew build.gradle settings.gradle ./
-COPY ../gradle gradle/
+COPY gradlew build.gradle settings.gradle ./
+COPY gradle/ gradle/
 RUN ./gradlew dependencies
-COPY ../src src/
+COPY src/ src/
 RUN ./gradlew build -x test
 
 # 실행 단계
