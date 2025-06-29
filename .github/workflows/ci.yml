@@ -36,6 +36,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
+      # 4. Amazon ECR 로그인 및 이미지 빌드/푸시
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -57,3 +58,36 @@ jobs:
           # 이미지 정보 출력
           echo "Image pushed to $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           echo "Image pushed to $ECR_REGISTRY/$ECR_REPOSITORY:latest"
+
+      # 4. 매니페스트 리포지토리 체크아웃
+      - name: Checkout manifest repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'HANIEUMICT/MANIFEST_REPO'  # 매니페스트 리포지토리 이름으로 변경
+          token: ${{ secrets.PAT }}  # 또는 개인 액세스 토큰 사용
+          path: 'manifest'
+
+      # 5. deployment.yml 파일 업데이트
+      - name: Update deployment.yml
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # 새 이미지 태그로 deployment.yml 업데이트
+          sed -i "s|image: .*|image: $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG|g" manifest/conik/deployment.yml
+          
+          # 변경사항 확인
+          echo "Updated deployment.yml:"
+          cat manifest/conik/deployment.yml
+
+      # 6. 변경사항 커밋 및 푸시
+      - name: Commit and push changes
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd manifest
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add conik/deployment.yml
+          git commit -m "Update image tag to $IMAGE_TAG" || exit 0
+          git push
