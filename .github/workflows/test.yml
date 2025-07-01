@@ -24,10 +24,10 @@ jobs:
       - name: Create application.yml
         run: |
           mkdir -p src/main/resources
-          echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.yml
-          echo "${{ secrets.APPLICATION_PROPERTIES_CLOUD }}" > ./src/main/resources/application-cloud.yml
-          echo "${{ secrets.APPLICATION_PROPERTIES_SWAGGER }}" > ./src/main/resources/application-swagger.yml
-          echo "${{ secrets.APPLICATION_PROPERTIES_ACTUATOR }}" > ./src/main/resources/application-actuator.yml          
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML_CLOUD }}" > ./src/main/resources/application-cloud.yml
+          echo "${{ secrets.APPLICATION_YML_SWAGGER }}" > ./src/main/resources/application-swagger.yml
+          echo "${{ secrets.APPLICATION_YML_ACTUATOR }}" > ./src/main/resources/application-actuator.yml          
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
