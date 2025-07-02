@@ -3,13 +3,12 @@ package hanieum.conik.global.apiPayload.exception;
 import lombok.Getter;
 
 @Getter
-public class CoreException extends RuntimeException {
+public class GlobalException extends RuntimeException {
 
     private final ErrorType errorType;
 
-    public CoreException(ErrorType errorType) {
+    public GlobalException(ErrorType errorType) {
         super(errorType.getMessage());
         this.errorType = errorType;
     }
-
 }

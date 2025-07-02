@@ -1,10 +1,10 @@
-package hanieum.conik.global.redis;
+package hanieum.conik.global.clients.redis;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
-import hanieum.conik.global.apiPayload.exception.CoreException;
+import hanieum.conik.global.apiPayload.exception.GlobalException;
 import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
 import java.time.Duration;
 
@@ -19,7 +19,7 @@ public class RedisClient {
             ValueOperations<String, Object> values = redisTemplate.opsForValue();
             values.set(key, value, Duration.ofMillis(timeout));
         } catch (Exception e) {
-            throw new CoreException(GlobalErrorType.REDIS_SET_ERROR);
+            throw new GlobalException(GlobalErrorType.REDIS_SET_ERROR);
         }
     }
 
@@ -31,7 +31,7 @@ public class RedisClient {
             }
             return values.get(key).toString();
         } catch (Exception e) {
-            throw new CoreException(GlobalErrorType.REDIS_GET_ERROR);
+            throw new GlobalException(GlobalErrorType.REDIS_GET_ERROR);
         }
     }
 
@@ -39,7 +39,7 @@ public class RedisClient {
         try {
             redisTemplate.delete(key);
         } catch (Exception e) {
-            throw new CoreException(GlobalErrorType.REDIS_DELETE_ERROR);
+            throw new GlobalException(GlobalErrorType.REDIS_DELETE_ERROR);
         }
     }
 
@@ -47,7 +47,7 @@ public class RedisClient {
         try {
             return redisTemplate.hasKey(key);
         } catch (Exception e) {
-            throw new CoreException(GlobalErrorType.REDIS_GET_ERROR);
+            throw new GlobalException(GlobalErrorType.REDIS_GET_ERROR);
         }
     }
 }
