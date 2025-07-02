@@ -2,7 +2,9 @@ name: PR Test
 permissions:
   contents: read    # checkout, 빌드 스크립트 읽기 권한
   checks: write     # Test Results 액션이 check-run 생성/수정 권한
-  issues: write     # PR에 코멘트 작성할 수 있는 권한
+  issues: write     # 이슈에 코멘트 작성 권한
+  pull-requests: write  # PR에 코멘트 작성 권한
+
 on:
   pull_request:
     branches: [ main ]
@@ -27,8 +29,7 @@ jobs:
           echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
           echo "${{ secrets.APPLICATION_YML_CLOUD }}" > ./src/main/resources/application-cloud.yml
           echo "${{ secrets.APPLICATION_YML_SWAGGER }}" > ./src/main/resources/application-swagger.yml
-          echo "${{ secrets.APPLICATION_YML_ACTUATOR }}" > ./src/main/resources/application-actuator.yml  
-          echo "${{ secrets.APPLICATION_YML_EMAIL }}" > ./src/main/resources/application-email.yml  
+          echo "${{ secrets.APPLICATION_YML_ACTUATOR }}" > ./src/main/resources/application-actuator.yml    
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -37,7 +38,7 @@ jobs:
         run: ./gradlew --info test
 
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}
         with:
           files: build/test-results/**/*.xml
