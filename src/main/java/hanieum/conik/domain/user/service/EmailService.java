@@ -18,11 +18,20 @@ public class EmailService {
 
     private static final long OTP_TIMEOUT = 5 * 60_000L; // 5분
 
+    /**
+     * 이메일 인증 코드 전송
+     * @param authCodeRequest 인증번호를 보낼 이메일 정보
+     */
     public void sendEmail(AuthCodeRequest authCodeRequest) {
         int authNumber = emailClient.sendAuthMail(authCodeRequest.email());
         redisClient.setValue(authCodeRequest.email(), String.valueOf(authNumber), OTP_TIMEOUT);
     }
 
+    /**
+     * 이메일 인증 코드 검증
+     * @param certificateRequest 이메일 인증 요청 정보
+     * @return 인증 성공 여부
+     */
     public Boolean certificateEmail(CertificateRequest certificateRequest) {
         if (redisClient.getValue(certificateRequest.email()).equals(certificateRequest.authCode())) {
             redisClient.deleteValue(certificateRequest.email());
