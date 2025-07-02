@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>Conic 인증 코드</title>
+    <style>
+        body { margin:0; padding:0; background-color:#f5f5f5; font-family: Arial, sans-serif; }
+        .container { max-width:600px; margin:0 auto; background-color:#ffffff; border-radius:8px; overflow:hidden; }
+        .header { background-color:#FF363C; padding:20px; text-align:center; }
+        .header .logo { color:#ffffff; font-size:28px; font-weight:bold; letter-spacing:1px; }
+        .divider { height:4px; background-color:#AD0F14; }
+        .content { padding:30px; }
+        .title { font-size:22px; color:#333333; margin-bottom:15px; }
+        .message { font-size:16px; color:#555555; line-height:1.6; }
+        .code-box { display:inline-block; background-color:#FF8345; color:#ffffff; font-size:32px; letter-spacing:6px; padding:12px 24px; border-radius:4px; margin:20px 0; }
+        .footer { background-color:#f0f0f0; text-align:center; padding:15px; font-size:12px; color:#777777; }
+        .footer a { color:#E4070E; text-decoration:none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo">Conic</div>
+    </div>
+    <div class="divider"></div>
+    <div class="content">
+        <div class="title">회원가입 인증 코드 안내</div>
+        <div class="message">
+            안녕하세요, <strong>Conic</strong>을 이용해 주셔서 감사합니다.<br/>
+            아래 인증 코드를 입력하여 이메일 주소를 확인해주세요.
+        </div>
+        <div class="code-box" th:text="${authCode}">123456</div>
+        <div class="message">
+            본 인증 코드는 발송 후 <strong>5분</strong> 동안 유효합니다.<br/>
+            요청하지 않으셨다면 이 메일을 무시해주세요.
+        </div>
+    </div>
+    <div class="footer">
+        &copy; 2025 Conic. All rights reserved.<br/>
+        <a href="https://www.conic.com" target="_blank">www.conic.com</a>
+    </div>
+</div>
+</body>
+</html>
