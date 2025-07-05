@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>이메일 인증</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            text-align: center;
+        }
+        .auth-code {
+            font-size: 2em;
+            font-weight: bold;
+            color: #28a745;
+            margin: 20px 0;
+            padding: 10px;
+            border: 2px dashed #28a745;
+            display: inline-block;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>이메일 인증 요청</h2>
+    </div>
+    <div class="content">
+        <p>안녕하세요!</p>
+        <p>요청하신 이메일 인증 번호입니다. 아래 번호를 입력하여 인증을 완료해주세요:</p>
+        <div class="auth-code" th:text="${authCode}">123456</div>
+        <p>이 코드는 일정 시간 후에 만료됩니다.</p>
+        <p>감사합니다.</p>
+    </div>
+    <div class="footer">
+        <p>본 메일은 발신 전용입니다.</p>
+        <p>&copy; 2025 Conic. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>
