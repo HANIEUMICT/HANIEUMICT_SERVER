@@ -48,6 +48,11 @@ dependencies {
 	//Emailclient
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	// S3
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4'
+
 }
 
 tasks.named('test') {
