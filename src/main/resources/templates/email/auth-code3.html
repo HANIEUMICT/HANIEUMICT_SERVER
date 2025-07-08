@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conic 회원가입 인증</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF363C 0%, #E4070E 50%, #AD0F14 100%);
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.1"><circle cx="30" cy="30" r="2"/></g></svg>') repeat;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        .welcome-text {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 16px;
+        }
+
+        .description {
+            font-size: 16px;
+            color: #718096;
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+
+        .auth-code-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border: 2px dashed #FF363C;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .auth-code-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #FF363C;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .auth-code {
+            font-size: 36px;
+            font-weight: 800;
+            color: #AD0F14;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #FF363C, #E4070E);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(255, 54, 60, 0.3);
+        }
+
+        .code-info {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        .instructions {
+            background: #fff8f0;
+            border-left: 4px solid #FF8345;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 0 8px 8px 0;
+            text-align: left;
+        }
+
+        .instructions-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #EF641F;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .instructions-title::before {
+            content: '💡';
+            margin-right: 8px;
+        }
+
+        .instructions ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .instructions li {
+            padding: 5px 0;
+            color: #495057;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .instructions li::before {
+            content: '•';
+            color: #FF8345;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+            border: 1px solid #feb2b2;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .warning-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .warning-text {
+            font-size: 14px;
+            color: #c53030;
+            font-weight: 500;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer-text {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .company-info {
+            font-size: 12px;
+            color: #adb5bd;
+            line-height: 1.5;
+        }
+
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FF8345, #EF641F, #FF8345, transparent);
+            margin: 20px 0;
+        }
+
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+
+            .auth-code {
+                font-size: 28px;
+                letter-spacing: 4px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header">
+        <div class="logo">CONIC</div>
+        <div class="subtitle">Welcome to the future</div>
+    </div>
+
+    <div class="content">
+        <div class="welcome-text">회원가입을 환영합니다! 🎉</div>
+        <div class="description">
+            Conic 서비스 이용을 위해 아래 인증코드를 입력해주세요.
+        </div>
+
+        <div class="auth-code-section pulse">
+            <div class="auth-code-label">인증 코드</div>
+            <div class="auth-code" th:text="${authCode}">123456</div>
+            <div class="code-info">5분 내에 입력해주세요</div>
+        </div>
+
+        <div class="divider"></div>
+
+
+
+        <div class="warning">
+            <div class="warning-icon">🔒</div>
+            <div class="warning-text">
+                보안을 위해 이 코드를 다른 사람과 공유하지 마세요.<br>
+                Conic은 절대 이메일이나 전화로 인증코드를 요청하지 않습니다.
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-text">
+            문의사항이 있으시면 언제든 연락주세요.
+        </div>
+        <div class="company-info">
+            © 2025 Conic. All rights reserved.<br>
+            이 이메일은 회원가입 요청에 따라 자동으로 발송되었습니다.
+        </div>
+    </div>
+</div>
+</body>
+</html>
