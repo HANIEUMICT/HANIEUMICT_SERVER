@@ -5,6 +5,7 @@ import hanieum.conik.user.adapter.email.dto.CertificateRequest;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import hanieum.conik.user.application.EmailCertService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/email")
+@Tag(name = "USER", description = "사용자 도메인 API")
 public class EmailController {
     private final EmailCertService emailCertService;
 

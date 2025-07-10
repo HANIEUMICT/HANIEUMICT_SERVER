@@ -5,12 +5,14 @@ import hanieum.conik.global.adapter.s3.dto.ReadPreSignedUrlResponse;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import hanieum.conik.global.application.required.BucketClient;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/bucket")
+@Tag(name = "USER", description = "사용자 도메인 API")
 public class ImageController {
     private final BucketClient bucketClient;
 
