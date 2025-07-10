@@ -1,10 +1,11 @@
 package hanieum.conik.domain.user.service;
 
-import hanieum.conik.domain.user.dto.request.AuthCodeRequest;
-import hanieum.conik.domain.user.dto.request.CertificateRequest;
-import hanieum.conik.domain.user.exception.UserException;
-import hanieum.conik.global.clients.email.EmailClient;
-import hanieum.conik.global.clients.redis.RedisClient;
+import hanieum.conik.global.application.required.MemoryMap;
+import hanieum.conik.user.adapter.email.dto.AuthCodeRequest;
+import hanieum.conik.user.adapter.email.dto.CertificateRequest;
+import hanieum.conik.user.application.EmailCertService;
+import hanieum.conik.user.application.required.EmailSender;
+import hanieum.conik.user.domain.exception.UserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,9 +23,9 @@ import static org.mockito.Mockito.verify;
 @DisplayName("EmailServiceImpl 테스트")
 class EmailServiceImplTest {
 
-    @Mock private EmailClient emailClient;
-    @Mock private RedisClient redisClient;
-    @InjectMocks private EmailServiceImpl emailService;
+    @Mock private EmailSender emailClient;
+    @Mock private MemoryMap memoryMap;
+    @InjectMocks private EmailCertService emailService;
 
     private AuthCodeRequest authCodeRequest;
     private CertificateRequest certificateRequest;
@@ -49,22 +50,22 @@ class EmailServiceImplTest {
 
         //then
         verify(emailClient).sendAuthMail(testEmail);
-        verify(redisClient).setValue(testEmail, String.valueOf(testUserAuthNumber), 5 * 60_000L);
+        verify(memoryMap).setValue(testEmail, String.valueOf(testUserAuthNumber), 5 * 60_000L);
     }
 
     @Test
     @DisplayName("이메일 인증 코드 검증 성공")
     void certificateEmail() {
         // given
-        given(redisClient.getValue(testEmail)).willReturn(testAuthCode);
+        given(memoryMap.getValue(testEmail)).willReturn(testAuthCode);
 
         // when
         Boolean result = emailService.certificateEmail(certificateRequest);
 
         // then
         assertThat(result).isTrue();
-        verify(redisClient).getValue(testEmail);
-        verify(redisClient).deleteValue(testEmail);
+        verify(memoryMap).getValue(testEmail);
+        verify(memoryMap).deleteValue(testEmail);
     }
 
     @Test
@@ -72,7 +73,7 @@ class EmailServiceImplTest {
     void certificateEmail_Fail_InvalidAuthCode() {
         // given
         String wrongAuthCode = "999999";
-        given(redisClient.getValue(testEmail)).willReturn(wrongAuthCode);
+        given(memoryMap.getValue(testEmail)).willReturn(wrongAuthCode);
 
         // when
         UserException exception = assertThrows(UserException.class, () -> {

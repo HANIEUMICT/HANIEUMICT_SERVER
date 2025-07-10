@@ -1,4 +1,4 @@
-package hanieum.conik.domain.user.dto.request;
+package hanieum.conik.user.adapter.email.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;

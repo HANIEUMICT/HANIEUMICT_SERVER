@@ -1,4 +1,4 @@
-package hanieum.conik.domain.user.exception;
+package hanieum.conik.user.domain.exception;
 
 import hanieum.conik.global.apiPayload.exception.ErrorType;
 import hanieum.conik.global.apiPayload.exception.GlobalException;

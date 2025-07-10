@@ -1,9 +1,11 @@
-package hanieum.conik.global.clients.s3;
+package hanieum.conik.global.adapter.s3;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import hanieum.conik.global.clients.s3.dto.ReadPreSignedUrlResponse;
+import hanieum.conik.global.adapter.s3.dto.ImageUploadRequest;
+import hanieum.conik.global.adapter.s3.dto.ReadPreSignedUrlResponse;
+import hanieum.conik.global.application.required.BucketClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,15 +17,16 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class S3Client {
+public class S3BucketClient implements BucketClient {
 
     @Value("${cloud.s3.bucket}")
     private String bucket;
 
-    private final AmazonS3 S3Client;
+    private final AmazonS3 amazonS3;
 
-    public ReadPreSignedUrlResponse getPreSignedUrl(String prefix, String originalFilename) {
-        String key = createPath(prefix, originalFilename);
+    @Override
+    public ReadPreSignedUrlResponse getPreSignedUrl(ImageUploadRequest imageUploadRequest) {
+        String key = createPath(imageUploadRequest.prefix(), imageUploadRequest.originalFilename());
 
         String presignedUrl = postPresignedUrl(key);
         String accessUrl =  getPublicUrl(key);
@@ -31,16 +34,18 @@ public class S3Client {
         return ReadPreSignedUrlResponse.of(presignedUrl, accessUrl);
     }
 
-    private String postPresignedUrl(String key) {
+    @Override
+    public String postPresignedUrl(String key) {
         Date expiration = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(2));
         GeneratePresignedUrlRequest req = new GeneratePresignedUrlRequest(bucket, key)
                 .withMethod(HttpMethod.PUT)
                 .withExpiration(expiration);
 
-        return S3Client.generatePresignedUrl(req).toString();
+        return amazonS3.generatePresignedUrl(req).toString();
     }
 
-    private String getPresignedUrl(String prefix, String originalFileName) {
+    @Override
+    public String getPresignedUrl(String prefix, String originalFileName) {
         String key = createPath(prefix, originalFileName);
 
         Date expiration = new Date(System.currentTimeMillis() + TimeUnit.MINUTES.toMillis(10));
@@ -48,14 +53,16 @@ public class S3Client {
                 .withMethod(HttpMethod.GET)
                 .withExpiration(expiration);
 
-        return S3Client.generatePresignedUrl(req).toString();
+        return amazonS3.generatePresignedUrl(req).toString();
     }
 
-    private String getPublicUrl(String key) {
-        return S3Client.getUrl(bucket, key).toString();
+    @Override
+    public String getPublicUrl(String key) {
+        return amazonS3.getUrl(bucket, key).toString();
     }
 
-    private String createPath(String prefix, String originalFileName) {
+    @Override
+    public String createPath(String prefix, String originalFileName) {
         String safeFileName = URLEncoder
                 .encode(originalFileName, StandardCharsets.UTF_8)
                 .replace("+", "%20");
