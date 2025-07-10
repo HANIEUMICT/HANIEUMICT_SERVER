@@ -1,19 +1,22 @@
-package hanieum.conik.global.clients.redis;
+package hanieum.conik.global.adapter.redis;
 
+import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
+import hanieum.conik.global.apiPayload.exception.GlobalException;
+import hanieum.conik.global.application.required.MemoryMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
-import hanieum.conik.global.apiPayload.exception.GlobalException;
-import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
+
 import java.time.Duration;
 
 @Component
 @RequiredArgsConstructor
-public class RedisClient {
+public class RedisMemoryMap implements MemoryMap {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
+    @Override
     public void setValue(String key, String value, Long timeout) {
         try {
             ValueOperations<String, Object> values = redisTemplate.opsForValue();
@@ -23,6 +26,7 @@ public class RedisClient {
         }
     }
 
+    @Override
     public String getValue(String key) {
         try {
             ValueOperations<String, Object> values = redisTemplate.opsForValue();
@@ -35,6 +39,7 @@ public class RedisClient {
         }
     }
 
+    @Override
     public void deleteValue(String key) {
         try {
             redisTemplate.delete(key);
@@ -43,6 +48,7 @@ public class RedisClient {
         }
     }
 
+    @Override
     public boolean checkExistsValue(String key) {
         try {
             return redisTemplate.hasKey(key);

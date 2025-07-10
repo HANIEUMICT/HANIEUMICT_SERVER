@@ -1,4 +1,4 @@
-package hanieum.conik.global.clients.s3.dto;
+package hanieum.conik.global.adapter.s3.dto;
 
 import lombok.Builder;
 
