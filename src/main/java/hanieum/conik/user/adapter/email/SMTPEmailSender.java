@@ -1,5 +1,6 @@
-package hanieum.conik.global.clients.email;
+package hanieum.conik.user.adapter.email;
 
+import hanieum.conik.user.application.required.EmailSender;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class EmailClient {
+public class SMTPEmailSender implements EmailSender {
 
     private final JavaMailSender javaMailSender;
     private final SpringTemplateEngine templateEngine;
@@ -29,7 +30,8 @@ public class EmailClient {
      *
      * @return 생성된 인증번호
      */
-    private int generateAuthNumber() {
+    @Override
+    public int generateAuthNumber() {
         return (int)(Math.random() * (90000)) + 100000;
     }
 
@@ -41,7 +43,8 @@ public class EmailClient {
      * @return 생성된 MimeMessage 객체
      * @throws MessagingException 메일 생성 중 발생할 수 있는 예외
      */
-    private MimeMessage createAuthMail(String toEmail, int authNumber) throws MessagingException {
+    @Override
+    public MimeMessage createAuthMail(String toEmail, int authNumber) throws MessagingException {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
 
@@ -58,13 +61,13 @@ public class EmailClient {
         return message;
     }
 
-
     /**
      * 인증 메일을 전송하는 메서드
      *
      * @param mail 이메일 내용
      * @return 생성된 인증번호
      */
+    @Override
     public int sendAuthMail(String mail) {
         int authNumber = generateAuthNumber();
         try{
