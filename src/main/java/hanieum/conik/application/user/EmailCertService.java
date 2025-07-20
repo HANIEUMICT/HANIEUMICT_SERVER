@@ -5,7 +5,6 @@ import hanieum.conik.adapter.user.email.dto.AuthCodeRequest;
 import hanieum.conik.adapter.user.email.dto.CertificateRequest;
 import hanieum.conik.domain.user.exception.UserErrorType;
 import hanieum.conik.domain.user.exception.UserException;
-import hanieum.conik.application.user.required.EmailSender;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -4,7 +4,6 @@ import hanieum.conik.global.application.required.MemoryMap;
 import hanieum.conik.adapter.user.email.dto.AuthCodeRequest;
 import hanieum.conik.adapter.user.email.dto.CertificateRequest;
 import hanieum.conik.application.user.EmailCertService;
-import hanieum.conik.application.user.required.EmailSender;
 import hanieum.conik.domain.user.exception.UserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
