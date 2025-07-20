@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ProjectStatus {
     PUBLIC("공개"),
-    PROTECTED("보호"),
-    PRIVATE("비공개");
+    PROTECTED("선택적공개"),
+    PRIVATE("비공개"),;
 
     private final String description;
 }
