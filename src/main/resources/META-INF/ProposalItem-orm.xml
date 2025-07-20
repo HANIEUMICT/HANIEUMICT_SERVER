@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings
+        xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+      http://xmlns.jcp.org/xml/ns/persistence/orm
+      http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
+        version="2.2">
+
+    <entity class="hanieum.conik.proposal.domain.entity.ProposalItem" access="FIELD">
+        <table name="proposal_item"/>
+
+        <attributes>
+            <!-- PK -->
+            <id name="proposalItemId">
+                <column name="proposal_item_id" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+
+            <!-- N:1 연관관계 -->
+            <many-to-one name="proposal" fetch="LAZY">
+                <join-column name="proposal_id" nullable="false"/>
+            </many-to-one>
+
+            <!-- 기본 컬럼들 -->
+            <basic name="itemName">
+                <column name="item_name" nullable="false"/>
+            </basic>
+            <basic name="itemSize">
+                <column name="item_size" nullable="false"/>
+            </basic>
+            <basic name="itemNote">
+                <column name="item_note" nullable="false"/>
+            </basic>
+            <basic name="itemUnitPrice">
+                <column name="item_unit_price" nullable="false"/>
+            </basic>
+            <basic name="itemQuantity">
+                <column name="item_quantity" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>
