@@ -1,11 +1,10 @@
-package hanieum.conik.user.application;
+package hanieum.conik.application.user;
 
 import hanieum.conik.global.application.required.MemoryMap;
-import hanieum.conik.user.adapter.email.dto.AuthCodeRequest;
-import hanieum.conik.user.adapter.email.dto.CertificateRequest;
-import hanieum.conik.user.domain.exception.UserErrorType;
-import hanieum.conik.user.domain.exception.UserException;
-import hanieum.conik.user.application.required.EmailSender;
+import hanieum.conik.adapter.user.email.dto.AuthCodeRequest;
+import hanieum.conik.adapter.user.email.dto.CertificateRequest;
+import hanieum.conik.domain.user.exception.UserErrorType;
+import hanieum.conik.domain.user.exception.UserException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

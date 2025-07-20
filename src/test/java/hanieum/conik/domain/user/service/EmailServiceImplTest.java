@@ -1,11 +1,11 @@
 package hanieum.conik.domain.user.service;
 
 import hanieum.conik.global.application.required.MemoryMap;
-import hanieum.conik.user.adapter.email.dto.AuthCodeRequest;
-import hanieum.conik.user.adapter.email.dto.CertificateRequest;
-import hanieum.conik.user.application.EmailCertService;
-import hanieum.conik.user.application.required.EmailSender;
-import hanieum.conik.user.domain.exception.UserException;
+import hanieum.conik.adapter.user.email.dto.AuthCodeRequest;
+import hanieum.conik.adapter.user.email.dto.CertificateRequest;
+import hanieum.conik.application.user.EmailCertService;
+import hanieum.conik.application.user.EmailSender;
+import hanieum.conik.domain.user.exception.UserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
