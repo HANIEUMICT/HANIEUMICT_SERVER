@@ -10,4 +10,26 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Company extends AbstractEntity {
+
+    private String name;
+
+    private String owner;
+
+    private String ownerEmail;
+
+    private String ownerPhoneNumber;
+
+    private String businessType;
+
+    private String industry;
+
+    private String RegistrationNumber;
+
+    private String registrationCertificateUrl;
+
+    private String bankAccountUrl;
+
+    private String profileUrl;
+
+    private CompanyStatus status;
 }
