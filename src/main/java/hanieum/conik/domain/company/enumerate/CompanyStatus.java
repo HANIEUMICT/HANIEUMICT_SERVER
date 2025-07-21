@@ -1,4 +1,4 @@
-package hanieum.conik.domain.company;
+package hanieum.conik.domain.company.enumerate;
 
 public enum CompanyStatus {
     PENDING,

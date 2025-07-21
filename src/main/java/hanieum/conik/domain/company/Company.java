@@ -1,6 +1,7 @@
 package hanieum.conik.domain.company;
 
 import hanieum.conik.global.domain.AbstractEntity;
+import hanieum.conik.domain.company.enumerate.CompanyStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
