@@ -1,26 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity-mappings
-        xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="
-      http://xmlns.jcp.org/xml/ns/persistence/orm
-      http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
-        version="2.2">
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
+    <access>FIELD</access>
 
     <entity class="hanieum.conik.proposal.domain.entity.Proposal" access="FIELD">
         <table name="proposal"/>
-
-        <sequence-generator
-                name="proposal_seq_gen"
-                sequence-name="proposal_seq"
-                allocation-size="50"/>
-
         <attributes>
-            <id name="proposalId">
-                <column name="proposal_id" nullable="false"/>
-                <generated-value strategy="SEQUENCE" generator="proposal_seq_gen"/>
-            </id>
-
             <basic name="projectId">
                 <column name="project_id" nullable="false"/>
             </basic>
@@ -43,11 +30,11 @@
                 <column name="proposal_note"/>
             </basic>
 
-            <!-- 1:N 연관관계 -->
-            <one-to-many name="items"
-                         mapped-by="proposal"
-                         cascade="ALL"
-                         orphan-removal="true"/>
+            <one-to-many name="items" mapped-by="proposal" orphan-removal="true">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
         </attributes>
     </entity>
 </entity-mappings>

@@ -1,6 +1,6 @@
 package hanieum.conik.proposal.domain.entity;
 
-import hanieum.conik.global.domain.BaseEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
@@ -8,11 +8,10 @@ import lombok.AccessLevel;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Proposal extends BaseEntity {
-    private Long proposalId;
-
+public class Proposal extends AbstractEntity {
     private Long projectId;
 
     private Long companyId;
@@ -40,5 +39,15 @@ public class Proposal extends BaseEntity {
         proposal.proposalDrawing = proposalDrawing;
         proposal.proposalNote = proposalNote;
         return proposal;
+    }
+
+    /** 양방향 연관관계 편의 메서드 */
+    public void addItem(ProposalItem item) {
+        this.items.add(item);
+        item.setProposal(this);
+    }
+
+    public void removeItem(ProposalItem item) {
+        this.items.remove(item);
     }
 }

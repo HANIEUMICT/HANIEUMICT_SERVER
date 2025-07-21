@@ -1,28 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity-mappings
-        xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="
-      http://xmlns.jcp.org/xml/ns/persistence/orm
-      http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd"
-        version="2.2">
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
+    <access>FIELD</access>
 
     <entity class="hanieum.conik.proposal.domain.entity.ProposalItem" access="FIELD">
         <table name="proposal_item"/>
-
         <attributes>
-            <!-- PK -->
-            <id name="proposalItemId">
-                <column name="proposal_item_id" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
-            </id>
-
-            <!-- N:1 연관관계 -->
+            <!-- 1. 연관관계 먼저 선언 -->
             <many-to-one name="proposal" fetch="LAZY">
                 <join-column name="proposal_id" nullable="false"/>
             </many-to-one>
 
-            <!-- 기본 컬럼들 -->
+            <!-- 2. 그 다음 basic 필드들 선언 -->
             <basic name="itemName">
                 <column name="item_name" nullable="false"/>
             </basic>
@@ -40,4 +31,5 @@
             </basic>
         </attributes>
     </entity>
+
 </entity-mappings>

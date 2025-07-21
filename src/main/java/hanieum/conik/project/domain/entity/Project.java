@@ -1,8 +1,8 @@
 package hanieum.conik.project.domain.entity;
 
-import hanieum.conik.global.domain.BaseEntity;
 import hanieum.conik.project.domain.enumerate.ProjectStatus;
 import hanieum.conik.project.domain.enumerate.ProjectType;
+import hanieum.conik.proposal.domain.entity.AbstractEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,42 +11,40 @@ import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Project extends BaseEntity {
-    private Long projectId;
-
+public class Project extends AbstractEntity {
     private Long userId;
 
     private String projectTitle;
 
-    private ProjectType projectType;
+    private ProjectType type;
 
-    private String projectCategory;
+    private String category;
 
-    private String projectCategoryService;
+    private String categoryService;
 
-    private String projectPurpose;
+    private String purpose;
 
-    private String projectPurposeDetail;
+    private String purposeDetail;
 
     private String projectDrawing;
 
     private Integer projectQuantity;
 
-    private String projectRequests;
+    private String requests;
 
-    private LocalDate projectDeadline;
+    private LocalDate deadline;
 
     private boolean canDeadlineChange;
 
-    private Integer projectRequestEstimate;
+    private Integer requestEstimate;
 
-    private LocalDate projectPublicUntil;
+    private LocalDate publicUntil;
 
     private ProjectStatus projectStatus;
 
     private boolean canPhoneConsult;
 
-    private String projectAddress;
+    private String address;
 
     public static Project create(Long userId, String projectTitle, ProjectType projectType, String projectCategory, String projectCategoryService,
                                  String projectPurpose, String projectPurposeDetail, String projectDrawing, Integer projectQuantity,
@@ -54,23 +52,23 @@ public class Project extends BaseEntity {
                                  LocalDate projectPublicUntil, ProjectStatus projectStatus, boolean canPhoneConsult, String projectAddress
     ) {
         Project project = new Project();
-        project.userId                 = userId;
-        project.projectTitle           = projectTitle;
-        project.projectType            = projectType;
-        project.projectCategory        = projectCategory;
-        project.projectCategoryService = projectCategoryService;
-        project.projectPurpose         = projectPurpose;
-        project.projectPurposeDetail   = projectPurposeDetail;
-        project.projectDrawing         = projectDrawing;
-        project.projectQuantity        = projectQuantity;
-        project.projectRequests        = projectRequests;
-        project.projectDeadline        = projectDeadline;
-        project.canDeadlineChange      = canDeadlineChange;
-        project.projectRequestEstimate = projectRequestEstimate;
-        project.projectPublicUntil     = projectPublicUntil;
-        project.projectStatus          = projectStatus;
-        project.canPhoneConsult        = canPhoneConsult;
-        project.projectAddress         = projectAddress;
+        project.userId              = userId;
+        project.projectTitle        = projectTitle;
+        project.type                = projectType;
+        project.category            = projectCategory;
+        project.categoryService     = projectCategoryService;
+        project.purpose             = projectPurpose;
+        project.purposeDetail       = projectPurposeDetail;
+        project.projectDrawing      = projectDrawing;
+        project.projectQuantity     = projectQuantity;
+        project.requests            = projectRequests;
+        project.deadline            = projectDeadline;
+        project.canDeadlineChange   = canDeadlineChange;
+        project.requestEstimate     = projectRequestEstimate;
+        project.publicUntil         = projectPublicUntil;
+        project.projectStatus       = projectStatus;
+        project.canPhoneConsult     = canPhoneConsult;
+        project.address             = projectAddress;
         return project;
     }
 }

@@ -1,97 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<entity-mappings
-        xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="
-      http://xmlns.jcp.org/xml/ns/persistence/orm
-      http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
-        version="2.1">
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
+    <access>FIELD</access>
 
     <entity class="hanieum.conik.project.domain.entity.Project" access="FIELD">
         <table name="project"/>
-
-        <!-- SEQUENCE 생성기 -->
-        <sequence-generator
-                name="project_seq_gen"
-                sequence-name="project_seq"
-                allocation-size="50"/>
-
         <attributes>
-            <!-- PK -->
-            <id name="projectId">
-                <column name="project_id" nullable="false"/>
-                <generated-value strategy="SEQUENCE" generator="project_seq_gen"/>
-            </id>
-
-            <!-- 기본 컬럼들 -->
             <basic name="userId">
                 <column name="user_id" nullable="false"/>
             </basic>
-
             <basic name="projectTitle">
                 <column name="project_title" nullable="false"/>
             </basic>
-
-            <!-- ENUM 매핑 -->
-            <basic name="projectType">
-                <column name="project_type" nullable="false"/>
+            <basic name="type">
+                <column name="type" nullable="false"/>
                 <enumerated>STRING</enumerated>
             </basic>
-
-            <basic name="projectCategory">
-                <column name="project_category" nullable="false"/>
+            <basic name="category">
+                <column name="category" nullable="false"/>
             </basic>
-
-            <basic name="projectCategoryService">
-                <column name="project_category_service" nullable="false"/>
+            <basic name="categoryService">
+                <column name="category_service" nullable="false"/>
             </basic>
-
-            <basic name="projectPurpose">
-                <column name="project_purpose" nullable="false"/>
+            <basic name="purpose">
+                <column name="purpose" nullable="false"/>
             </basic>
-
-            <basic name="projectPurposeDetail">
-                <column name="project_purpose_detail" nullable="false"/>
+            <basic name="purposeDetail">
+                <column name="purpose_detail" nullable="false"/>
             </basic>
-
             <basic name="projectDrawing">
-                <column name="project_drawing"/>
+                <column name="drawing"/>
             </basic>
-
             <basic name="projectQuantity">
                 <column name="project_quantity"/>
             </basic>
-
-            <basic name="projectRequests">
-                <column name="project_requests" column-definition="TEXT"/>
+            <basic name="requests">
+                <column name="requests" column-definition="TEXT"/>
             </basic>
-
-            <basic name="projectDeadline">
-                <column name="project_deadline"/>
+            <basic name="deadline">
+                <column name="deadline"/>
             </basic>
-
             <basic name="canDeadlineChange">
                 <column name="can_deadline_change" nullable="false"/>
             </basic>
-
-            <basic name="projectRequestEstimate">
+            <basic name="requestEstimate">
                 <column name="project_request_estimate"/>
             </basic>
-
-            <basic name="projectPublicUntil">
+            <basic name="publicUntil">
                 <column name="project_public_until"/>
             </basic>
-
             <basic name="projectStatus">
                 <column name="project_status"/>
                 <enumerated>STRING</enumerated>
             </basic>
-
             <basic name="canPhoneConsult">
                 <column name="can_phone_consult" nullable="false"/>
             </basic>
-
-            <basic name="projectAddress">
+            <basic name="address">
                 <column name="project_address" nullable="false"/>
             </basic>
         </attributes>
