@@ -5,7 +5,7 @@
                                      https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
     <access>FIELD</access>
 
-    <entity class="hanieum.conik.proposal.domain.entity.ProposalItem" access="FIELD">
+    <entity class="hanieum.conik.domain.proposal.domain.entity.ProposalItem" access="FIELD">
         <table name="proposal_item"/>
         <attributes>
             <!-- 1. 연관관계 먼저 선언 -->

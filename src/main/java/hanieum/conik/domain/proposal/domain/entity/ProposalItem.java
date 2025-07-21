@@ -1,4 +1,4 @@
-package hanieum.conik.proposal.domain.entity;
+package hanieum.conik.domain.proposal.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
