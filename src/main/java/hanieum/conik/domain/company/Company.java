@@ -1,5 +1,7 @@
 package hanieum.conik.domain.company;
 
+import hanieum.conik.domain.company.enumerate.CompanyStatus;
+
 public class Company {
 
     private String name;
