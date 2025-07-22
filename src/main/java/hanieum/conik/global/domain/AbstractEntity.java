@@ -1,6 +1,5 @@
-package hanieum.conik.domain.proposal.domain.entity;
+package hanieum.conik.global.domain;
 
-import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;

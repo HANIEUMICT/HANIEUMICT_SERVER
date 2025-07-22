@@ -1,5 +1,6 @@
 package hanieum.conik.domain.proposal.domain.entity;
 
+import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

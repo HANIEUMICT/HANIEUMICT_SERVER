@@ -1,7 +1,7 @@
 package hanieum.conik.domain.project.entity;
 
 import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
-import hanieum.conik.domain.proposal.domain.entity.AbstractEntity;
+import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

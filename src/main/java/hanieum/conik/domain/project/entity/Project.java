@@ -2,7 +2,7 @@ package hanieum.conik.domain.project.entity;
 
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.ProjectType;
-import hanieum.conik.domain.proposal.domain.entity.AbstractEntity;
+import hanieum.conik.global.domain.AbstractEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -5,7 +5,7 @@
                                      https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
     <access>FIELD</access>
 
-    <mapped-superclass class="hanieum.conik.domain.proposal.domain.entity.AbstractEntity">
+    <mapped-superclass class="hanieum.conik.global.domain.AbstractEntity">
         <attributes>
             <id name="id">
                 <column name="id"/>

@@ -1,5 +1,6 @@
 package hanieum.conik.domain.proposal.domain.entity;
 
+import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProposalItem extends AbstractEntity{
+public class ProposalItem extends AbstractEntity {
     private Proposal proposal;
 
     private String itemName;
