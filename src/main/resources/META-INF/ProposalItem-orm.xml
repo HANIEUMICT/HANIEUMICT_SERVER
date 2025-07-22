@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
+    <access>FIELD</access>
+
+    <entity class="hanieum.conik.domain.proposal.domain.entity.ProposalItem" access="FIELD">
+        <table name="proposal_item"/>
+        <attributes>
+            <!-- 1. 연관관계 먼저 선언 -->
+            <many-to-one name="proposal" fetch="LAZY">
+                <join-column name="proposal_id" nullable="false"/>
+            </many-to-one>
+
+            <!-- 2. 그 다음 basic 필드들 선언 -->
+            <basic name="itemName">
+                <column name="item_name" nullable="false"/>
+            </basic>
+            <basic name="itemSize">
+                <column name="item_size" nullable="false"/>
+            </basic>
+            <basic name="itemNote">
+                <column name="item_note" nullable="false"/>
+            </basic>
+            <basic name="itemUnitPrice">
+                <column name="item_unit_price" nullable="false"/>
+            </basic>
+            <basic name="itemQuantity">
+                <column name="item_quantity" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+</entity-mappings>

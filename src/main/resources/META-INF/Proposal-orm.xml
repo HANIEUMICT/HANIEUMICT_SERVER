@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
+    <access>FIELD</access>
+
+    <entity class="hanieum.conik.domain.proposal.domain.entity.Proposal" access="FIELD">
+        <table name="proposal"/>
+        <attributes>
+            <basic name="projectId">
+                <column name="project_id" nullable="false"/>
+            </basic>
+            <basic name="companyId">
+                <column name="company_id" nullable="false"/>
+            </basic>
+            <basic name="totalPrice">
+                <column name="total_price" nullable="false"/>
+            </basic>
+            <basic name="firstPrice">
+                <column name="first_price"/>
+            </basic>
+            <basic name="secondPrice">
+                <column name="second_price"/>
+            </basic>
+            <basic name="proposalDrawing">
+                <column name="proposal_drawing"/>
+            </basic>
+            <basic name="proposalNote">
+                <column name="proposal_note"/>
+            </basic>
+
+            <one-to-many name="items" mapped-by="proposal" orphan-removal="true">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>

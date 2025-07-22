@@ -1,0 +1,4 @@
+<persistence-unit name="default">
+    <mapping-file>META-INF/Proposal-orm.xml</mapping-file>
+    <mapping-file>META-INF/proposalItem-orm.xml</mapping-file>
+</persistence-unit>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
+    <access>FIELD</access>
+
+    <entity class="hanieum.conik.domain.project.entity.ProjectPicture">
+        <attributes>
+            <basic name="projectProgressId">
+                <column name="project_progress_id"/>
+            </basic>
+            <basic name="projectProgressStep">
+                <enumerated>STRING</enumerated>
+                <column name="project_progress_step"/>
+            </basic>
+            <basic name="pictureUrl">
+                <column name="picture_url"/>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

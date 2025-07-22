@@ -1,4 +1,4 @@
-package hanieum.conik.user.application.required;
+package hanieum.conik.application.user.required;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

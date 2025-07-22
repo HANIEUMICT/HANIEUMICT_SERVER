@@ -1,9 +1,9 @@
-package hanieum.conik.user.adapter.webapi;
+package hanieum.conik.adapter.user.webapi;
 
-import hanieum.conik.user.adapter.email.dto.AuthCodeRequest;
-import hanieum.conik.user.adapter.email.dto.CertificateRequest;
+import hanieum.conik.adapter.user.email.dto.AuthCodeRequest;
+import hanieum.conik.adapter.user.email.dto.CertificateRequest;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
-import hanieum.conik.user.application.EmailCertService;
+import hanieum.conik.application.user.EmailCertService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
