@@ -36,7 +36,7 @@ public class AuthService implements Auth {
 
         checkDuplicateEmail(request);
 
-        Member member = Member.signUp(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), request.role());
+        Member member = Member.signUp(request);
 
         memberRepository.save(member);
 

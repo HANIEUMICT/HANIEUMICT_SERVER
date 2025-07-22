@@ -1,5 +1,6 @@
 package hanieum.conik.domain.member;
 
+import hanieum.conik.adapter.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.UserErrorType;
@@ -52,8 +53,8 @@ public class Member extends BaseEntity {
     }
 
     /** 회원가입 */
-    public static Member signUp(Email email, String password, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role) {
-        return new Member(email, password, phoneNumber, termsOfServiceAgreed, role);
+    public static Member signUp(MemberSignUpRequest request) {
+        return new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), request.role());
     }
 
     /** 로그인 등에서 비밀번호 검증 */
