@@ -1,6 +1,6 @@
 package hanieum.conik.application.member;
 
-import hanieum.conik.application.member.provided.findMember;
+import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.exception.UserErrorType;
@@ -14,7 +14,7 @@ import org.springframework.validation.annotation.Validated;
 @Transactional
 @Validated
 @RequiredArgsConstructor
-public class MemberService implements findMember {
+public class MemberFinderService implements MemberFinder {
 
     private final MemberRepository memberRepository;
 
