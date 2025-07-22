@@ -28,7 +28,7 @@ public class AuthController {
     - 회원가입 완료 시 로그인도 완료됩니다.
     """)
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<MemberLoginResponse>> signUp(@RequestBody MemberSignUpRequest request) {
+    public ResponseEntity<ApiResponse<MemberLoginResponse>> signUp(@RequestBody @Valid MemberSignUpRequest request) {
         MemberLoginResponse loginResponse = authService.register(request);
         return new ResponseEntity<>(ApiResponse.success(loginResponse), HttpStatus.OK);
     }
