@@ -1,6 +1,6 @@
-package hanieum.conik.adapter.user.email;
+package hanieum.conik.adapter.member.email;
 
-import hanieum.conik.application.user.EmailSender;
+import hanieum.conik.application.member.required.EmailSender;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
