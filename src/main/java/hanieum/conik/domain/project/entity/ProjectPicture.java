@@ -1,6 +1,5 @@
 package hanieum.conik.domain.project.entity;
 
-import hanieum.conik.domain.project.enumerate.DeliveryStatus;
 import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.proposal.domain.entity.AbstractEntity;
 import jakarta.persistence.Entity;
@@ -13,12 +12,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProjectProgess extends AbstractEntity {
-    private Long projectId;
+public class ProjectPicture extends AbstractEntity {
+    private Long projectProgressId;
 
     @Enumerated(EnumType.STRING)
-    private ProjectProgressStep progressStep;
+    private ProjectProgressStep projectProgressStep;
 
-    @Enumerated(EnumType.STRING)
-    private DeliveryStatus deliveryStatus;
+    private String pictureUrl;
 }

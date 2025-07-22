@@ -41,3 +41,4 @@ out/
 /src/main/resources/application-actuator.yml
 /src/main/resources/application-email.yml
 /src/main/resources/application-test.yml
+/src/test/resources/application.yml
