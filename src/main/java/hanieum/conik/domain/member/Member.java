@@ -1,5 +1,6 @@
 package hanieum.conik.domain.member;
 
+import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.UserErrorType;
 import hanieum.conik.domain.member.exception.UserException;
@@ -22,6 +23,7 @@ public class Member extends BaseEntity {
     private Long id;
 
     @NaturalId
+    @Convert(converter = EmailAttributeConverter.class)
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private Email email;
 
