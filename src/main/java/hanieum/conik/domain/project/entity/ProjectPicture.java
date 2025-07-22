@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class ProjectPicture extends AbstractEntity {
     private Long projectProgressId;
 
-    @Enumerated(EnumType.STRING)
     private ProjectProgressStep projectProgressStep;
 
     private String pictureUrl;

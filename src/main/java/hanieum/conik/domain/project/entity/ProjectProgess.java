@@ -16,9 +16,7 @@ import lombok.NoArgsConstructor;
 public class ProjectProgess extends AbstractEntity {
     private Long projectId;
 
-    @Enumerated(EnumType.STRING)
     private ProjectProgressStep progressStep;
 
-    @Enumerated(EnumType.STRING)
     private DeliveryStatus deliveryStatus;
 }
