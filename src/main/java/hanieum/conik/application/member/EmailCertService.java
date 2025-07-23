@@ -4,8 +4,8 @@ import hanieum.conik.application.member.required.EmailSender;
 import hanieum.conik.global.application.required.MemoryMap;
 import hanieum.conik.adapter.member.email.dto.AuthCodeRequest;
 import hanieum.conik.adapter.member.email.dto.CertificateRequest;
-import hanieum.conik.domain.member.exception.UserErrorType;
-import hanieum.conik.domain.member.exception.UserException;
+import hanieum.conik.domain.member.exception.MemberErrorType;
+import hanieum.conik.domain.member.exception.MemberException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +30,7 @@ public class EmailCertService{
             return true;
         }
         else{
-            throw new UserException(UserErrorType.INVALID_AUTHORIZATION_CODE);
+            throw new MemberException(MemberErrorType.INVALID_AUTHORIZATION_CODE);
         }
     }
 }

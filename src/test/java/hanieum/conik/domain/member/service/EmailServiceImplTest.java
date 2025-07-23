@@ -1,10 +1,11 @@
-package hanieum.conik.domain.user.service;
+package hanieum.conik.domain.member.service;
 
+import hanieum.conik.application.member.required.EmailSender;
+import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.global.application.required.MemoryMap;
-import hanieum.conik.adapter.user.email.dto.AuthCodeRequest;
-import hanieum.conik.adapter.user.email.dto.CertificateRequest;
-import hanieum.conik.application.user.EmailCertService;
-import hanieum.conik.domain.user.exception.UserException;
+import hanieum.conik.adapter.member.email.dto.AuthCodeRequest;
+import hanieum.conik.adapter.member.email.dto.CertificateRequest;
+import hanieum.conik.application.member.EmailCertService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,7 @@ class EmailServiceImplTest {
         given(memoryMap.getValue(testEmail)).willReturn(wrongAuthCode);
 
         // when
-        UserException exception = assertThrows(UserException.class, () -> {
+        MemberException exception = assertThrows(MemberException.class, () -> {
             emailService.certificateEmail(new CertificateRequest(testEmail, testAuthCode));
         });
 

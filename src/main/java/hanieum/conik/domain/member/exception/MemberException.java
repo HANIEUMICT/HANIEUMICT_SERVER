@@ -3,9 +3,9 @@ package hanieum.conik.domain.member.exception;
 import hanieum.conik.global.apiPayload.exception.ErrorType;
 import hanieum.conik.global.apiPayload.exception.GlobalException;
 
-public class UserException extends GlobalException {
+public class MemberException extends GlobalException {
 
-    public UserException(ErrorType errorType) {
+    public MemberException(ErrorType errorType) {
         super(errorType);
     }
 }

@@ -1,7 +1,7 @@
 package hanieum.conik.domain.member.shared;
 
-import hanieum.conik.domain.member.exception.UserErrorType;
-import hanieum.conik.domain.member.exception.UserException;
+import hanieum.conik.domain.member.exception.MemberErrorType;
+import hanieum.conik.domain.member.exception.MemberException;
 
 import java.util.regex.Pattern;
 
@@ -14,7 +14,7 @@ public record Email(String address) {
 
     public Email {
         if (!EMAIL_PATTERN.matcher(address).matches()) {
-            throw new UserException(UserErrorType.INVALID_EMAIL);
+            throw new MemberException(MemberErrorType.INVALID_EMAIL);
         }
     }
 }

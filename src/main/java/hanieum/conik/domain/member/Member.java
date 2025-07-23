@@ -3,8 +3,8 @@ package hanieum.conik.domain.member;
 import hanieum.conik.adapter.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.member.enumerate.MemberRole;
-import hanieum.conik.domain.member.exception.UserErrorType;
-import hanieum.conik.domain.member.exception.UserException;
+import hanieum.conik.domain.member.exception.MemberErrorType;
+import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
@@ -43,7 +43,7 @@ public class Member extends BaseEntity {
 
     private Member(Email email, String password, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role) {
         if (!termsOfServiceAgreed) {
-            throw new UserException(UserErrorType.TERMS_NOT_AGREED);
+            throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
         }
         this.email = email;
         this.password = password;
@@ -65,7 +65,7 @@ public class Member extends BaseEntity {
     /** 비밀번호 변경 */
     public void changePassword(String oldPassword, String newPassword) {
         if (!verifyPassword(oldPassword)) {
-            throw new UserException(UserErrorType.INVALID_PASSWORD);
+            throw new MemberException(MemberErrorType.INVALID_PASSWORD);
         }
         this.password = newPassword;
     }

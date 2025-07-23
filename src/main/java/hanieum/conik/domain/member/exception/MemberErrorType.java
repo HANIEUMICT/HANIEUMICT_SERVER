@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum UserErrorType implements ErrorType {
+public enum MemberErrorType implements ErrorType {
     INVALID_AUTHORIZATION_CODE(HttpStatus.UNAUTHORIZED, "유효하지 않은 인증 코드입니다."),
     TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "약관동의를 해야 가입이 가능합니다."),
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
