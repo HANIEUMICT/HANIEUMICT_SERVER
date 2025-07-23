@@ -41,7 +41,7 @@ public class Company extends BaseEntity {
     private String registrationCertificateUrl;
 
     @Column(nullable = false)
-    private String bankAccountUrl;
+    private String bankbookCopy;
 
     @Column(nullable = false)
     private String profileUrl;
