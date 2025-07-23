@@ -1,5 +1,6 @@
 package hanieum.conik.domain.project.entity;
 
+import hanieum.conik.adapter.project.dto.ProjectRegisterRequest;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.ProjectType;
 import hanieum.conik.global.domain.AbstractEntity;
@@ -77,5 +78,25 @@ public class Project extends AbstractEntity {
         Project project = new Project();
         project.memberId = memberId;
         return project;
+    }
+
+    public void updateDraft(ProjectRegisterRequest request) {
+        this.memberId = request.memberId();
+        this.projectTitle = request.projectTitle();
+        this.type = request.type();
+        this.category = request.category();
+        this.categoryService = request.categoryService();
+        this.purpose = request.purpose();
+        this.purposeDetail = request.purposeDetail();
+        this.projectQuantity = request.projectQuantity();
+        this.requests = request.requests();
+        this.deadline = request.deadline();
+        this.canDeadlineChange = request.canDeadlineChange();
+        this.requestEstimate = request.requestEstimate();
+        this.publicUntil = request.publicUntil();
+        this.projectStatus = request.projectStatus();
+        this.canPhoneConsult = request.canPhoneConsult();
+        this.deliveryAddress = request.deliveryAddress();
+        this.isFinalized = request.isFinalized();
     }
 }
