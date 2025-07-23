@@ -41,8 +41,8 @@ public class ProjectController {
 
     @Operation(summary = "프로젝트(공고) 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
     @PostMapping("/final")
-    public ApiResponse<?> saveProjectFinal(@RequestParam("member_id") Long memberId,
+    public ApiResponse<ProjectRegisterRequest> saveProjectFinal(@RequestParam("member_id") Long memberId,
                                            @RequestBody @Valid ProjectRegisterRequest projectRegisterRequest) {
-        return ApiResponse.success("도면 파일 업로드 성공");
+        return ApiResponse.success(projectSaver.saveProjectFinal(memberId, projectRegisterRequest));
     }
 }

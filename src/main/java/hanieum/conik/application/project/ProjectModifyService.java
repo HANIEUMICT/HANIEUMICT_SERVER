@@ -24,27 +24,34 @@ public class ProjectModifyService implements ProjectSaver {
             projectRepository.save(project);
             return project.getId();
         } catch (Exception e) {
-            throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
+            throw new ProjectException(ProjectErrorType.PROJECT_INITIATE_ERROR);
         }
     }
 
     @Override
-    public ProjectRegisterRequest saveProjectDraft(Long memberId, ProjectRegisterRequest projectRegisterRequest) {
-        try{
+    public ProjectRegisterRequest saveProjectDraft(Long memberId, ProjectRegisterRequest request) {
+        if (request.isFinalized()) {
+            throw new ProjectException(ProjectErrorType.PROJECT_DRAFT_SAVE_ERROR);
+        }
+        return getSavedProject(memberId, request);
+    }
+
+    @Override
+    public ProjectRegisterRequest saveProjectFinal(Long memberId, ProjectRegisterRequest request) {
+        if (!request.isFinalized()) {
+            throw new ProjectException(ProjectErrorType.FINAL_PROJECT_SAVE_ERROR);
+        }
+        return getSavedProject(memberId, request);
+    }
+
+    private ProjectRegisterRequest getSavedProject(Long memberId, ProjectRegisterRequest request) {
+        try {
             Project project = projectFinder.findProject(memberId);
-            project.updateDraft(projectRegisterRequest);
+            project.updateDraft(request);
             projectRepository.save(project);
             return ProjectRegisterRequest.from(project);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
         }
     }
-
-    @Override
-    public Long saveProjectFinal(Long memberId, ProjectRegisterRequest projectRegisterRequest) {
-        return 0L;
-    }
-
-
 }

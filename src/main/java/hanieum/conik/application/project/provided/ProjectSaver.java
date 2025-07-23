@@ -7,5 +7,5 @@ public interface ProjectSaver {
 
     ProjectRegisterRequest saveProjectDraft(Long memberId, ProjectRegisterRequest projectRegisterRequest);
 
-    Long saveProjectFinal(Long memberId, ProjectRegisterRequest projectRegisterRequest);
+    ProjectRegisterRequest saveProjectFinal(Long memberId, ProjectRegisterRequest projectRegisterRequest);
 }
