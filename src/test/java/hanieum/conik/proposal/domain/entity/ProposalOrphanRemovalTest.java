@@ -6,18 +6,22 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@EnableJpaAuditing
 @Transactional
 class ProposalOrphanRemovalTest {
 
     @Autowired
     private EntityManager em;
+
+    @TestConfiguration
+    @EnableJpaAuditing
+    static class JpaAuditingTestConfig {}
 
     @Test
     void proposal_삭제시_연관된_proposalItem도_삭제되는지_테스트() {
