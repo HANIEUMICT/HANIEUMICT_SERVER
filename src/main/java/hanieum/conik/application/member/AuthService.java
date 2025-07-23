@@ -14,6 +14,7 @@ import hanieum.conik.global.application.required.MemoryMap;
 import hanieum.conik.global.domain.exception.AuthErrorType;
 import hanieum.conik.global.domain.exception.AuthException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +27,7 @@ import org.springframework.validation.annotation.Validated;
 public class AuthService implements Auth {
 
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final MemoryMap memoryMap;
 
@@ -34,11 +36,11 @@ public class AuthService implements Auth {
 
         checkDuplicateEmail(request);
 
-        Member member = Member.signUp(request);
+        Member member = Member.signUp(getHashedRequest(request));
 
         memberRepository.save(member);
 
-        return login(new MemberLoginRequest(member.getEmail().address(), member.getPassword()));
+        return login(new MemberLoginRequest(member.getEmail().address(), request.password()));
     }
 
     @Override
@@ -46,7 +48,7 @@ public class AuthService implements Auth {
         Member member = memberRepository.findByEmail(new Email(request.email()))
                 .orElseThrow(() -> new AuthException(AuthErrorType.MEMBER_NOT_FOUND));
 
-        if (member.getPassword().equals(request.password())) {
+        if (member.verifyPassword(request.password(), passwordEncoder)) {
             String accessToken = jwtTokenProviderPort.createAccessToken(member.getId());
             String refreshToken = jwtTokenProviderPort.createRefreshToken(member.getId());
 
@@ -55,7 +57,7 @@ public class AuthService implements Auth {
 
             return new MemberLoginResponse(accessToken, refreshToken, member.getId());
         } else {
-            throw new AuthException(MemberErrorType.INVALID_PASSWORD);
+            throw new MemberException(MemberErrorType.INVALID_PASSWORD);
         }
     }
 
@@ -63,5 +65,11 @@ public class AuthService implements Auth {
         if (memberRepository.findByEmail(new Email(signUpRequest.email())).isPresent()) {
             throw new MemberException(MemberErrorType.EMAIL_DUPLICATE);
         }
+    }
+
+    private MemberSignUpRequest getHashedRequest(MemberSignUpRequest request) {
+        String hashedPassword = passwordEncoder.encode(request.password());
+
+        return new MemberSignUpRequest(request.email(), hashedPassword, request.phoneNumber(), request.termsOfServiceAgreed(), request.role());
     }
 }

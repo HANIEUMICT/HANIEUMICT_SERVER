@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.NaturalId;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -32,7 +33,7 @@ public class Member extends BaseEntity {
     private String phoneNumber;
 
     @Column(name = "password", nullable = false)
-    private String password;
+    private String hashedPassword;
 
     @Column(name = "terms_of_service_agreed", nullable = false)
     private Boolean termsOfServiceAgreed;
@@ -41,12 +42,12 @@ public class Member extends BaseEntity {
     @Column(name = "role", nullable = false, length = 20)
     private MemberRole role;
 
-    private Member(Email email, String password, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role) {
+    private Member(Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role) {
         if (!termsOfServiceAgreed) {
             throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
         }
         this.email = email;
-        this.password = password;
+        this.hashedPassword = hashedPassword;
         this.phoneNumber = phoneNumber;
         this.termsOfServiceAgreed = termsOfServiceAgreed;
         this.role = role;
@@ -57,16 +58,7 @@ public class Member extends BaseEntity {
         return new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), request.role());
     }
 
-    /** 로그인 등에서 비밀번호 검증 */
-    public boolean verifyPassword(String rawPassword) {
-        return this.password.equals(rawPassword);
-    }
-
-    /** 비밀번호 변경 */
-    public void changePassword(String oldPassword, String newPassword) {
-        if (!verifyPassword(oldPassword)) {
-            throw new MemberException(MemberErrorType.INVALID_PASSWORD);
-        }
-        this.password = newPassword;
+    public boolean verifyPassword(String rawPassword, PasswordEncoder encoder) {
+        return encoder.matches(rawPassword, this.hashedPassword);
     }
 }
