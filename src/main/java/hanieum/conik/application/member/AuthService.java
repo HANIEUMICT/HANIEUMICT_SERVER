@@ -1,16 +1,14 @@
 package hanieum.conik.application.member;
 
 import hanieum.conik.adapter.member.dto.MemberLoginResponse;
-import hanieum.conik.adapter.member.email.dto.CertificateRequest;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.adapter.member.dto.MemberLoginRequest;
 import hanieum.conik.adapter.member.dto.MemberSignUpRequest;
-import hanieum.conik.domain.member.exception.DuplicateEmailException;
 import hanieum.conik.domain.member.exception.MemberErrorType;
+import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
-import hanieum.conik.global.adapter.redis.RedisMemoryMap;
 import hanieum.conik.global.application.jwt.required.JwtTokenProviderPort;
 import hanieum.conik.global.application.required.MemoryMap;
 import hanieum.conik.global.domain.exception.AuthErrorType;
@@ -63,7 +61,7 @@ public class AuthService implements Auth {
 
     private void checkDuplicateEmail(MemberSignUpRequest signUpRequest){
         if (memberRepository.findByEmail(new Email(signUpRequest.email())).isPresent()) {
-            throw new DuplicateEmailException();
+            throw new MemberException(MemberErrorType.EMAIL_DUPLICATE);
         }
     }
 }
