@@ -54,7 +54,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
 
         String token = resolveToken(httpServletRequest);
-        log.info("BearerToken: {}", token);
+        String uri = httpServletRequest.getRequestURI();
+        String ip = httpServletRequest.getRemoteAddr();
+        String forwarded = httpServletRequest.getHeader("X-Forwarded-For");
+
+        log.info("BearerToken: null, URI: {}, IP: {}, X-Forwarded-For: {}", uri, ip, forwarded);
 
         try {
             if (token != null) {
