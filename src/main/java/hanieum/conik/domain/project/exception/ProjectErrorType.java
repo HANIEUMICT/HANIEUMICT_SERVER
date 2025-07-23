@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ProjectErrorType implements ErrorType {
     PROJECT_DRAWING_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 도면 파일 저장 중 오류가 발생했습니다."),
+    PROJECT_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 저장 중 오류가 발생했습니다."),
     ;
 
     private final HttpStatus status;

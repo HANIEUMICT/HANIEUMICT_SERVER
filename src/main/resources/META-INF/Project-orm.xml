@@ -8,27 +8,27 @@
     <entity class="hanieum.conik.domain.project.entity.Project" access="FIELD">
         <table name="project"/>
         <attributes>
-            <basic name="userId">
-                <column name="user_id" nullable="false"/>
+            <basic name="memberId">
+                <column name="member_id" nullable="false"/>
             </basic>
             <basic name="projectTitle">
-                <column name="project_title" nullable="false"/>
+                <column name="project_title"/>
             </basic>
             <basic name="type">
-                <column name="type" nullable="false"/>
+                <column name="type"/>
                 <enumerated>STRING</enumerated>
             </basic>
             <basic name="category">
-                <column name="category" nullable="false"/>
+                <column name="category"/>
             </basic>
             <basic name="categoryService">
-                <column name="category_service" nullable="false"/>
+                <column name="category_service"/>
             </basic>
             <basic name="purpose">
-                <column name="purpose" nullable="false"/>
+                <column name="purpose"/>
             </basic>
             <basic name="purposeDetail">
-                <column name="purpose_detail" nullable="false"/>
+                <column name="purpose_detail"/>
             </basic>
             <basic name="projectDrawing">
                 <column name="drawing"/>
@@ -43,7 +43,7 @@
                 <column name="deadline"/>
             </basic>
             <basic name="canDeadlineChange">
-                <column name="can_deadline_change" nullable="false"/>
+                <column name="can_deadline_change"/>
             </basic>
             <basic name="requestEstimate">
                 <column name="project_request_estimate"/>
@@ -56,10 +56,13 @@
                 <enumerated>STRING</enumerated>
             </basic>
             <basic name="canPhoneConsult">
-                <column name="can_phone_consult" nullable="false"/>
+                <column name="can_phone_consult"/>
             </basic>
             <basic name="address">
-                <column name="project_address" nullable="false"/>
+                <column name="project_address"/>
+            </basic>
+            <basic name="isFinalized">
+                <column name="is_finalized"/>
             </basic>
         </attributes>
     </entity>

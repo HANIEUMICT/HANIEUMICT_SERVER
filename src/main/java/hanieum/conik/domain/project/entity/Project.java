@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project extends AbstractEntity {
-    private Long userId;
+    private Long memberId;
 
     private String projectTitle;
 
@@ -46,13 +46,15 @@ public class Project extends AbstractEntity {
 
     private String deliveryAddress;
 
+    private boolean isFinalized;
+
     public static Project create(Long userId, String projectTitle, ProjectType projectType, String projectCategory, String projectCategoryService,
                                  String projectPurpose, String projectPurposeDetail, Integer projectQuantity, String projectRequests,
                                  LocalDate projectDeadline, boolean canDeadlineChange, Integer projectRequestEstimate, LocalDate projectPublicUntil,
                                  ProjectStatus projectStatus, boolean canPhoneConsult, String projectAddress
     ) {
         Project project = new Project();
-        project.userId              = userId;
+        project.memberId              = userId;
         project.projectTitle        = projectTitle;
         project.type                = projectType;
         project.category            = projectCategory;
@@ -68,6 +70,12 @@ public class Project extends AbstractEntity {
         project.projectStatus       = projectStatus;
         project.canPhoneConsult     = canPhoneConsult;
         project.deliveryAddress     = projectAddress;
+        return project;
+    }
+
+    public static Project create(Long memberId) {
+        Project project = new Project();
+        project.memberId = memberId;
         return project;
     }
 }
