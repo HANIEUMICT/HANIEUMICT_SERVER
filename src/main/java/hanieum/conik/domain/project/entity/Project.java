@@ -3,12 +3,14 @@ package hanieum.conik.domain.project.entity;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.ProjectType;
 import hanieum.conik.global.domain.AbstractEntity;
+import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project extends AbstractEntity {
