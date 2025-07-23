@@ -28,9 +28,9 @@ public class AuthController {
     - 회원가입 완료 시 로그인도 완료됩니다.
     """)
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<MemberLoginResponse>> signUp(@RequestBody @Valid MemberSignUpRequest request) {
+    public ApiResponse<MemberLoginResponse> signUp(@RequestBody @Valid MemberSignUpRequest request) {
         MemberLoginResponse loginResponse = authService.register(request);
-        return new ResponseEntity<>(ApiResponse.success(loginResponse), HttpStatus.OK);
+        return ApiResponse.success(loginResponse);
     }
 
     @Operation(summary = "일반 로그인", description = """
@@ -39,8 +39,8 @@ public class AuthController {
     - 리턴값 : accessToken, refreshToken, memberId
     """)
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<MemberLoginResponse>> login(@RequestBody @Valid MemberLoginRequest request) {
+    public ApiResponse<MemberLoginResponse> login(@RequestBody @Valid MemberLoginRequest request) {
         MemberLoginResponse loginResponse = authService.login(request);
-        return new ResponseEntity<>(ApiResponse.success(loginResponse),HttpStatus.OK);
+        return ApiResponse.success(loginResponse);
     }
 }
