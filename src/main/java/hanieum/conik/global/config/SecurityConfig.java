@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers(HttpMethod.OPTIONS, "/v1/**").permitAll()
+                                .requestMatchers("/actuator/health").permitAll()
                                 .requestMatchers(
                                         "/v1/auth/signup",
                                         "/v1/auth/login",
