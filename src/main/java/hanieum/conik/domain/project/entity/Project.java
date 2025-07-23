@@ -28,8 +28,6 @@ public class Project extends AbstractEntity {
 
     private String purposeDetail;
 
-    private String projectDrawing;
-
     private Integer projectQuantity;
 
     private String requests;
@@ -46,12 +44,12 @@ public class Project extends AbstractEntity {
 
     private boolean canPhoneConsult;
 
-    private String address;
+    private String deliveryAddress;
 
     public static Project create(Long userId, String projectTitle, ProjectType projectType, String projectCategory, String projectCategoryService,
-                                 String projectPurpose, String projectPurposeDetail, String projectDrawing, Integer projectQuantity,
-                                 String projectRequests, LocalDate projectDeadline, boolean canDeadlineChange, Integer projectRequestEstimate,
-                                 LocalDate projectPublicUntil, ProjectStatus projectStatus, boolean canPhoneConsult, String projectAddress
+                                 String projectPurpose, String projectPurposeDetail, Integer projectQuantity, String projectRequests,
+                                 LocalDate projectDeadline, boolean canDeadlineChange, Integer projectRequestEstimate, LocalDate projectPublicUntil,
+                                 ProjectStatus projectStatus, boolean canPhoneConsult, String projectAddress
     ) {
         Project project = new Project();
         project.userId              = userId;
@@ -61,7 +59,6 @@ public class Project extends AbstractEntity {
         project.categoryService     = projectCategoryService;
         project.purpose             = projectPurpose;
         project.purposeDetail       = projectPurposeDetail;
-        project.projectDrawing      = projectDrawing;
         project.projectQuantity     = projectQuantity;
         project.requests            = projectRequests;
         project.deadline            = projectDeadline;
@@ -70,7 +67,7 @@ public class Project extends AbstractEntity {
         project.publicUntil         = projectPublicUntil;
         project.projectStatus       = projectStatus;
         project.canPhoneConsult     = canPhoneConsult;
-        project.address             = projectAddress;
+        project.deliveryAddress     = projectAddress;
         return project;
     }
 }

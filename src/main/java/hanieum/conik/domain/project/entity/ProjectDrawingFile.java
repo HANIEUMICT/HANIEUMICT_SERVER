@@ -1,5 +1,6 @@
 package hanieum.conik.domain.project.entity;
 
+import hanieum.conik.adapter.project.dto.ProjectDrawingUploadRequest;
 import hanieum.conik.domain.project.enumerate.FileStatus;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Column;
@@ -18,17 +19,21 @@ public class ProjectDrawingFile extends AbstractEntity {
     private Long projectId;
 
     @Column(nullable = false)
-    private String drawingUri;
+    private String drawingUrl;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private FileStatus uploadStatus;
 
-    public static ProjectDrawingFile create(Long projectId, String drawingUri, FileStatus uploadStatus) {
+    public static ProjectDrawingFile create(ProjectDrawingUploadRequest request) {
         ProjectDrawingFile projectDrawingFile = new ProjectDrawingFile();
-        projectDrawingFile.projectId = projectId;
-        projectDrawingFile.drawingUri = drawingUri;
-        projectDrawingFile.uploadStatus = uploadStatus;
+        projectDrawingFile.projectId = request.projectId();
+        projectDrawingFile.drawingUrl = request.drawingUrl();
+        projectDrawingFile.uploadStatus = FileStatus.TEMPORARY;
         return projectDrawingFile;
+    }
+
+    public void updateUploadStatus() {
+        this.uploadStatus = FileStatus.FINALIZED;
     }
 }
