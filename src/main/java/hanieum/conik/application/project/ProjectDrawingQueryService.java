@@ -1,6 +1,5 @@
 package hanieum.conik.application.project;
 
-import hanieum.conik.adapter.project.dto.ProjectDrawingUploadRequest;
 import hanieum.conik.application.project.provided.ProjectDrawingFinder;
 import hanieum.conik.application.project.required.ProjectDrawingRepository;
 import hanieum.conik.domain.project.entity.ProjectDrawingFile;
