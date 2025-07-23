@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @EnableFeignClients
 @SpringBootApplication
 public class ConikApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(ConikApplication.class, args);
 	}
