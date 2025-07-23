@@ -15,13 +15,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 class ProposalOrphanRemovalTest {
-
     @Autowired
     private EntityManager em;
-
-    @TestConfiguration
-    @EnableJpaAuditing
-    static class JpaAuditingTestConfig {}
 
     @Test
     void proposal_삭제시_연관된_proposalItem도_삭제되는지_테스트() {
