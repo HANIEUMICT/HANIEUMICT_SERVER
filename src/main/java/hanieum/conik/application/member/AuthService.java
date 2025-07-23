@@ -1,6 +1,7 @@
 package hanieum.conik.application.member;
 
 import hanieum.conik.adapter.member.dto.MemberLoginResponse;
+import hanieum.conik.adapter.member.email.dto.CertificateRequest;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.member.Member;
