@@ -46,7 +46,7 @@ public record ProjectRegisterRequest (
         String requests,
 
         @NotNull
-        @Schema(description = "프로젝트(공고) 닙기일", example = "2025-12-31")
+        @Schema(description = "프로젝트(공고) 납기일", example = "2025-12-31")
         LocalDate deadline,
 
         @NotNull

@@ -2,9 +2,10 @@ package hanieum.conik.adapter.project.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record ProjectDrawingUploadRequest (
-        @NotBlank
+        @NotNull
         @Schema(description = "프로젝트 아이디", example = "1")
         Long projectId,
 

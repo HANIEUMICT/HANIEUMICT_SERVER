@@ -22,7 +22,7 @@ public class ProjectDrawingModifyService implements ProjectDrawingSaver {
 
      @Override
      public void saveDrawingFileTemp(ProjectDrawingUploadRequest projectDrawingUploadRequest) {
-         try{
+         try {
              ProjectDrawingFile projectDrawingFile = ProjectDrawingFile.create(projectDrawingUploadRequest);
              projectDrawingRepository.save(projectDrawingFile);
          }
