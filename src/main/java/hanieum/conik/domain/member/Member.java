@@ -1,6 +1,6 @@
 package hanieum.conik.domain.member;
 
-import hanieum.conik.adapter.member.dto.MemberSignUpRequest;
+import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.MemberErrorType;
@@ -56,12 +56,36 @@ public class Member extends BaseEntity {
         this.role = role;
     }
 
-    /** 회원가입 */
-    public static Member signUp(MemberSignUpRequest request) {
-        return new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), request.role());
+    /**
+     * 개인 회원가입
+     * */
+    public static Member signUpIndividual(MemberSignUpRequest request) {
+        return new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), MemberRole.INDIVIDUAL);
     }
 
+    /**
+     * 기업 회원가입
+     * */
+    public static Member signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
+        Member member = new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), MemberRole.OWNER);
+        member.assignCompany(companyId);
+        return member;
+    }
+
+    /**
+     * 비밀번호 검증
+     * @param rawPassword
+     * @param encoder
+     * @return
+     */
     public boolean verifyPassword(String rawPassword, PasswordEncoder encoder) {
         return encoder.matches(rawPassword, this.hashedPassword);
+    }
+
+    private void assignCompany(Long companyId) {
+        if (this.role != MemberRole.OWNER) {
+            throw new MemberException(MemberErrorType.INVALID_ROLE_FOR_COMPANY);
+        }
+        this.companyId = companyId;
     }
 }
