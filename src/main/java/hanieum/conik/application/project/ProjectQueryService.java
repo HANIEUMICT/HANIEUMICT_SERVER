@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,15 +30,13 @@ public class ProjectQueryService implements ProjectFinder {
 
     @Override
     public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, String status) {
-        List<Project> projects;
+        Map<String, Supplier<List<Project>>> strategies = Map.of(
+                "finalized", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, true),
+                "draft", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, false)
+        );
 
-        if ("finalized".equalsIgnoreCase(status)) {
-            projects = projectRepository.findByMemberIdAndIsFinalized(memberId, true);
-        } else if ("draft".equalsIgnoreCase(status)) {
-            projects = projectRepository.findByMemberIdAndIsFinalized(memberId, false);
-        } else {
-            projects = projectRepository.findByMemberId(memberId);
-        }
+        List<Project> projects = strategies.getOrDefault(status != null ? status.toLowerCase() : "all",
+                () -> projectRepository.findByMemberId(memberId)).get();
 
         return projects.stream()
                 .map(project -> MemberProjectQueryResponse.from(project.getId(),
