@@ -1,6 +1,8 @@
 package hanieum.conik.domain.company;
 
+import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
+import hanieum.conik.domain.member.shared.Email;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -23,10 +25,10 @@ public class Company extends BaseEntity {
     private String owner;
 
     @Column(nullable = false)
-    private String ownerEmail;
+    private Email email;
 
     @Column(nullable = false)
-    private String ownerPhoneNumber;
+    private String phoneNumber;
 
     @Column(nullable = false)
     private String businessType;
@@ -35,7 +37,7 @@ public class Company extends BaseEntity {
     private String industry;
 
     @Column(nullable = false)
-    private String registrationNumber;   // camelCase
+    private String registrationNumber;
 
     @Column(nullable = false)
     private String registrationCertificateUrl;
@@ -49,4 +51,26 @@ public class Company extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CompanyStatus status;
+
+    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, CompanyStatus status) {
+        this.businessType = businessType;
+        this.email = email;
+        this.industry = industry;
+        this.name = name;
+        this.owner = owner;
+        this.phoneNumber = phoneNumber;
+        this.bankbookCopy = bankbookCopy;
+        this.profileUrl = profileUrl;
+        this.registrationCertificateUrl = registrationCertificateUrl;
+        this.registrationNumber = registrationNumber;
+        this.status = status;
+    }
+
+    /**
+     * 기업 등록
+     * */
+    public static Company register(CompanyRegisterRequest request) {
+        return new Company(
+                request.name(), request.owner(), new Email(request.email()), request.phoneNumber(), request.businessType(), request.industry(), request.registrationNumber(), request.registrationCertificateUrl(), request.profileUrl(), request.bankbookCopy(),CompanyStatus.REGISTER_APPROVED);
+    }
 }

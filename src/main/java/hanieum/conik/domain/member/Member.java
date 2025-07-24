@@ -42,6 +42,9 @@ public class Member extends BaseEntity {
     @Column(name = "role", nullable = false, length = 20)
     private MemberRole role;
 
+    @Column(name = "company_id", nullable = true)
+    private Long companyId;
+
     private Member(Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role) {
         if (!termsOfServiceAgreed) {
             throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
