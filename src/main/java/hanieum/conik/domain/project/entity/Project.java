@@ -1,6 +1,6 @@
 package hanieum.conik.domain.project.entity;
 
-import hanieum.conik.adapter.project.dto.ProjectRegisterRequest;
+import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.ProjectType;
 import hanieum.conik.global.domain.AbstractEntity;

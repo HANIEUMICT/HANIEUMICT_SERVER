@@ -1,6 +1,6 @@
 package hanieum.conik.application.project.provided;
 
-import hanieum.conik.adapter.project.dto.ProjectRegisterRequest;
+import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 
 public interface ProjectSaver {
     Long initiate(Long memberId);

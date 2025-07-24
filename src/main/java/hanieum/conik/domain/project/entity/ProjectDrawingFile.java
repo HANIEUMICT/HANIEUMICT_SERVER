@@ -1,6 +1,6 @@
 package hanieum.conik.domain.project.entity;
 
-import hanieum.conik.adapter.project.dto.ProjectDrawingUploadRequest;
+import hanieum.conik.adapter.project.dto.request.ProjectDrawingUploadRequest;
 import hanieum.conik.domain.project.enumerate.FileStatus;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Column;

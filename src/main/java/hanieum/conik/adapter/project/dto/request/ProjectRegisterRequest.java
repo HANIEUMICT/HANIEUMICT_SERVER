@@ -1,4 +1,4 @@
-package hanieum.conik.adapter.project.dto;
+package hanieum.conik.adapter.project.dto.request;
 
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;

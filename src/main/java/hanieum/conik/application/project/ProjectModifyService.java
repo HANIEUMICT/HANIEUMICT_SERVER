@@ -1,6 +1,6 @@
 package hanieum.conik.application.project;
 
-import hanieum.conik.adapter.project.dto.ProjectRegisterRequest;
+import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.domain.project.entity.Project;
@@ -29,24 +29,24 @@ public class ProjectModifyService implements ProjectSaver {
     }
 
     @Override
-    public ProjectRegisterRequest saveProjectDraft(Long memberId, ProjectRegisterRequest request) {
+    public ProjectRegisterRequest saveProjectDraft(Long projectId, ProjectRegisterRequest request) {
         if (request.isFinalized()) {
             throw new ProjectException(ProjectErrorType.PROJECT_DRAFT_SAVE_ERROR);
         }
-        return getSavedProject(memberId, request);
+        return getSavedProject(projectId, request);
     }
 
     @Override
-    public ProjectRegisterRequest saveProjectFinal(Long memberId, ProjectRegisterRequest request) {
+    public ProjectRegisterRequest saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
         if (!request.isFinalized()) {
             throw new ProjectException(ProjectErrorType.FINAL_PROJECT_SAVE_ERROR);
         }
-        return getSavedProject(memberId, request);
+        return getSavedProject(projectId, request);
     }
 
-    private ProjectRegisterRequest getSavedProject(Long memberId, ProjectRegisterRequest request) {
+    private ProjectRegisterRequest getSavedProject(Long projectId, ProjectRegisterRequest request) {
         try {
-            Project project = projectFinder.findProject(memberId);
+            Project project = projectFinder.findProject(projectId);
             project.updateDraft(request);
             projectRepository.save(project);
             return ProjectRegisterRequest.from(project);
