@@ -23,21 +23,20 @@ public class Proposal extends AbstractEntity {
 
     private Long secondPrice;
 
-    private String proposalDrawing;
-
     private String proposalNote;
 
     private List<ProposalItem> items = new ArrayList<>();
 
-    public static Proposal create(Long projectId, Long companyId, Long totalPrice, Long firstPrice,
-                                  Long secondPrice, String proposalDrawing, String proposalNote) {
+    private List<ProposalDrawingFile> drawingFiles = new ArrayList<>();
+
+    public static Proposal create(Long projectId, Long companyId, Long totalPrice,
+                                  Long firstPrice, Long secondPrice, String proposalNote) {
         Proposal proposal = new Proposal();
         proposal.projectId = projectId;
         proposal.companyId = companyId;
         proposal.totalPrice = totalPrice;
         proposal.firstPrice = firstPrice;
         proposal.secondPrice = secondPrice;
-        proposal.proposalDrawing = proposalDrawing;
         proposal.proposalNote = proposalNote;
         return proposal;
     }

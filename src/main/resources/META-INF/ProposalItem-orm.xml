@@ -8,12 +8,6 @@
     <entity class="hanieum.conik.domain.proposal.domain.entity.ProposalItem" access="FIELD">
         <table name="proposal_item"/>
         <attributes>
-            <!-- 1. 연관관계 먼저 선언 -->
-            <many-to-one name="proposal" fetch="LAZY">
-                <join-column name="proposal_id" nullable="false"/>
-            </many-to-one>
-
-            <!-- 2. 그 다음 basic 필드들 선언 -->
             <basic name="itemName">
                 <column name="item_name" nullable="false"/>
             </basic>
@@ -29,6 +23,10 @@
             <basic name="itemQuantity">
                 <column name="item_quantity" nullable="false"/>
             </basic>
+
+            <many-to-one name="proposal" fetch="LAZY">
+                <join-column name="proposal_id" nullable="false"/>
+            </many-to-one>
         </attributes>
     </entity>
 

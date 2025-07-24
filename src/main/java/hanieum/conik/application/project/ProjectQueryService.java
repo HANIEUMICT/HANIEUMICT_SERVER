@@ -17,8 +17,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectQueryService implements ProjectFinder {
     private final ProjectRepository projectRepository;
 
