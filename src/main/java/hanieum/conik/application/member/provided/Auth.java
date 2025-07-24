@@ -1,9 +1,8 @@
 package hanieum.conik.application.member.provided;
 
-import hanieum.conik.adapter.member.dto.MemberLoginRequest;
-import hanieum.conik.adapter.member.dto.MemberLoginResponse;
-import hanieum.conik.adapter.member.dto.MemberSignUpRequest;
-import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.dto.MemberLoginRequest;
+import hanieum.conik.domain.member.dto.MemberLoginResponse;
+import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import jakarta.validation.Valid;
 
 /**
@@ -11,5 +10,6 @@ import jakarta.validation.Valid;
  */
 public interface Auth {
     MemberLoginResponse login(@Valid MemberLoginRequest loginRequest);
-    MemberLoginResponse register(@Valid MemberSignUpRequest signUpRequest);
+    MemberLoginResponse signUpIndividual(@Valid MemberSignUpRequest signUpRequest);
+    MemberLoginResponse signUpCompanyMember(@Valid MemberSignUpRequest signUpRequest, Long companyId);
 }

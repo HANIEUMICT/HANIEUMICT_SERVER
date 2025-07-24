@@ -1,11 +1,15 @@
 package hanieum.conik.application.member;
 
-import hanieum.conik.adapter.member.dto.MemberLoginResponse;
+import hanieum.conik.application.company.required.CompanyRepository;
+import hanieum.conik.domain.member.dto.MemberLoginResponse;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
+import hanieum.conik.domain.company.Company;
+import hanieum.conik.domain.company.exception.CompanyErrorType;
+import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
-import hanieum.conik.adapter.member.dto.MemberLoginRequest;
-import hanieum.conik.adapter.member.dto.MemberSignUpRequest;
+import hanieum.conik.domain.member.dto.MemberLoginRequest;
+import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
@@ -27,16 +31,29 @@ import org.springframework.validation.annotation.Validated;
 public class AuthService implements Auth {
 
     private final MemberRepository memberRepository;
+    private final CompanyRepository companyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final MemoryMap memoryMap;
 
     @Override
-    public MemberLoginResponse register(MemberSignUpRequest request) {
+    public MemberLoginResponse signUpIndividual(MemberSignUpRequest request) {
+        checkDuplicateEmail(request);
+
+        Member member = Member.signUpIndividual(getHashedRequest(request));
+
+        memberRepository.save(member);
+
+        return login(new MemberLoginRequest(member.getEmail().address(), request.password()));
+    }
+
+    @Override
+    public MemberLoginResponse signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
+        Company company = companyRepository.findById(companyId).orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
 
         checkDuplicateEmail(request);
 
-        Member member = Member.signUp(getHashedRequest(request));
+        Member member = Member.signUpCompanyMember(getHashedRequest(request), company.getId());
 
         memberRepository.save(member);
 
@@ -70,6 +87,6 @@ public class AuthService implements Auth {
     private MemberSignUpRequest getHashedRequest(MemberSignUpRequest request) {
         String hashedPassword = passwordEncoder.encode(request.password());
 
-        return new MemberSignUpRequest(request.email(), hashedPassword, request.phoneNumber(), request.termsOfServiceAgreed(), request.role());
+        return new MemberSignUpRequest(request.email(), hashedPassword, request.phoneNumber(), request.termsOfServiceAgreed());
     }
 }
