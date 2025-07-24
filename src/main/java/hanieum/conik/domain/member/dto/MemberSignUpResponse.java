@@ -1,4 +1,4 @@
-package hanieum.conik.adapter.member.dto;
+package hanieum.conik.domain.member.dto;
 
 public record MemberSignUpResponse(
 ) {
