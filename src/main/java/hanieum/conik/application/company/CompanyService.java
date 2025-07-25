@@ -37,37 +37,19 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
     @Override
     @Transactional(readOnly = true)
-    public Company findCompanyById(Long companyId) {
-        return companyRepository.findById(companyId).orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+    public Company findCompany(Long companyId) {
+        return companyRepository.findById(companyId)
+                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
     }
 
     @Override
     public Long register(CompanyRegisterRequest request) {
 
-        Company company = createCompanyWithFileUrls(request);
+        Company company = Company.register(request);
 
         companyRepository.save(company);
         log.info("기업 등록 성공: company id = {}", company.getId());
 
         return company.getId();
-    }
-
-    private Company createCompanyWithFileUrls(CompanyRegisterRequest request) {
-        ReadPreSignedUrlResponse certUrls = bucketClient.getPreSignedUrl(new ImageUploadRequest("certificates", request.registrationCertificateUrl().getOriginalFilename()));
-        ReadPreSignedUrlResponse bankUrls = bucketClient.getPreSignedUrl(new ImageUploadRequest("bankbooks", request.bankbookCopy().getOriginalFilename()));
-        ReadPreSignedUrlResponse profUrls = bucketClient.getPreSignedUrl(new ImageUploadRequest("profiles", request.profileUrl().getOriginalFilename()));
-
-        return Company.register(
-                request.name(),
-                request.owner(),
-                new Email(request.email()),
-                request.phoneNumber(),
-                request.businessType(),
-                request.industry(),
-                request.registrationNumber(),
-                certUrls.objectUrl(),
-                profUrls.objectUrl(),
-                bankUrls.objectUrl()
-        );
     }
 }

@@ -69,18 +69,18 @@ public class Company extends BaseEntity {
     /**
      * 기업 등록
      * */
-    public static Company register(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy) {
+    public static Company register(CompanyRegisterRequest request) {
         return new Company(
-                name,
-                owner,
-                email,
-                phoneNumber,
-                businessType,
-                industry,
-                registrationNumber,
-                registrationCertificateUrl,
-                profileUrl,
-                bankbookCopy
+                request.name(),
+                request.owner(),
+                new Email(request.email()),
+                request.phoneNumber(),
+                request.businessType(),
+                request.industry(),
+                request.registrationNumber(),
+                request.registrationCertificateUrl(),
+                request.profileUrl(),
+                request.bankbookCopy()
         );
     }
 }

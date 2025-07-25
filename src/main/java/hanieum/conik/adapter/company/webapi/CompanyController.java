@@ -17,7 +17,6 @@ import java.util.List;
 @RequestMapping("/v1/company")
 @RequiredArgsConstructor
 public class CompanyController {
-
     private final CompanyFinder companyFinder;
     private final CompanyRegister companyRegister;
 
@@ -46,6 +45,6 @@ public class CompanyController {
     """)
     @GetMapping("/{companyId}")
     public ApiResponse<Company> findCompany(@PathVariable Long companyId) {
-        return ApiResponse.success(companyFinder.findCompanyById(companyId));
+        return ApiResponse.success(companyFinder.findCompany(companyId));
     }
 }

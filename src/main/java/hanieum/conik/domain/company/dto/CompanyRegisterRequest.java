@@ -29,11 +29,11 @@ public record CompanyRegisterRequest(
     String registrationNumber,
 
     @NotNull(message = "사업자등록증 파일을 첨부해주세요.")
-    MultipartFile registrationCertificateUrl,
+    String registrationCertificateUrl,
 
     @NotNull(message = "통장 사본 파일을 첨부해주세요.")
-    MultipartFile bankbookCopy,
+    String bankbookCopy,
 
     @NotNull(message = "회사 소개서 파일을 첨부해주세요.")
-    MultipartFile profileUrl
+    String profileUrl
 ) {}
