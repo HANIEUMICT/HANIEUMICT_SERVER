@@ -1,4 +1,4 @@
-package hanieum.conik.adapter.member.dto;
+package hanieum.conik.domain.member.dto;
 
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import jakarta.validation.constraints.Email;
@@ -17,7 +17,5 @@ public record MemberSignUpRequest(
         String phoneNumber,
 
         @NotNull(message = "약관 동의 여부를 선택해주세요.")
-        Boolean termsOfServiceAgreed,
-
-        @NotNull(message = "회원 역할은 필수 입력입니다.")
-        MemberRole role) {}
+        Boolean termsOfServiceAgreed
+) {}
