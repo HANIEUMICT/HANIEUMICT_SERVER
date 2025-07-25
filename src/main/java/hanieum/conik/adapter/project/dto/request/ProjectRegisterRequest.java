@@ -2,7 +2,6 @@ package hanieum.conik.adapter.project.dto.request;
 
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
-import hanieum.conik.domain.project.enumerate.ProjectType;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -19,24 +18,24 @@ public record ProjectRegisterRequest (
         String projectTitle,
 
         @NotNull
-        @Schema(description = "프로젝트(공고) 제조 분류", example = "PRODUCT_DEVELOPMENT | FINAL_PRODUCT")
-        ProjectType type,
-
-        @NotNull
-        @Schema(description = "프로젝트(공고) 제조 서비스 카테고리", example = "종류1")
+        @Schema(description = "프로젝트(공고) 제조 분류", example = "원스톱 제품개발")
         String category,
 
         @NotNull
-        @Schema(description = "프로젝트(공고) 요청할 제조 서비스", example = "종류2")
-        String categoryService,
+        @Schema(description = "프로젝트(공고) 제조 분류 - 세부 항목 선택", example = "디자인 완료")
+        String categoryDetail,
 
         @NotNull
-        @Schema(description = "프로젝트(공고) 제품 용도", example = "종류3")
+        @Schema(description = "프로젝트(공고) 제조 사항 상세 입력", example = "기타")
+        String categoryDetailEtc,
+
+        @NotNull
+        @Schema(description = "프로젝트(공고) 제품 용도", example = "의료 / 건강")
         String purpose,
 
         @NotNull
-        @Schema(description = "프로젝트(공고) 상세 제품 용도", example = "새로운 제품 용도 설명")
-        String purposeDetail,
+        @Schema(description = "프로젝트(공고) 제품 용도 기타 세부 사항", example = "기타 / 기타")
+        String purposeEtc,
 
         @NotNull
         @Schema(description = "프로젝트(공고) 제조 수량", example = "1000")
@@ -82,11 +81,11 @@ public record ProjectRegisterRequest (
                 return new ProjectRegisterRequest(
                         project.getMemberId(),
                         project.getProjectTitle(),
-                        project.getType(),
                         project.getCategory(),
-                        project.getCategoryService(),
+                        project.getCategoryDetail(),
+                        project.getCategoryDetailEtc(),
                         project.getPurpose(),
-                        project.getPurposeDetail(),
+                        project.getPurposeEtc(),
                         project.getProjectQuantity(),
                         project.getRequests(),
                         project.getDeadline(),
