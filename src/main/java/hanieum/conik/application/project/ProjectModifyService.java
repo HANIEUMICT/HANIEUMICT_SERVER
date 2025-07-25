@@ -40,7 +40,7 @@ public class ProjectModifyService implements ProjectSaver {
     @Override
     public ProjectRegisterRequest saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
         if (!request.isFinalized()) {
-            throw new ProjectException(ProjectErrorType.FINAL_PROJECT_SAVE_ERROR);
+            throw new ProjectException(ProjectErrorType.PROJECT_FINAL_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
     }

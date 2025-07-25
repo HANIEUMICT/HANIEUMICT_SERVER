@@ -28,4 +28,8 @@ public class ProposalDrawingFile extends AbstractEntity {
     public void updateUploadStatus() {
         this.uploadStatus = FileStatus.FINALIZED;
     }
+
+    void updateProposal(Proposal proposal) {
+        this.proposal = proposal;
+    }
 }

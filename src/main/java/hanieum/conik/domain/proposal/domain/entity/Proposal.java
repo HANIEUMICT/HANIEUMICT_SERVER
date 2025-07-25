@@ -41,13 +41,21 @@ public class Proposal extends AbstractEntity {
         return proposal;
     }
 
-    /** 양방향 연관관계 편의 메서드 */
     public void addItem(ProposalItem item) {
         this.items.add(item);
-        item.setProposal(this);
+        item.updateProposal(this);
     }
 
     public void removeItem(ProposalItem item) {
         this.items.remove(item);
+    }
+
+    public void addDrawing(ProposalDrawingFile drawingFile) {
+        this.drawingFiles.add(drawingFile);
+        drawingFile.updateProposal(this);
+    }
+
+    public void removeDrawing(ProposalDrawingFile drawingFile) {
+        this.drawingFiles.remove(drawingFile);
     }
 }
