@@ -9,10 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/auth")
@@ -39,8 +36,8 @@ public class AuthController {
     - 이메일, 비밀번호 등의 정보를 입력하여 회원가입합니다.
     - 회원가입 완료 시 로그인도 완료됩니다.
     """)
-    @PostMapping("/signup/company")
-    public ApiResponse<MemberLoginResponse> signUpCompanyMember(@RequestBody @Valid MemberSignUpRequest request, Long companyId) {
+    @PostMapping("/signup/company/{companyId}")
+    public ApiResponse<MemberLoginResponse> signUpCompanyMember(@RequestBody @Valid MemberSignUpRequest request, @PathVariable Long companyId) {
         MemberLoginResponse loginResponse = authService.signUpCompanyMember(request, companyId);
         return ApiResponse.success(loginResponse);
     }
