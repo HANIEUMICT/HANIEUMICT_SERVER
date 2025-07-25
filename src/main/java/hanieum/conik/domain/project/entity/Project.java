@@ -3,6 +3,7 @@ package hanieum.conik.domain.project.entity;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.ProjectType;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -47,7 +48,7 @@ public class Project extends AbstractEntity {
 
     private String deliveryAddress;
 
-    private boolean isFinalized;
+    private SubmitStatus submitStatus;
 
     public static Project create(Long userId, String projectTitle, ProjectType projectType, String projectCategory, String projectCategoryService,
                                  String projectPurpose, String projectPurposeDetail, Integer projectQuantity, String projectRequests,
@@ -97,6 +98,6 @@ public class Project extends AbstractEntity {
         this.projectStatus = request.projectStatus();
         this.canPhoneConsult = request.canPhoneConsult();
         this.deliveryAddress = request.deliveryAddress();
-        this.isFinalized = request.isFinalized();
+        this.submitStatus = request.submitStatus();
     }
 }

@@ -5,6 +5,7 @@ import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
@@ -31,8 +32,8 @@ public class ProjectQueryService implements ProjectFinder {
     @Override
     public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, String status) {
         Map<String, Supplier<List<Project>>> strategies = Map.of(
-                "finalized", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, true),
-                "draft", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, false)
+                "finalized", () -> projectRepository.findByMemberIdAndSubmitStatus(memberId, SubmitStatus.SUBMIT),
+                "draft", () -> projectRepository.findByMemberIdAndSubmitStatus(memberId, SubmitStatus.TEMPORARY_SAVE)
         );
 
         List<Project> projects = strategies.getOrDefault(status != null ? status.toLowerCase() : "all",

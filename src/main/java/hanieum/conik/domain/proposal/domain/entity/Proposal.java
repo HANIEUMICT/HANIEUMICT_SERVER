@@ -1,5 +1,6 @@
 package hanieum.conik.domain.proposal.domain.entity;
 
+import hanieum.conik.adapter.proposal.dto.request.ProposalInitiateRequest;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -38,6 +39,12 @@ public class Proposal extends AbstractEntity {
         proposal.firstPrice = firstPrice;
         proposal.secondPrice = secondPrice;
         proposal.proposalNote = proposalNote;
+        return proposal;
+    }
+
+    public static Proposal initiate(ProposalInitiateRequest proposalInitiateRequest) {
+        Proposal proposal = new Proposal();
+        proposal.companyId = proposalInitiateRequest.companyId();
         return proposal;
     }
 

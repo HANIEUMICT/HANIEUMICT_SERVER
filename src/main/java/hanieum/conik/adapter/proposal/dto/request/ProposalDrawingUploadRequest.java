@@ -12,4 +12,4 @@ public record ProposalDrawingUploadRequest(
         @NotBlank
         @Schema(description = "Object url", example = "https://conik-bucket.s3.ap-northeast-2.amazonaws.com/prefix/filename.png")
         String drawingUrl
-){ }
+){}

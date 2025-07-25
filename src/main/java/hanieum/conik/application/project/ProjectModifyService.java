@@ -6,6 +6,7 @@ import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public MemberProjectQueryResponse saveProjectDraft(Long projectId, ProjectRegisterRequest request) {
-        if (request.isFinalized()) {
+        if (!request.submitStatus().equals(SubmitStatus.TEMPORARY_SAVE)) {
             throw new ProjectException(ProjectErrorType.PROJECT_DRAFT_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
@@ -40,7 +41,7 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public MemberProjectQueryResponse saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
-        if (!request.isFinalized()) {
+        if (!request.submitStatus().equals(SubmitStatus.SUBMIT)) {
             throw new ProjectException(ProjectErrorType.PROJECT_FINAL_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
