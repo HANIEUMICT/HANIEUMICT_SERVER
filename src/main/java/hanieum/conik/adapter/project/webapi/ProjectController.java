@@ -45,7 +45,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트(공고) 수정 및 임시저장 API", description = "임시 저장 시, 발급된 프로젝트(공고)에 대해 정보를 수정합니다.")
     @PostMapping("{projectId}/draft")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
-    public ApiResponse<ProjectRegisterRequest> saveProjectTemp(@PathVariable("projectId") Long projectId,
+    public ApiResponse<MemberProjectQueryResponse> saveProjectTemp(@PathVariable("projectId") Long projectId,
                                                                @RequestBody ProjectRegisterRequest projectRegisterRequest) {
         return ApiResponse.success(projectSaver.saveProjectDraft(projectId, projectRegisterRequest));
     }
@@ -53,7 +53,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트(공고) 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
     @PostMapping("{projectId}/final")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
-    public ApiResponse<ProjectRegisterRequest> saveProjectFinal(@PathVariable("projectId") Long projectId,
+    public ApiResponse<MemberProjectQueryResponse> saveProjectFinal(@PathVariable("projectId") Long projectId,
                                                                 @RequestBody @Valid ProjectRegisterRequest projectRegisterRequest) {
         return ApiResponse.success(projectSaver.saveProjectFinal(projectId, projectRegisterRequest));
     }

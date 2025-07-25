@@ -19,7 +19,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
@@ -32,9 +31,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers(HttpMethod.OPTIONS, "/v1/**").permitAll()
-                                .requestMatchers("/actuator/health/**").permitAll()
                                 .requestMatchers(
-                                        "/v1/auth/signup",
+                                        "/v1/auth/signup/**",
+                                        "/actuator/health/readiness",
+                                        "/actuator/health/liveness"
+                                ).permitAll()
+                                .requestMatchers(
                                         "/v1/auth/login",
                                         "/v1/email",
                                         "/v1/email/certificate"
@@ -43,6 +45,10 @@ public class SecurityConfig {
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
                                         "/v1/api-docs/**"
+                                ).permitAll()
+                                .requestMatchers(
+                                        "/v1/company",
+                                        "/v1/company/{id}"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
