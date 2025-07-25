@@ -16,10 +16,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Value("${cors.origin.development}")
     private String devOrigin;
 
+    @Value("${cors.origin.test}")
+    private String testOrigin;
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(devOrigin, prodOrigin)
+                .allowedOrigins(devOrigin, prodOrigin, testOrigin)
                 .allowedMethods("GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowCredentials(true)
                 .maxAge(3000);
