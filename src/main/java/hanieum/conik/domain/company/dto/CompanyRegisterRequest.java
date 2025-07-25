@@ -2,6 +2,8 @@ package hanieum.conik.domain.company.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.web.multipart.MultipartFile;
 
 public record CompanyRegisterRequest(
     @NotBlank(message = "기업 이름은 필수 입력입니다.")
@@ -26,12 +28,12 @@ public record CompanyRegisterRequest(
     @NotBlank(message = "사업자등록 번호는 필수 입력입니다.")
     String registrationNumber,
 
-    @NotBlank(message = "사업자등록증은 필수 입력입니다.")
-    String registrationCertificateUrl,
+    @NotNull(message = "사업자등록증 파일을 첨부해주세요.")
+    MultipartFile registrationCertificateUrl,
 
-    @NotBlank(message = "통장 사본은 필수 입력입니다.")
-    String bankbookCopy,
+    @NotNull(message = "통장 사본 파일을 첨부해주세요.")
+    MultipartFile bankbookCopy,
 
-    @NotBlank(message = "회사 소개서는 필수 입력입니다.")
-    String profileUrl
+    @NotNull(message = "회사 소개서 파일을 첨부해주세요.")
+    MultipartFile profileUrl
 ) {}

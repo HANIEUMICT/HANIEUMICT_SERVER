@@ -39,20 +39,20 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private String registrationNumber;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2048)
     private String registrationCertificateUrl;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2048)
     private String bankbookCopy;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 2048)
     private String profileUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CompanyStatus status;
 
-    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, CompanyStatus status) {
+    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy) {
         this.businessType = businessType;
         this.email = email;
         this.industry = industry;
@@ -63,14 +63,24 @@ public class Company extends BaseEntity {
         this.profileUrl = profileUrl;
         this.registrationCertificateUrl = registrationCertificateUrl;
         this.registrationNumber = registrationNumber;
-        this.status = status;
+        this.status = CompanyStatus.REGISTER_APPROVED;
     }
 
     /**
      * 기업 등록
      * */
-    public static Company register(CompanyRegisterRequest request) {
+    public static Company register(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy) {
         return new Company(
-                request.name(), request.owner(), new Email(request.email()), request.phoneNumber(), request.businessType(), request.industry(), request.registrationNumber(), request.registrationCertificateUrl(), request.profileUrl(), request.bankbookCopy(),CompanyStatus.REGISTER_APPROVED);
+                name,
+                owner,
+                email,
+                phoneNumber,
+                businessType,
+                industry,
+                registrationNumber,
+                registrationCertificateUrl,
+                profileUrl,
+                bankbookCopy
+        );
     }
 }

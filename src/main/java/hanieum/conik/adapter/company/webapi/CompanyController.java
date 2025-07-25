@@ -1,6 +1,5 @@
 package hanieum.conik.adapter.company.webapi;
 
-import hanieum.conik.application.company.CompanyService;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanyRegister;
 import hanieum.conik.domain.company.Company;
@@ -9,6 +8,7 @@ import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,8 +26,8 @@ public class CompanyController {
     - 기업 정보를 모두 기입한 후에 기업 등록을 진행합니다.
     - 기업 등록 완료시 기업 id를 반환 받습니다.
     """)
-    @PostMapping
-    public ApiResponse<Long> registerCompany(@RequestBody @Valid CompanyRegisterRequest request) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Long> registerCompany(@Valid @ModelAttribute CompanyRegisterRequest request) {
         return ApiResponse.success(companyRegister.register(request));
     }
 
