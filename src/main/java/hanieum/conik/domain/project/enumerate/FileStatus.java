@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ProjectStatus {
-    PUBLIC("공개"),
-    PROTECTED("선택적공개"),
-    PRIVATE("비공개");
+public enum FileStatus {
+    TEMPORARY("임시 저장"),
+    FINALIZED("최종 저장");
 
     private final String description;
 }

@@ -21,11 +21,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     private final JwtTokenProviderPort jwtTokenProviderPort;
 
     // JWT 검증을 제외할 경로
@@ -44,7 +43,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/v1/email/certificate",
             "/v1/company",
             "/v1/company/**"
-
+            // Health check endpoint
+            "/actuator/health/readiness",
+            "/actuator/health/liveness"
     );
 
     @Override
@@ -54,10 +55,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest httpServletRequest,
+                                    HttpServletResponse httpServletResponse,
+                                    FilterChain filterChain) throws ServletException, IOException {
         String token = resolveToken(httpServletRequest);
-        log.info("BearerToken: {}", token);
 
         try {
             if (token != null) {

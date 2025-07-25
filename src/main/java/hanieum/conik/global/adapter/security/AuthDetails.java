@@ -8,13 +8,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-public class CustomUserDetails implements UserDetails {
+public class AuthDetails implements UserDetails {
 
     private final Member member;
 
-    public CustomUserDetails(Member member) {
+    public AuthDetails(Member member) {
         this.member = member;
     }
+
+    public Long getMemberId() {return member.getId();}
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

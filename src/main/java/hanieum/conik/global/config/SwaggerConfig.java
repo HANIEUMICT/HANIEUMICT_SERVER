@@ -15,7 +15,7 @@ import java.util.Collections;
         info = @Info(title = "Conik API 명세서", description = "Conik API 명세서", version = "v1"
         ),
         servers = {
-                @Server(url = "http://localhost:8080", description = "로컬 서버 URL"),
+                @Server(url = "${openapi.server.local}", description = "로컬 서버 URL"),
                 @Server(url = "${openapi.server.url}", description = "배포 서버 URL")
         }
 )
