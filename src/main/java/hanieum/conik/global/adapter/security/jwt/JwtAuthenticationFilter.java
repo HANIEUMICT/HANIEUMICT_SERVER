@@ -42,7 +42,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/v1/email",
             "/v1/email/certificate",
             "/v1/company",
-            "/v1/company/**"
+            "/v1/company/**",
             // Health check endpoint
             "/actuator/health/readiness",
             "/actuator/health/liveness"
