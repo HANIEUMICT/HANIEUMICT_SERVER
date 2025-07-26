@@ -1,10 +1,7 @@
 package hanieum.conik.adapter.proposal.webapi;
 
-import hanieum.conik.adapter.project.dto.request.ProjectDrawingUploadRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
-import hanieum.conik.adapter.proposal.dto.request.ProposalInitiateRequest;
 import hanieum.conik.adapter.proposal.dto.response.MemberProposalResponse;
-import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.global.adapter.security.AuthSourceType;
