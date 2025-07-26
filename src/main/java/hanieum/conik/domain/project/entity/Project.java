@@ -74,13 +74,14 @@ public class Project extends AbstractEntity {
         return project;
     }
 
-    public static Project create(Long memberId) {
+    public static Project initiate(Long memberId) {
         Project project = new Project();
         project.memberId = memberId;
+        project.submitStatus = SubmitStatus.INITIALIZE;
         return project;
     }
 
-    public void updateDraft(ProjectRegisterRequest request) {
+    public void update(ProjectRegisterRequest request) {
         this.memberId = request.memberId();
         this.projectTitle = request.projectTitle();
         this.category = request.category();

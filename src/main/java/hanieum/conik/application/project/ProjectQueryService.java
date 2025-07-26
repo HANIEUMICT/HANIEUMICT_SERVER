@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,18 +28,13 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
-    public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, String status) {
-        Map<String, Supplier<List<Project>>> strategies = Map.of(
-                "finalized", () -> projectRepository.findByMemberIdAndSubmitStatus(memberId, SubmitStatus.SUBMIT),
-                "draft", () -> projectRepository.findByMemberIdAndSubmitStatus(memberId, SubmitStatus.TEMPORARY_SAVE)
-        );
-
-        List<Project> projects = strategies.getOrDefault(status != null ? status.toLowerCase() : "all",
-                () -> projectRepository.findByMemberId(memberId)).get();
+    public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus) {
+        List<Project> projects = (submitStatus == null)
+                ? projectRepository.findByMemberId(memberId)
+                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus);
 
         return projects.stream()
-                .map(project -> MemberProjectQueryResponse.from(project.getId(),
-                        ProjectRegisterRequest.from(project)))
+                .map(project -> MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project)))
                 .collect(Collectors.toList());
     }
 }

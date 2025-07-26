@@ -6,6 +6,7 @@ import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -61,8 +62,8 @@ public class ProjectController {
     @Operation(summary = "사용자 프로젝트(공고) 조회 API", description = "사용자의 프로젝트(공고) 목록을 조회합니다.")
     @GetMapping("/{memberId}")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
-    public ApiResponse<List<MemberProjectQueryResponse>> getMemberProjects(@RequestParam(value = "status", required = false) String status,
+    public ApiResponse<List<MemberProjectQueryResponse>> getMemberProjects(@RequestParam(value = "status", required = false) SubmitStatus submitStatus,
                                                                            @PathVariable("memberId") Long memberId) {
-        return ApiResponse.success(projectFinder.getMemberProjects(memberId, status));
+        return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus));
     }
 }

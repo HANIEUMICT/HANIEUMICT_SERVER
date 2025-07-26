@@ -23,7 +23,7 @@ public class ProjectModifyService implements ProjectSaver {
     @Override
     public Long initiate(Long memberId) {
         try {
-            Project project = Project.create(memberId);
+            Project project = Project.initiate(memberId);
             projectRepository.save(project);
             return project.getId();
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class ProjectModifyService implements ProjectSaver {
     private MemberProjectQueryResponse getSavedProject(Long projectId, ProjectRegisterRequest request) {
         try {
             Project project = projectFinder.findProject(projectId);
-            project.updateDraft(request);
+            project.update(request);
             projectRepository.save(project);
             return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project));
         } catch (Exception e) {
