@@ -1,6 +1,6 @@
 package hanieum.conik.domain.proposal.domain.entity;
 
-import hanieum.conik.adapter.proposal.dto.request.ProposalInitiateRequest;
+import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -42,9 +42,9 @@ public class Proposal extends AbstractEntity {
         return proposal;
     }
 
-    public static Proposal initiate(ProposalInitiateRequest proposalInitiateRequest) {
+    public static Proposal initiate(Member member) {
         Proposal proposal = new Proposal();
-        proposal.companyId = proposalInitiateRequest.companyId();
+        proposal.companyId = member.getCompanyId();
         return proposal;
     }
 

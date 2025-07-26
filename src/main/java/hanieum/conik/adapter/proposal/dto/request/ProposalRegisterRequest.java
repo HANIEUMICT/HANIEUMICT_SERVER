@@ -1,5 +1,6 @@
 package hanieum.conik.adapter.proposal.dto.request;
 
+import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -29,4 +30,19 @@ public record ProposalRegisterRequest(
         @NotEmpty(message = "견적 항목은 최소 1개 이상이어야 합니다")
         @Valid
         List<ProposalItemRequest> items
-) {}
+) {
+    public static ProposalRegisterRequest from(Proposal proposal) {
+        return new ProposalRegisterRequest(
+                proposal.getProjectId(),
+                proposal.getCompanyId(),
+                proposal.getTotalPrice(),
+                proposal.getFirstPrice(),
+                proposal.getSecondPrice(),
+                null,
+                proposal.getProposalNote(),
+                proposal.getItems().stream()
+                        .map(ProposalItemRequest::from)
+                        .toList()
+        );
+    }
+}

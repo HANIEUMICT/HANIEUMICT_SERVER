@@ -3,6 +3,7 @@ package hanieum.conik.adapter.proposal.webapi;
 import hanieum.conik.adapter.project.dto.request.ProjectDrawingUploadRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalInitiateRequest;
+import hanieum.conik.adapter.proposal.dto.response.MemberProposalResponse;
 import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
@@ -33,10 +34,9 @@ public class ProposalController {
     }
 
     @Operation(summary = "기업 견적서(입찰) 생성 API", description = "초기에 기업 견적서(입찰) 페이지를 생성합니다.")
-    @PostMapping("/{companyId}/init")
+    @PostMapping("/{memberId}/init")
     @AuthorizeUser(sourceType = AuthSourceType.NONE)
-    public ApiResponse<Long> initProposal(@PathVariable("companyId") Long companyId,
-                                          @Valid ProposalInitiateRequest proposalInitiateRequest) {
-        return ApiResponse.success(proposalSaver.initiate(proposalInitiateRequest));
+    public ApiResponse<MemberProposalResponse> initProposal(@PathVariable("memberId") Long memberId) {
+        return ApiResponse.success(proposalSaver.initiate(memberId));
     }
 }

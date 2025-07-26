@@ -1,8 +1,11 @@
 package hanieum.conik.application.proposal;
 
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
+import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
-import hanieum.conik.adapter.proposal.dto.request.ProposalInitiateRequest;
+import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
+import hanieum.conik.adapter.proposal.dto.response.MemberProposalResponse;
+import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
@@ -23,14 +26,14 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     private final ProposalDrawingFileRepository proposalDrawingFileRepository;
     private final ProposalFinder proposalFinder;
     private final ProposalRepository proposalRepository;
+    private final MemberFinder memberFinder;
 
     @Override
-    public Long initiate(ProposalInitiateRequest proposalInitiateRequest) {
-        // 멤버 아이디로 받았지만, 멤버가 소속된 회사 아이디를 찾고 그 아이디를 아래 빨간 컴패니 저기에 넣어야함
+    public MemberProposalResponse initiate(Long memberId) {
         try {
-            Proposal proposal = Proposal.initiate(proposalInitiateRequest);
+            Proposal proposal = Proposal.initiate(memberFinder.find(memberId));
             proposalRepository.save(proposal);
-            return proposal.getId();
+            return MemberProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
         } catch (Exception e) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_INITIATE_ERROR);
         }

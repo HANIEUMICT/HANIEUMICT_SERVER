@@ -24,6 +24,7 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private String owner;
 
+    @Embedded
     @Column(nullable = false)
     private Email email;
 
