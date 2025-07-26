@@ -51,7 +51,7 @@ public class ProjectController {
         return ApiResponse.success(projectSaver.saveProjectDraft(projectId, projectRegisterRequest));
     }
 
-    @Operation(summary = "프로젝트(공고) 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
+    @Operation(summary = "프로젝트(공고) 수정 및 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
     @PostMapping("{projectId}/final")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> saveProjectFinal(@PathVariable("projectId") Long projectId,

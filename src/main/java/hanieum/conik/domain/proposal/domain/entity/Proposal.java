@@ -1,6 +1,10 @@
 package hanieum.conik.domain.proposal.domain.entity;
 
+import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
+import hanieum.conik.adapter.proposal.dto.request.ProposalItemRequest;
+import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,6 +29,8 @@ public class Proposal extends AbstractEntity {
     private Long secondPrice;
 
     private String proposalNote;
+
+    private SubmitStatus submitStatus;
 
     private List<ProposalItem> items = new ArrayList<>();
 
@@ -64,5 +70,21 @@ public class Proposal extends AbstractEntity {
 
     public void removeDrawing(ProposalDrawingFile drawingFile) {
         this.drawingFiles.remove(drawingFile);
+    }
+
+    public void update(ProposalRegisterRequest proposalRegisterRequest) {
+        this.projectId = proposalRegisterRequest.projectId();
+        this.companyId = proposalRegisterRequest.companyId();
+        this.totalPrice = proposalRegisterRequest.totalPrice();
+        this.firstPrice = proposalRegisterRequest.firstPrice();
+        this.secondPrice = proposalRegisterRequest.secondPrice();
+        this.proposalNote = proposalRegisterRequest.proposalNote();
+
+        this.items.clear();
+
+        for (ProposalItemRequest proposalItemRequest : proposalRegisterRequest.items()) {
+            ProposalItem item = proposalItemRequest.toProposalItem();
+            this.addItem(item);
+        }
     }
 }

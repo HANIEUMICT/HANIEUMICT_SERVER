@@ -30,4 +30,13 @@ public record ProposalItemRequest(
                         item.getItemQuantity()
                 );
         }
+        public ProposalItem toProposalItem() {
+                return ProposalItem.create(
+                        this.itemName,
+                        this.itemSize,
+                        this.itemNote,
+                        this.itemUnitPrice,
+                        this.itemQuantity );
+        }
 }
+

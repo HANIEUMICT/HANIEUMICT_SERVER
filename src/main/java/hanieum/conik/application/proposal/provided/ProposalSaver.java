@@ -1,12 +1,12 @@
 package hanieum.conik.application.proposal.provided;
 
-import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
-import hanieum.conik.adapter.proposal.dto.response.MemberProposalResponse;
+import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
+import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
 
 public interface ProposalSaver {
-    MemberProposalResponse initiate(Long memberId);
+    ProposalResponse initiate(Long memberId);
 
-    ProjectRegisterRequest saveProjectDraft(Long projectId, ProjectRegisterRequest projectRegisterRequest);
+    ProposalResponse saveProposalDraft(Long proposalId, ProposalRegisterRequest proposalRegisterRequest);
 
-    ProjectRegisterRequest saveProjectFinal(Long projectId, ProjectRegisterRequest projectRegisterRequest);
+    ProposalResponse saveProposalFinal(Long proposalId, ProposalRegisterRequest proposalRegisterRequest);
 }

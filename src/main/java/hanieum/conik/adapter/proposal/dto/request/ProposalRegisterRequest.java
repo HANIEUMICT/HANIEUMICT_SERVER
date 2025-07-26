@@ -1,6 +1,8 @@
 package hanieum.conik.adapter.proposal.dto.request;
 
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -17,19 +19,24 @@ public record ProposalRegisterRequest(
 
         @NotNull(message = "견적 총액은 필수입니다")
         @Min(value = 0, message = "견적 총액은 0 이상이어야 합니다")
-        Long proposalTotalPrice,
+        Long totalPrice,
 
-        Long proposalFirstPrice,
+        @NotNull(message = "견적 총액은 필수입니다")
+        Long firstPrice,
 
-        Long proposalSecondPrice,
+        @NotNull(message = "견적 총액은 필수입니다")
+        Long secondPrice,
 
-        String proposalDrawing,
-
+        @NotNull(message = "견적 총액은 필수입니다")
         String proposalNote,
 
         @NotEmpty(message = "견적 항목은 최소 1개 이상이어야 합니다")
         @Valid
-        List<ProposalItemRequest> items
+        List<ProposalItemRequest> items,
+
+        @NotNull
+        @Schema(description = "작성 상태", example = "INITIALIZE | TEMPORARY_SAVE | SUBMIT")
+        SubmitStatus submitStatus
 ) {
     public static ProposalRegisterRequest from(Proposal proposal) {
         return new ProposalRegisterRequest(
@@ -38,11 +45,11 @@ public record ProposalRegisterRequest(
                 proposal.getTotalPrice(),
                 proposal.getFirstPrice(),
                 proposal.getSecondPrice(),
-                null,
                 proposal.getProposalNote(),
                 proposal.getItems().stream()
                         .map(ProposalItemRequest::from)
-                        .toList()
+                        .toList(),
+                proposal.getSubmitStatus()
         );
     }
 }

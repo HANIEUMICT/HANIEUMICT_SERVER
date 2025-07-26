@@ -1,16 +1,15 @@
 package hanieum.conik.application.proposal;
 
-import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
-import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
-import hanieum.conik.adapter.proposal.dto.response.MemberProposalResponse;
+import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.application.proposal.required.ProposalDrawingFileRepository;
 import hanieum.conik.application.proposal.required.ProposalRepository;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.domain.entity.ProposalDrawingFile;
 import hanieum.conik.domain.proposal.exception.ProposalErrorType;
@@ -29,24 +28,41 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     private final MemberFinder memberFinder;
 
     @Override
-    public MemberProposalResponse initiate(Long memberId) {
+    public ProposalResponse initiate(Long memberId) {
         try {
             Proposal proposal = Proposal.initiate(memberFinder.find(memberId));
             proposalRepository.save(proposal);
-            return MemberProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+            return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
         } catch (Exception e) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_INITIATE_ERROR);
         }
     }
 
     @Override
-    public ProjectRegisterRequest saveProjectDraft(Long projectId, ProjectRegisterRequest projectRegisterRequest) {
-        return null;
+    public ProposalResponse saveProposalDraft(Long proposalId, ProposalRegisterRequest proposalRegisterRequest) {
+        if (!proposalRegisterRequest.submitStatus().equals(SubmitStatus.TEMPORARY_SAVE)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_DRAFT_REQUEST_ERROR);
+        }
+        return getSavedProposal(proposalId, proposalRegisterRequest);
     }
 
     @Override
-    public ProjectRegisterRequest saveProjectFinal(Long projectId, ProjectRegisterRequest projectRegisterRequest) {
-        return null;
+    public ProposalResponse saveProposalFinal(Long proposalId, ProposalRegisterRequest proposalRegisterRequest) {
+        if (!proposalRegisterRequest.submitStatus().equals(SubmitStatus.SUBMIT)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_FINAL_REQUEST_ERROR);
+        }
+        return getSavedProposal(proposalId, proposalRegisterRequest);
+    }
+
+    private ProposalResponse getSavedProposal(Long proposalId, ProposalRegisterRequest request) {
+        try {
+            Proposal proposal = proposalFinder.findProposal(proposalId);
+            proposal.update(request);
+            proposalRepository.save(proposal);
+            return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+        } catch (Exception e) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_SAVE_ERROR);
+        }
     }
 
     @Override

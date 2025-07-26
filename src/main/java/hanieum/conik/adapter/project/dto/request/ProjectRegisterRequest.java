@@ -74,7 +74,7 @@ public record ProjectRegisterRequest (
         String deliveryAddress,
 
         @NotNull
-        @Schema(description = "작성 상태", example = "INITIALIZED | TEMPORARY_SAVEd | SUBMITTED")
+        @Schema(description = "작성 상태", example = "INITIALIZE | TEMPORARY_SAVE | SUBMIT")
         SubmitStatus submitStatus
 ){
         public static ProjectRegisterRequest from(Project project) {

@@ -1,7 +1,8 @@
 package hanieum.conik.adapter.proposal.webapi;
 
 import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
-import hanieum.conik.adapter.proposal.dto.response.MemberProposalResponse;
+import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
+import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.global.adapter.security.AuthSourceType;
@@ -32,8 +33,21 @@ public class ProposalController {
 
     @Operation(summary = "기업 견적서(입찰) 생성 API", description = "초기에 기업 견적서(입찰) 페이지를 생성합니다.")
     @PostMapping("/{memberId}/init")
-    @AuthorizeUser(sourceType = AuthSourceType.NONE)
-    public ApiResponse<MemberProposalResponse> initProposal(@PathVariable("memberId") Long memberId) {
+    public ApiResponse<ProposalResponse> initProposal(@PathVariable("memberId") Long memberId) {
         return ApiResponse.success(proposalSaver.initiate(memberId));
+    }
+
+    @Operation(summary = "기업 견적서(입찰) 수정 및 임시저장 API", description = "임시 저장 시, 발급된 기업 견적서(입찰)에 대해 정보를 수정합니다.")
+    @PostMapping("{proposalId}/draft")
+    public ApiResponse<ProposalResponse> saveProjectTemp(@PathVariable("proposalId") Long proposalId,
+                                                                   @RequestBody ProposalRegisterRequest proposalRegisterRequest) {
+        return ApiResponse.success(proposalSaver.saveProposalDraft(proposalId, proposalRegisterRequest));
+    }
+
+    @Operation(summary = "기업 견적서(입찰) 수정 및 저장 API", description = "작성 완료 된 기업 견적서(입찰)를 최종 저장합니다.")
+    @PostMapping("{proposalId}/final")
+    public ApiResponse<ProposalResponse> saveProjectFinal(@PathVariable("proposalId") Long proposalId,
+                                                                    @RequestBody @Valid ProposalRegisterRequest proposalRegisterRequest) {
+        return ApiResponse.success(proposalSaver.saveProposalFinal(proposalId, proposalRegisterRequest));
     }
 }

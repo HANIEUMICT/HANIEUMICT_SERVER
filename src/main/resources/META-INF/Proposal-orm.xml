@@ -29,6 +29,10 @@
             <basic name="proposalNote">
                 <column name="proposal_note"/>
             </basic>
+            <basic name="submitStatus">
+                <column name="submit_status"/>
+                <enumerated>STRING</enumerated>
+            </basic>
 
             <one-to-many name="items" mapped-by="proposal" orphan-removal="true">
                 <cascade>
