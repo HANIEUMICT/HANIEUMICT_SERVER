@@ -1,9 +1,8 @@
 package hanieum.conik.adapter.member.webapi;
 
-import hanieum.conik.domain.member.dto.MemberLoginRequest;
-import hanieum.conik.domain.member.dto.MemberLoginResponse;
-import hanieum.conik.domain.member.dto.MemberSignUpRequest;
-import hanieum.conik.application.member.AuthService;
+import hanieum.conik.application.member.provided.Auth;
+import hanieum.conik.application.member.provided.TokenRefresh;
+import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -17,7 +16,8 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class AuthController {
 
-    private final AuthService authService;
+    private final Auth auth;
+    private final TokenRefresh tokenRefresh;
 
     @Operation(summary = "[구현완료] 일반 회원가입", description = """
     ## 일반 회원 가입을 수행합니다.
@@ -26,7 +26,7 @@ public class AuthController {
     """)
     @PostMapping("/signup/individual")
     public ApiResponse<MemberLoginResponse> signUpMember(@RequestBody @Valid MemberSignUpRequest request) {
-        MemberLoginResponse loginResponse = authService.signUpIndividual(request);
+        MemberLoginResponse loginResponse = auth.signUpIndividual(request);
         return ApiResponse.success(loginResponse);
     }
 
@@ -38,7 +38,7 @@ public class AuthController {
     """)
     @PostMapping("/signup/company/{companyId}")
     public ApiResponse<MemberLoginResponse> signUpCompanyMember(@RequestBody @Valid MemberSignUpRequest request, @PathVariable Long companyId) {
-        MemberLoginResponse loginResponse = authService.signUpCompanyMember(request, companyId);
+        MemberLoginResponse loginResponse = auth.signUpCompanyMember(request, companyId);
         return ApiResponse.success(loginResponse);
     }
 
@@ -49,7 +49,23 @@ public class AuthController {
     """)
     @PostMapping("/login")
     public ApiResponse<MemberLoginResponse> login(@RequestBody @Valid MemberLoginRequest request) {
-        MemberLoginResponse loginResponse = authService.login(request);
+        MemberLoginResponse loginResponse = auth.login(request);
         return ApiResponse.success(loginResponse);
+    }
+
+    @Operation(
+            summary = "토큰 갱신",
+            description = """
+        ## 리프레시 토큰을 사용해 새로운 Access/Refresh 토큰을 발급합니다.
+        - 입력: { "refreshToken": "기존_리프레시_토큰" }
+        - 반환: accessToken, refreshToken, accessTokenExpiresIn, refreshTokenExpiresIn
+        """
+    )
+    @PostMapping("/refresh")
+    public ApiResponse<TokenResponse> refresh(
+            @RequestBody @Valid RefreshTokenRequest request
+    ) {
+        TokenResponse tokenResponse = tokenRefresh.refresh(request.refreshToken());
+        return ApiResponse.success(tokenResponse);
     }
 }
