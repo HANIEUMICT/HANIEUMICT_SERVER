@@ -1,6 +1,7 @@
 package hanieum.conik.application.member;
 
 import hanieum.conik.application.company.required.CompanyRepository;
+import hanieum.conik.application.member.provided.TokenRefresh;
 import hanieum.conik.domain.member.dto.MemberLoginResponse;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
@@ -10,6 +11,7 @@ import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.dto.MemberLoginRequest;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
+import hanieum.conik.domain.member.dto.TokenResponse;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
@@ -28,7 +30,7 @@ import org.springframework.validation.annotation.Validated;
 @Transactional
 @Validated
 @RequiredArgsConstructor
-public class AuthService implements Auth {
+public class AuthService implements Auth, TokenRefresh {
 
     private final MemberRepository memberRepository;
     private final CompanyRepository companyRepository;
@@ -76,6 +78,32 @@ public class AuthService implements Auth {
         } else {
             throw new MemberException(MemberErrorType.INVALID_PASSWORD);
         }
+    }
+
+    @Override
+    public TokenResponse refresh(String refreshToken) {
+        Long memberId = jwtTokenProviderPort.parseRefreshToken(refreshToken);
+
+        String key = "auth:refresh:" + memberId;
+        String savedToken = memoryMap.getValue(key);
+        if (savedToken == null || !savedToken.equals(refreshToken)) {
+            throw new AuthException(AuthErrorType.INVALID_REFRESH_TOKEN);
+        }
+
+        String newAccess  = jwtTokenProviderPort.createAccessToken(memberId);
+        String newRefresh = jwtTokenProviderPort.createRefreshToken(memberId);
+
+        long refreshTtl = jwtTokenProviderPort.getRefreshTokenExpiration();
+        memoryMap.setValue(key, newRefresh, refreshTtl);
+
+        long accessTtl  = jwtTokenProviderPort.getAccessTokenExpiration();
+
+        return new TokenResponse(
+                newAccess,
+                newRefresh,
+                accessTtl,
+                refreshTtl
+        );
     }
 
     private void checkDuplicateEmail(MemberSignUpRequest signUpRequest){
