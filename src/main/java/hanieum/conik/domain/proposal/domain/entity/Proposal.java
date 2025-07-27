@@ -30,7 +30,7 @@ public class Proposal extends AbstractEntity {
 
     private String proposalNote;
 
-    private SubmitStatus submitStatus;
+    private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
 
     private List<ProposalItem> items = new ArrayList<>();
 
@@ -51,6 +51,7 @@ public class Proposal extends AbstractEntity {
     public static Proposal initiate(Member member) {
         Proposal proposal = new Proposal();
         proposal.companyId = member.getCompanyId();
+        proposal.submitStatus = SubmitStatus.INITIALIZE;
         return proposal;
     }
 
@@ -86,5 +87,13 @@ public class Proposal extends AbstractEntity {
             ProposalItem item = proposalItemRequest.toProposalItem();
             this.addItem(item);
         }
+    }
+
+    public void updateToDraft() {
+        this.submitStatus = SubmitStatus.TEMPORARY_SAVE;
+    }
+
+    public void updateToFinal() {
+        this.submitStatus = SubmitStatus.SUBMIT;
     }
 }

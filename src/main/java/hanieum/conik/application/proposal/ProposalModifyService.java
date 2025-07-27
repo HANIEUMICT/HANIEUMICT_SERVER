@@ -18,6 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.function.Consumer;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -26,6 +29,11 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     private final ProposalFinder proposalFinder;
     private final ProposalRepository proposalRepository;
     private final MemberFinder memberFinder;
+
+    private final Map<SubmitStatus, Consumer<Proposal>> statusHandlers = Map.of(
+            SubmitStatus.TEMPORARY_SAVE, Proposal::updateToDraft,
+            SubmitStatus.SUBMIT, Proposal::updateToFinal
+    );
 
     @Override
     public ProposalResponse initiate(Long memberId) {
@@ -58,6 +66,10 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         try {
             Proposal proposal = proposalFinder.findProposal(proposalId);
             proposal.update(request);
+
+            Consumer<Proposal> handler = statusHandlers.get(request.submitStatus());
+            handler.accept(proposal);
+
             proposalRepository.save(proposal);
             return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
         } catch (Exception e) {
