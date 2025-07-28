@@ -9,5 +9,5 @@ import java.util.List;
 public interface ProposalFinder {
     Proposal findProposal(Long proposalId);
 
-    List<ProposalDetailResponse> getCompanyProposals(Long memberId, SubmitStatus submitStatus);
+    List<ProposalDetailResponse> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus);
 }

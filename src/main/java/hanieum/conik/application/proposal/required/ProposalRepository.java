@@ -10,4 +10,6 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
     List<Proposal> findByCompanyId(Long companyId);
     List<Proposal> findByCompanyIdAndSubmitStatus(Long companyId, SubmitStatus submitStatus);
     List<Proposal> findByCompanyIdAndSubmitStatusIn(Long companyId, List<SubmitStatus> submitStatuses);
+    List<Proposal> findByCompanyIdAndProjectIdAndSubmitStatusIn(Long companyId, Long projectId, List<SubmitStatus> submitStatuses);
+    List<Proposal> findByCompanyIdAndProjectIdAndSubmitStatus(Long companyId, Long projectId, SubmitStatus submitStatuses);
 }

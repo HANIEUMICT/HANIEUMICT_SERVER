@@ -29,20 +29,27 @@ public class ProposalQueryService implements ProposalFinder {
     }
 
     @Override
-    public List<ProposalDetailResponse> getCompanyProposals(Long memberId, SubmitStatus submitStatus) {
+    public List<ProposalDetailResponse> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus) {
         Member member = memberFinder.find(memberId);
         Long companyId = member.getCompanyId();
 
-        List<Proposal> proposals = findProposalsWithStatus(submitStatus, companyId);
+        List<Proposal> proposals = findProposalsWithStatus(submitStatus, companyId, projectId);
 
         return proposals.stream()
                 .map(ProposalDetailResponse::from)
                 .toList();
     }
 
-    private List<Proposal> findProposalsWithStatus(SubmitStatus submitStatus, Long companyId) {
-        return (submitStatus == null)
-                ? proposalRepository.findByCompanyIdAndSubmitStatusIn(companyId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT))
-                : proposalRepository.findByCompanyIdAndSubmitStatus(companyId, submitStatus);
+    private List<Proposal> findProposalsWithStatus(SubmitStatus submitStatus, Long companyId, Long projectId) {
+        if (projectId == null) {
+            return (submitStatus == null)
+                    ? proposalRepository.findByCompanyIdAndSubmitStatusIn(companyId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT))
+                    : proposalRepository.findByCompanyIdAndSubmitStatus(companyId, submitStatus);
+        } else {
+            return (submitStatus == null)
+                    ? proposalRepository.findByCompanyIdAndProjectIdAndSubmitStatusIn(companyId, projectId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT))
+                    : proposalRepository.findByCompanyIdAndProjectIdAndSubmitStatus(companyId, projectId, submitStatus);
+        }
     }
+
 }

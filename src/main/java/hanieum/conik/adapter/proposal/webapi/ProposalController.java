@@ -58,12 +58,12 @@ public class ProposalController {
         return ApiResponse.success(proposalSaver.saveProposalFinal(proposalId, proposalRegisterRequest));
     }
 
-    @Operation(summary = "기업 견적서(입찰) 조회 API", description = "기업 견적서(입찰) 목록을 조회합니다.")
+    @Operation(summary = "프로젝트별 기업 견적서(입찰) 조회 API", description = "기업 견적서(입찰) 목록을 조회합니다.")
     @GetMapping("/{memberId}")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
     public ApiResponse<List<ProposalDetailResponse>> getCompanyProposals(@PathVariable("memberId") Long memberId,
                                                                          @RequestParam(required = false) SubmitStatus status,
                                                                          @RequestParam(required = false) Long projectId) {
-        return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, status));
+        return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, projectId, status));
     }
 }
