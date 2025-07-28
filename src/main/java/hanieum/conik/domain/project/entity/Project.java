@@ -1,5 +1,6 @@
 package hanieum.conik.domain.project.entity;
 
+import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
@@ -104,7 +105,8 @@ public class Project extends AbstractEntity {
         this.submitStatus = request.submitStatus();
     }
 
-    public void updateBidStatus(BidStatus bidStatus) {
-        this.bidStatus = bidStatus;
+    public void updateBidStatusAndPublicUntil(BidStatusUpdateRequest bidStatusUpdateRequest) {
+        this.bidStatus = bidStatusUpdateRequest.bidStatus();
+        this.publicUntil = bidStatusUpdateRequest.publicUntil();
     }
 }

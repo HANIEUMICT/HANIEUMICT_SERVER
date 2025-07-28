@@ -1,5 +1,6 @@
 package hanieum.conik.adapter.project.webapi;
 
+import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectDrawingUploadRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
@@ -7,7 +8,6 @@ import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
-import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -72,7 +72,7 @@ public class ProjectController {
     @PostMapping("/{projectId}/status")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> changeProjectStatus(@PathVariable("projectId") Long projectId,
-                                                                       @RequestParam("bidStatus") BidStatus bidStatus) {
-        return ApiResponse.success(projectSaver.updateProjectBidStatus(projectId, bidStatus));
+                                                                       @RequestBody @Valid  BidStatusUpdateRequest bidStatusUpdateRequest) {
+        return ApiResponse.success(projectSaver.updateProjectBidStatus(projectId, bidStatusUpdateRequest));
     }
 }

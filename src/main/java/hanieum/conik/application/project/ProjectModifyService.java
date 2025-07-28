@@ -1,5 +1,6 @@
 package hanieum.conik.application.project;
 
+import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectFinder;
@@ -49,10 +50,10 @@ public class ProjectModifyService implements ProjectSaver {
     }
 
     @Override
-    public MemberProjectQueryResponse updateProjectBidStatus(Long projectId, BidStatus bidStatus) {
+    public MemberProjectQueryResponse updateProjectBidStatus(Long projectId, BidStatusUpdateRequest bidStatusUpdateRequest) {
         try {
             Project project = projectFinder.findProject(projectId);
-            project.updateBidStatus(bidStatus);
+            project.updateBidStatusAndPublicUntil(bidStatusUpdateRequest);
             projectRepository.save(project);
             return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
         } catch (Exception e) {
