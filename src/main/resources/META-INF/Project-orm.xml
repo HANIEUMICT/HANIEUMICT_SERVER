@@ -14,24 +14,20 @@
             <basic name="projectTitle">
                 <column name="project_title"/>
             </basic>
-            <basic name="type">
-                <column name="type"/>
-                <enumerated>STRING</enumerated>
-            </basic>
             <basic name="category">
                 <column name="category"/>
             </basic>
-            <basic name="categoryService">
-                <column name="category_service"/>
+            <basic name="categoryDetail">
+                <column name="category_detail"/>
+            </basic>
+            <basic name="categoryDetailEtc">
+                <column name="category_detail_etc"/>
             </basic>
             <basic name="purpose">
                 <column name="purpose"/>
             </basic>
-            <basic name="purposeDetail">
-                <column name="purpose_detail"/>
-            </basic>
-            <basic name="projectDrawing">
-                <column name="drawing"/>
+            <basic name="purposeEtc">
+                <column name="purpose_etc"/>
             </basic>
             <basic name="projectQuantity">
                 <column name="project_quantity"/>
@@ -58,11 +54,12 @@
             <basic name="canPhoneConsult">
                 <column name="can_phone_consult"/>
             </basic>
-            <basic name="address">
-                <column name="project_address"/>
+            <basic name="deliveryAddress">
+                <column name="delivery_address"/>
             </basic>
-            <basic name="isFinalized">
-                <column name="is_finalized"/>
+            <basic name="submitStatus">
+                <column name="submit_status"/>
+                <enumerated>STRING</enumerated>
             </basic>
         </attributes>
     </entity>

@@ -6,6 +6,7 @@ import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class ProjectModifyService implements ProjectSaver {
     @Override
     public Long initiate(Long memberId) {
         try {
-            Project project = Project.create(memberId);
+            Project project = Project.initiate(memberId);
             projectRepository.save(project);
             return project.getId();
         } catch (Exception e) {
@@ -32,7 +33,7 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public MemberProjectQueryResponse saveProjectDraft(Long projectId, ProjectRegisterRequest request) {
-        if (request.isFinalized()) {
+        if (!request.submitStatus().equals(SubmitStatus.TEMPORARY_SAVE)) {
             throw new ProjectException(ProjectErrorType.PROJECT_DRAFT_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
@@ -40,8 +41,8 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public MemberProjectQueryResponse saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
-        if (!request.isFinalized()) {
-            throw new ProjectException(ProjectErrorType.FINAL_PROJECT_SAVE_ERROR);
+        if (!request.submitStatus().equals(SubmitStatus.SUBMIT)) {
+            throw new ProjectException(ProjectErrorType.PROJECT_FINAL_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
     }
@@ -49,7 +50,7 @@ public class ProjectModifyService implements ProjectSaver {
     private MemberProjectQueryResponse getSavedProject(Long projectId, ProjectRegisterRequest request) {
         try {
             Project project = projectFinder.findProject(projectId);
-            project.updateDraft(request);
+            project.update(request);
             projectRepository.save(project);
             return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project));
         } catch (Exception e) {

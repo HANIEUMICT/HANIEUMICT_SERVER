@@ -2,7 +2,7 @@ package hanieum.conik.domain.project.entity;
 
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
-import hanieum.conik.domain.project.enumerate.ProjectType;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -19,15 +19,15 @@ public class Project extends AbstractEntity {
 
     private String projectTitle;
 
-    private ProjectType type;
-
     private String category;
 
-    private String categoryService;
+    private String categoryDetail;
+
+    private String categoryDetailEtc;
 
     private String purpose;
 
-    private String purposeDetail;
+    private String purposeEtc;
 
     private Integer projectQuantity;
 
@@ -47,21 +47,21 @@ public class Project extends AbstractEntity {
 
     private String deliveryAddress;
 
-    private boolean isFinalized;
+    private SubmitStatus submitStatus;
 
-    public static Project create(Long userId, String projectTitle, ProjectType projectType, String projectCategory, String projectCategoryService,
-                                 String projectPurpose, String projectPurposeDetail, Integer projectQuantity, String projectRequests,
+    public static Project create(Long userId, String projectTitle, String category, String categoryDetail, String categoryDetailEtc,
+                                 String purpose, String purposeEtc, Integer projectQuantity, String projectRequests,
                                  LocalDate projectDeadline, boolean canDeadlineChange, Integer projectRequestEstimate, LocalDate projectPublicUntil,
                                  ProjectStatus projectStatus, boolean canPhoneConsult, String projectAddress
     ) {
         Project project = new Project();
-        project.memberId              = userId;
+        project.memberId            = userId;
         project.projectTitle        = projectTitle;
-        project.type                = projectType;
-        project.category            = projectCategory;
-        project.categoryService     = projectCategoryService;
-        project.purpose             = projectPurpose;
-        project.purposeDetail       = projectPurposeDetail;
+        project.category            = category;
+        project.categoryDetail      = categoryDetail;
+        project.categoryDetailEtc   = categoryDetailEtc;
+        project.purpose             = purpose;
+        project.purposeEtc          = purposeEtc;
         project.projectQuantity     = projectQuantity;
         project.requests            = projectRequests;
         project.deadline            = projectDeadline;
@@ -74,20 +74,21 @@ public class Project extends AbstractEntity {
         return project;
     }
 
-    public static Project create(Long memberId) {
+    public static Project initiate(Long memberId) {
         Project project = new Project();
         project.memberId = memberId;
+        project.submitStatus = SubmitStatus.INITIALIZE;
         return project;
     }
 
-    public void updateDraft(ProjectRegisterRequest request) {
+    public void update(ProjectRegisterRequest request) {
         this.memberId = request.memberId();
         this.projectTitle = request.projectTitle();
-        this.type = request.type();
         this.category = request.category();
-        this.categoryService = request.categoryService();
+        this.categoryDetail = request.categoryDetail();
+        this.categoryDetailEtc = request.categoryDetailEtc();
         this.purpose = request.purpose();
-        this.purposeDetail = request.purposeDetail();
+        this.purposeEtc = request.purposeEtc();
         this.projectQuantity = request.projectQuantity();
         this.requests = request.requests();
         this.deadline = request.deadline();
@@ -97,6 +98,6 @@ public class Project extends AbstractEntity {
         this.projectStatus = request.projectStatus();
         this.canPhoneConsult = request.canPhoneConsult();
         this.deliveryAddress = request.deliveryAddress();
-        this.isFinalized = request.isFinalized();
+        this.submitStatus = request.submitStatus();
     }
 }

@@ -9,13 +9,13 @@
         <table name="proposal"/>
         <attributes>
             <basic name="projectId">
-                <column name="project_id" nullable="false"/>
+                <column name="project_id" />
             </basic>
             <basic name="companyId">
                 <column name="company_id" nullable="false"/>
             </basic>
             <basic name="totalPrice">
-                <column name="total_price" nullable="false"/>
+                <column name="total_price" />
             </basic>
             <basic name="firstPrice">
                 <column name="first_price"/>
@@ -29,8 +29,17 @@
             <basic name="proposalNote">
                 <column name="proposal_note"/>
             </basic>
+            <basic name="submitStatus">
+                <column name="submit_status"/>
+                <enumerated>STRING</enumerated>
+            </basic>
 
             <one-to-many name="items" mapped-by="proposal" orphan-removal="true">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
+            <one-to-many name="drawingFiles" mapped-by="proposal" orphan-removal="true">
                 <cascade>
                     <cascade-all/>
                 </cascade>

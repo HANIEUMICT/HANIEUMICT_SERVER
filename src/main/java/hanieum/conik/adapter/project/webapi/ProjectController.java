@@ -6,6 +6,7 @@ import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -50,7 +51,7 @@ public class ProjectController {
         return ApiResponse.success(projectSaver.saveProjectDraft(projectId, projectRegisterRequest));
     }
 
-    @Operation(summary = "프로젝트(공고) 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
+    @Operation(summary = "프로젝트(공고) 수정 및 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
     @PostMapping("{projectId}/final")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> saveProjectFinal(@PathVariable("projectId") Long projectId,
@@ -61,8 +62,8 @@ public class ProjectController {
     @Operation(summary = "사용자 프로젝트(공고) 조회 API", description = "사용자의 프로젝트(공고) 목록을 조회합니다.")
     @GetMapping("/{memberId}")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
-    public ApiResponse<List<MemberProjectQueryResponse>> getMemberProjects(@RequestParam(value = "status", required = false) String status,
+    public ApiResponse<List<MemberProjectQueryResponse>> getMemberProjects(@RequestParam(value = "status", required = false) SubmitStatus submitStatus,
                                                                            @PathVariable("memberId") Long memberId) {
-        return ApiResponse.success(projectFinder.getMemberProjects(memberId, status));
+        return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus));
     }
 }

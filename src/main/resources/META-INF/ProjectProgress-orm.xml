@@ -11,12 +11,12 @@
                 <column name="project_id"/>
             </basic>
             <basic name="progressStep">
-                <enumerated>STRING</enumerated>
                 <column name="progress_step"/>
+                <enumerated>STRING</enumerated>
             </basic>
             <basic name="deliveryStatus">
-                <enumerated>STRING</enumerated>
                 <column name="delivery_status"/>
+                <enumerated>STRING</enumerated>
             </basic>
         </attributes>
     </entity>

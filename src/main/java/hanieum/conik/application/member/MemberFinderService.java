@@ -15,7 +15,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @RequiredArgsConstructor
 public class MemberFinderService implements MemberFinder {
-
     private final MemberRepository memberRepository;
 
     @Override

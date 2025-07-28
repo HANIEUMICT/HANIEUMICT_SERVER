@@ -5,6 +5,7 @@ import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
@@ -12,13 +13,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectQueryService implements ProjectFinder {
     private final ProjectRepository projectRepository;
 
@@ -29,18 +28,13 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
-    public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, String status) {
-        Map<String, Supplier<List<Project>>> strategies = Map.of(
-                "finalized", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, true),
-                "draft", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, false)
-        );
-
-        List<Project> projects = strategies.getOrDefault(status != null ? status.toLowerCase() : "all",
-                () -> projectRepository.findByMemberId(memberId)).get();
+    public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus) {
+        List<Project> projects = (submitStatus == null)
+                ? projectRepository.findByMemberId(memberId)
+                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus);
 
         return projects.stream()
-                .map(project -> MemberProjectQueryResponse.from(project.getId(),
-                        ProjectRegisterRequest.from(project)))
+                .map(project -> MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project)))
                 .collect(Collectors.toList());
     }
 }
