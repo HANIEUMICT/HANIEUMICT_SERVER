@@ -67,6 +67,11 @@ public class JwtTokenProvider implements JwtTokenProviderPort {
     }
 
     @Override
+    public Long getAccessTokenExpiration() {
+        return accessTokenExpiration;
+    }
+
+    @Override
     public Authentication getAuthentication(String token) {
         if (!isValidToken(token)) {
             throw new AuthException(AuthErrorType.INVALID_ACCESS_TOKEN);
