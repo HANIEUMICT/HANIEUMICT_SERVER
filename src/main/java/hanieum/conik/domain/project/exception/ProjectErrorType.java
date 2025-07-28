@@ -14,6 +14,7 @@ public enum ProjectErrorType implements ErrorType {
     PROJECT_FINAL_SAVE_ERROR(HttpStatus.BAD_REQUEST, "최종 프로젝트 저장 중 오류가 발생했습니다."),
     PROJECT_SAVE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 저장 중 오류가 발생했습니다."),
     PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."),
+    PROJECT_BID_STATUS_UPDATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "프로젝트 입찰 상태 업데이트 중 오류가 발생했습니다."),
     ;
 
     private final HttpStatus status;

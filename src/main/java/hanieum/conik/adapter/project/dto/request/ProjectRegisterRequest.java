@@ -3,6 +3,7 @@ package hanieum.conik.adapter.project.dto.request;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
+import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -74,6 +75,10 @@ public record ProjectRegisterRequest (
         String deliveryAddress,
 
         @NotNull
+        @Schema(description = "공고 상태", example = "PRE_BID | BID_CLOSED | BIDDING")
+        BidStatus bidStatus,
+
+        @NotNull
         @Schema(description = "작성 상태", example = "INITIALIZE | TEMPORARY_SAVE | SUBMIT")
         SubmitStatus submitStatus
 ){
@@ -95,7 +100,9 @@ public record ProjectRegisterRequest (
                         project.getProjectStatus(),
                         project.isCanPhoneConsult(),
                         project.getDeliveryAddress(),
+                        project.getBidStatus(),
                         project.getSubmitStatus()
+
                 );
         }
 }

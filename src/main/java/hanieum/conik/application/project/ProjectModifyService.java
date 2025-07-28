@@ -9,6 +9,7 @@ import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
+import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,11 +22,11 @@ public class ProjectModifyService implements ProjectSaver {
     private final ProjectFinder projectFinder;
 
     @Override
-    public Long initiate(Long memberId) {
+    public MemberProjectQueryResponse initiate(Long memberId) {
         try {
             Project project = Project.initiate(memberId);
             projectRepository.save(project);
-            return project.getId();
+            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
         } catch (Exception e) {
             throw new ProjectException(ProjectErrorType.PROJECT_INITIATE_ERROR);
         }
@@ -47,6 +48,18 @@ public class ProjectModifyService implements ProjectSaver {
         return getSavedProject(projectId, request);
     }
 
+    @Override
+    public MemberProjectQueryResponse updateProjectBidStatus(Long projectId, BidStatus bidStatus) {
+        try {
+            Project project = projectFinder.findProject(projectId);
+            project.updateBidStatus(bidStatus);
+            projectRepository.save(project);
+            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
+        } catch (Exception e) {
+            throw new ProjectException(ProjectErrorType.PROJECT_BID_STATUS_UPDATE_ERROR);
+        }
+    }
+
     private MemberProjectQueryResponse getSavedProject(Long projectId, ProjectRegisterRequest request) {
         try {
             Project project = projectFinder.findProject(projectId);
@@ -57,4 +70,6 @@ public class ProjectModifyService implements ProjectSaver {
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
         }
     }
+
+
 }

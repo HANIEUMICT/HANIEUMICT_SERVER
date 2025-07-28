@@ -1,16 +1,15 @@
 package hanieum.conik.domain.proposal.domain.entity;
 
-import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalItemRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
 import hanieum.conik.global.domain.AbstractEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +54,6 @@ public class Proposal extends AbstractEntity {
         Proposal proposal = new Proposal();
         proposal.projectId = member.getId();
         proposal.companyId = member.getCompanyId();
-        proposal.submitStatus = SubmitStatus.INITIALIZE;
         return proposal;
     }
 
