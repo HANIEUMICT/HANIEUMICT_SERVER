@@ -33,6 +33,10 @@
                 <column name="submit_status"/>
                 <enumerated>STRING</enumerated>
             </basic>
+            <basic name="bidStatus">
+                <column name="bid_status"/>
+                <enumerated>STRING</enumerated>
+            </basic>
 
             <one-to-many name="items" mapped-by="proposal" orphan-removal="true">
                 <cascade>
