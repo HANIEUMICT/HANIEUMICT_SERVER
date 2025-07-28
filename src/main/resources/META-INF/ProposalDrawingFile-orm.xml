@@ -14,10 +14,6 @@
             <basic name="uploadStatus">
                 <column nullable="false"/>
             </basic>
-            <basic name="uploadStatus">
-                <column nullable="false"/>
-                <enumerated>STRING</enumerated>
-            </basic>
 
             <many-to-one name="proposal" fetch="LAZY">
                 <join-column name="proposal_id" nullable="false"/>
