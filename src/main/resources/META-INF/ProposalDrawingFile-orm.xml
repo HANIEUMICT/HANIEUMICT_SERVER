@@ -12,7 +12,8 @@
                 <column nullable="false"/>
             </basic>
             <basic name="uploadStatus">
-                <column nullable="false"/>
+                <column name="upload_status" nullable="false"/>
+                <enumerated>STRING</enumerated>
             </basic>
 
             <many-to-one name="proposal" fetch="LAZY">

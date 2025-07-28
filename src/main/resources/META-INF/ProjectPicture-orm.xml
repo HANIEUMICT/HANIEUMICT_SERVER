@@ -11,8 +11,8 @@
                 <column name="project_progress_id"/>
             </basic>
             <basic name="projectProgressStep">
-                <enumerated>STRING</enumerated>
                 <column name="project_progress_step"/>
+                <enumerated>STRING</enumerated>
             </basic>
             <basic name="pictureUrl">
                 <column name="picture_url"/>
