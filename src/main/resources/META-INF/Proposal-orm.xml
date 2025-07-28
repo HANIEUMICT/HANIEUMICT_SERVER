@@ -9,13 +9,13 @@
         <table name="proposal"/>
         <attributes>
             <basic name="projectId">
-                <column name="project_id" nullable="false"/>
+                <column name="project_id" />
             </basic>
             <basic name="companyId">
                 <column name="company_id" nullable="false"/>
             </basic>
             <basic name="totalPrice">
-                <column name="total_price" nullable="false"/>
+                <column name="total_price" />
             </basic>
             <basic name="firstPrice">
                 <column name="first_price"/>

@@ -62,7 +62,8 @@ public class ProposalController {
     @GetMapping("/{memberId}")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
     public ApiResponse<List<ProposalDetailResponse>> getCompanyProposals(@PathVariable("memberId") Long memberId,
-                                                                         @RequestParam(required = false) SubmitStatus status) {
+                                                                         @RequestParam(required = false) SubmitStatus status,
+                                                                         @RequestParam(required = false) Long projectId) {
         return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, status));
     }
 }

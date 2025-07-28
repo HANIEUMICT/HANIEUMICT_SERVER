@@ -50,6 +50,7 @@ public class Proposal extends AbstractEntity {
 
     public static Proposal initiate(Member member) {
         Proposal proposal = new Proposal();
+        proposal.projectId = member.getId();
         proposal.companyId = member.getCompanyId();
         proposal.submitStatus = SubmitStatus.INITIALIZE;
         return proposal;
