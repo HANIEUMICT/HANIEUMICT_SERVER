@@ -69,7 +69,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "프로젝트(공고) 입찰 상태 변경 API", description = "프로젝트(공고)의 입찰 상태를 변경합니다.")
-    @PostMapping("/{projectId}/status")
+    @PatchMapping("/{projectId}/status")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> changeProjectStatus(@PathVariable("projectId") Long projectId,
                                                                        @RequestBody @Valid  BidStatusUpdateRequest bidStatusUpdateRequest) {

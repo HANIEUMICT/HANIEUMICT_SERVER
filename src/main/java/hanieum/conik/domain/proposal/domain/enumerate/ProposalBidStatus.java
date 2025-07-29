@@ -9,8 +9,8 @@ public enum ProposalBidStatus {
     PRE_BID("입찰 전"),
     BIDDING("입찰 중"),
     DEAL_REQUESTED("거래 요청받음"),
-    DEAL_ACCEPT("거래 수락함"),
-    DEAL_REJECT("거래 거절함"),
+    ACCEPT_DEAL("거래 수락함"),
+    REJECT_DEAL("거래 거절함"),
     BID_SELECTED("낙찰 됨"),
     BID_REJECTED("낙찰 실패");
 

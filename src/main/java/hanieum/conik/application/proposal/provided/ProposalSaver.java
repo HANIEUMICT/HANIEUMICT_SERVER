@@ -12,4 +12,8 @@ public interface ProposalSaver {
     ProposalResponse saveProposalFinal(Long proposalId, ProposalRegisterRequest proposalRegisterRequest);
 
     ProposalResponse updateToDealRequested(Long proposalId, ProposalBidStatus proposalBidStatus);
+
+    ProposalResponse RejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus);
+
+    ProposalResponse AcceptDeal(Long proposalId, ProposalBidStatus proposalBidStatus);
 }

@@ -69,9 +69,23 @@ public class ProposalController {
     }
 
     @Operation(summary = "기업 견적서(입찰) 요청 API", description = "입찰에 참여한 기업 중에 골라서 거래를 요청합니다.")
-    @GetMapping("/deal/{proposalId}")
-    public ApiResponse<ProposalResponse> getCompanyProposals(@PathVariable("proposalId") Long proposalId,
-                                                                         @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
+    @PatchMapping("/{proposalId}/request")
+    public ApiResponse<ProposalResponse> requestDeal(@PathVariable("proposalId") Long proposalId,
+                                                     @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
         return ApiResponse.success(proposalSaver.updateToDealRequested(proposalId, proposalBidStatus));
+    }
+
+    @Operation(summary = "요청된 거래를 수락합니다.", description = "입찰에 참여한 기업 중에 골라서 거래를 요청합니다.")
+    @PatchMapping("/{proposalId}/accept")
+    public ApiResponse<ProposalResponse> acceptDeal(@PathVariable("proposalId") Long proposalId,
+                                                    @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
+        return ApiResponse.success(proposalSaver.AcceptDeal(proposalId, proposalBidStatus));
+    }
+
+    @Operation(summary = "요청된 거래를 거절합니다.", description = "입찰한 견적서에 대해 수신한 거래 요청을 거절합니다.")
+    @PatchMapping("/{proposalId}/reject")
+    public ApiResponse<ProposalResponse> rejectDeal(@PathVariable("proposalId") Long proposalId,
+                                                    @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
+        return ApiResponse.success(proposalSaver.RejectDeal(proposalId, proposalBidStatus));
     }
 }

@@ -91,11 +91,31 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     @Override
     public ProposalResponse updateToDealRequested(Long proposalId, ProposalBidStatus proposalBidStatus) {
         if (!proposalBidStatus.equals(ProposalBidStatus.DEAL_REQUESTED)) {
-            throw new ProposalException(ProposalErrorType.PROPOSAL_FINAL_REQUEST_ERROR);
+            throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_REQUEST_ERROR);
         }
         Proposal proposal = proposalFinder.findProposal(proposalId);
         proposal.updateToBidRequested();
+        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+    }
+
+    @Override
+    public ProposalResponse AcceptDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
+        if (!proposalBidStatus.equals(ProposalBidStatus.ACCEPT_DEAL)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_ACCEPT_ERROR);
+        }
+        Proposal proposal = proposalFinder.findProposal(proposalId);
+        proposal.acceptDeal();
         /** 거래 상태 레코드 생성 로직 추가**/
+        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+    }
+
+    @Override
+    public ProposalResponse RejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
+        if (!proposalBidStatus.equals(ProposalBidStatus.REJECT_DEAL)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_REJECT_ERROR);
+        }
+        Proposal proposal = proposalFinder.findProposal(proposalId);
+        proposal.rejectDeal();
         return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
     }
 }

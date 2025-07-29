@@ -105,10 +105,10 @@ public class Proposal extends AbstractEntity {
     }
 
     public void acceptDeal() {
-        this.proposalBidStatus = ProposalBidStatus.DEAL_ACCEPT;
+        this.proposalBidStatus = ProposalBidStatus.ACCEPT_DEAL;
     }
 
-    public void rejectDeal() {this.proposalBidStatus = ProposalBidStatus.DEAL_REJECT; }
+    public void rejectDeal() {this.proposalBidStatus = ProposalBidStatus.REJECT_DEAL; }
 
     public void updateToBidRejected() {
         this.proposalBidStatus = ProposalBidStatus.BID_REJECTED;
