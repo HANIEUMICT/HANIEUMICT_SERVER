@@ -49,7 +49,7 @@ public class Project extends AbstractEntity {
 
     private String deliveryAddress;
 
-    private SubmitStatus submitStatus;
+    private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
 
     private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
 
@@ -81,7 +81,6 @@ public class Project extends AbstractEntity {
     public static Project initiate(Long memberId) {
         Project project = new Project();
         project.memberId = memberId;
-        project.submitStatus = SubmitStatus.INITIALIZE;
         return project;
     }
 

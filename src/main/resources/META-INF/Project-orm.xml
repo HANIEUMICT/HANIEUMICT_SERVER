@@ -57,12 +57,12 @@
             <basic name="deliveryAddress">
                 <column name="delivery_address"/>
             </basic>
-            <basic name="bidStatus">
-                <column name="bid_status"/>
-                <enumerated>STRING</enumerated>
-            </basic>
             <basic name="submitStatus">
                 <column name="submit_status"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+            <basic name="projectBidStatus">
+                <column name="project_bid_status"/>
                 <enumerated>STRING</enumerated>
             </basic>
         </attributes>
