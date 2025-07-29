@@ -9,5 +9,7 @@ import java.util.List;
 public interface ProjectFinder {
     Project findProject(Long projectId);
 
+    Project validateProjectOpenStatus(Long projectId);
+
     List<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus);
 }

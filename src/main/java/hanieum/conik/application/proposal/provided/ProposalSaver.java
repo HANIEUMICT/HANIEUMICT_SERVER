@@ -5,7 +5,7 @@ import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
 import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 
 public interface ProposalSaver {
-    ProposalResponse initiate(Long memberId);
+    ProposalResponse initiate(Long memberId, Long projectId);
 
     ProposalResponse saveProposalDraft(Long proposalId, ProposalRegisterRequest proposalRegisterRequest);
 

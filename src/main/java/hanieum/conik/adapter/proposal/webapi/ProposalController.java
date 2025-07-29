@@ -40,9 +40,10 @@ public class ProposalController {
     }
 
     @Operation(summary = "기업 견적서(입찰) 생성 API", description = "초기에 기업 견적서(입찰) 페이지를 생성합니다.")
-    @PostMapping("/{memberId}/init")
-    public ApiResponse<ProposalResponse> initProposal(@PathVariable("memberId") Long memberId) {
-        return ApiResponse.success(proposalSaver.initiate(memberId));
+    @PostMapping("/{projectId}/{memberId}/init")
+    public ApiResponse<ProposalResponse> initProposal(@PathVariable("memberId") Long memberId,
+                                                      @PathVariable("projectId") Long projectId) {
+        return ApiResponse.success(proposalSaver.initiate(memberId, projectId));
     }
 
     @Operation(summary = "기업 견적서(입찰) 수정 및 임시저장 API", description = "임시 저장 시, 발급된 기업 견적서(입찰)에 대해 정보를 수정합니다.")
