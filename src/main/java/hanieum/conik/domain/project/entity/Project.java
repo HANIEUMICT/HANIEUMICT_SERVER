@@ -2,9 +2,9 @@ package hanieum.conik.domain.project.entity;
 
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
+import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
-import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -51,7 +51,7 @@ public class Project extends AbstractEntity {
 
     private SubmitStatus submitStatus;
 
-    private BidStatus bidStatus = BidStatus.PRE_BID;
+    private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
 
     public static Project create(Long userId, String projectTitle, String category, String categoryDetail, String categoryDetailEtc,
                                  String purpose, String purposeEtc, Integer projectQuantity, String projectRequests,
@@ -106,7 +106,7 @@ public class Project extends AbstractEntity {
     }
 
     public void updateBidStatusAndPublicUntil(BidStatusUpdateRequest bidStatusUpdateRequest) {
-        this.bidStatus = bidStatusUpdateRequest.bidStatus();
+        this.projectBidStatus = bidStatusUpdateRequest.projectBidStatus();
         this.publicUntil = bidStatusUpdateRequest.publicUntil();
     }
 }

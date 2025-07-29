@@ -10,7 +10,6 @@ import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
-import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

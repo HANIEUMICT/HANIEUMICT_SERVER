@@ -3,7 +3,6 @@ package hanieum.conik.application.project.provided;
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
-import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
 
 public interface ProjectSaver {
     /**

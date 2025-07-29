@@ -4,7 +4,7 @@ import hanieum.conik.adapter.proposal.dto.request.ProposalItemRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
-import hanieum.conik.domain.proposal.domain.enumerate.BidStatus;
+import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Entity;
 import lombok.AccessLevel;
@@ -32,7 +32,7 @@ public class Proposal extends AbstractEntity {
 
     private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
 
-    private BidStatus bidStatus = BidStatus.PRE_BID;
+    private ProposalBidStatus proposalBidStatus = ProposalBidStatus.PRE_BID;
 
     private List<ProposalItem> items = new ArrayList<>();
 
