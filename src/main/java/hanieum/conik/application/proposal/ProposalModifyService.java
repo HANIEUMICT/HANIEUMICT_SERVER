@@ -12,6 +12,7 @@ import hanieum.conik.application.proposal.required.ProposalRepository;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.domain.entity.ProposalDrawingFile;
+import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import hanieum.conik.domain.proposal.exception.ProposalErrorType;
 import hanieum.conik.domain.proposal.exception.ProposalException;
 import lombok.RequiredArgsConstructor;
@@ -85,5 +86,16 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         proposal.addDrawing(drawingFile);
 
         proposalDrawingFileRepository.save(drawingFile);
+    }
+
+    @Override
+    public ProposalResponse updateToDealRequested(Long proposalId, ProposalBidStatus proposalBidStatus) {
+        if (!proposalBidStatus.equals(ProposalBidStatus.DEAL_REQUESTED)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_FINAL_REQUEST_ERROR);
+        }
+        Proposal proposal = proposalFinder.findProposal(proposalId);
+        proposal.updateToBidRequested();
+        /** 거래 상태 레코드 생성 로직 추가**/
+        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
     }
 }

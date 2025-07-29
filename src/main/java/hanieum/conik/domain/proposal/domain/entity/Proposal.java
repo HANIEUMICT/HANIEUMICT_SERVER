@@ -3,6 +3,7 @@ package hanieum.conik.domain.proposal.domain.entity;
 import hanieum.conik.adapter.proposal.dto.request.ProposalItemRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import hanieum.conik.global.domain.AbstractEntity;
@@ -97,5 +98,19 @@ public class Proposal extends AbstractEntity {
 
     public void updateToFinal() {
         this.submitStatus = SubmitStatus.SUBMIT;
+    }
+
+    public void updateToBidRequested() {
+        this.proposalBidStatus = ProposalBidStatus.DEAL_REQUESTED;
+    }
+
+    public void acceptDeal() {
+        this.proposalBidStatus = ProposalBidStatus.DEAL_ACCEPT;
+    }
+
+    public void rejectDeal() {this.proposalBidStatus = ProposalBidStatus.DEAL_REJECT; }
+
+    public void updateToBidRejected() {
+        this.proposalBidStatus = ProposalBidStatus.BID_REJECTED;
     }
 }

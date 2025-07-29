@@ -9,6 +9,7 @@ import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
+import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -65,5 +66,12 @@ public class ProposalController {
                                                                          @RequestParam(required = false) SubmitStatus status,
                                                                          @RequestParam(required = false) Long projectId) {
         return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, projectId, status));
+    }
+
+    @Operation(summary = "기업 견적서(입찰) 요청 API", description = "입찰에 참여한 기업 중에 골라서 거래를 요청합니다.")
+    @GetMapping("/deal/{proposalId}")
+    public ApiResponse<ProposalResponse> getCompanyProposals(@PathVariable("proposalId") Long proposalId,
+                                                                         @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
+        return ApiResponse.success(proposalSaver.updateToDealRequested(proposalId, proposalBidStatus));
     }
 }
