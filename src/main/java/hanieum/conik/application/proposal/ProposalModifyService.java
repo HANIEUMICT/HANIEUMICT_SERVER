@@ -47,7 +47,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
             Proposal proposal = Proposal.initiate(memberFinder.find(memberId), project);
             proposalRepository.save(proposal);
 
-            return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+            return ProposalResponse.from(proposal.getId(),proposal.getModifiedAt(), ProposalRegisterRequest.from(proposal));
         } catch (Exception e) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_INITIATE_ERROR);
         }
@@ -78,7 +78,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
             handler.accept(proposal);
 
             proposalRepository.save(proposal);
-            return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+            return ProposalResponse.from(proposal.getId(), proposal.getModifiedAt(), ProposalRegisterRequest.from(proposal));
         } catch (Exception e) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_SAVE_ERROR);
         }
@@ -101,7 +101,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         }
         Proposal proposal = proposalFinder.findProposal(proposalId);
         proposal.updateToBidRequested();
-        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+        return ProposalResponse.from(proposal.getId(), proposal.getModifiedAt(), ProposalRegisterRequest.from(proposal));
     }
 
     @Override
@@ -112,7 +112,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         Proposal proposal = proposalFinder.findProposal(proposalId);
         proposal.acceptDeal();
         /** 거래 상태 레코드 생성 로직 추가**/
-        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+        return ProposalResponse.from(proposal.getId(), proposal.getModifiedAt(), ProposalRegisterRequest.from(proposal));
     }
 
     @Override
@@ -122,6 +122,6 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         }
         Proposal proposal = proposalFinder.findProposal(proposalId);
         proposal.rejectDeal();
-        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+        return ProposalResponse.from(proposal.getId(), proposal.getModifiedAt(), ProposalRegisterRequest.from(proposal));
     }
 }

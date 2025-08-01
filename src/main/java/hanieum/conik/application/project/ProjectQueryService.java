@@ -35,6 +35,7 @@ public class ProjectQueryService implements ProjectFinder {
 
         return projects.map(project -> MemberProjectQueryResponse.from(
                         project.getId(),
+                        project.getModifiedAt(),
                         ProjectRegisterRequest.from(project),
                         project.getDrawingFiles()
                 ));
