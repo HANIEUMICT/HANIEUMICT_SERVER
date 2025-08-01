@@ -10,6 +10,8 @@ import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.exception.ProposalErrorType;
 import hanieum.conik.domain.proposal.exception.ProposalException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,26 +31,24 @@ public class ProposalQueryService implements ProposalFinder {
     }
 
     @Override
-    public List<ProposalDetailResponse> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus) {
+    public Page<ProposalDetailResponse> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable) {
         Member member = memberFinder.find(memberId);
         Long companyId = member.getCompanyId();
 
-        List<Proposal> proposals = findProposalsWithStatus(submitStatus, companyId, projectId);
+        Page<Proposal> proposals = findProposalsWithStatus(submitStatus, companyId, projectId, pageable);
 
-        return proposals.stream()
-                .map(ProposalDetailResponse::from)
-                .toList();
+        return proposals.map(ProposalDetailResponse::from);
     }
 
-    private List<Proposal> findProposalsWithStatus(SubmitStatus submitStatus, Long companyId, Long projectId) {
+    private Page<Proposal> findProposalsWithStatus(SubmitStatus submitStatus, Long companyId, Long projectId, Pageable pageable) {
         if (projectId == null) {
             return (submitStatus == null)
-                    ? proposalRepository.findByCompanyIdAndSubmitStatusIn(companyId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT))
-                    : proposalRepository.findByCompanyIdAndSubmitStatus(companyId, submitStatus);
+                    ? proposalRepository.findByCompanyIdAndSubmitStatusIn(companyId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
+                    : proposalRepository.findByCompanyIdAndSubmitStatus(companyId, submitStatus, pageable);
         } else {
             return (submitStatus == null)
-                    ? proposalRepository.findByCompanyIdAndProjectIdAndSubmitStatusIn(companyId, projectId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT))
-                    : proposalRepository.findByCompanyIdAndProjectIdAndSubmitStatus(companyId, projectId, submitStatus);
+                    ? proposalRepository.findByCompanyIdAndProjectIdAndSubmitStatusIn(companyId, projectId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
+                    : proposalRepository.findByCompanyIdAndProjectIdAndSubmitStatus(companyId, projectId, submitStatus, pageable);
         }
     }
 

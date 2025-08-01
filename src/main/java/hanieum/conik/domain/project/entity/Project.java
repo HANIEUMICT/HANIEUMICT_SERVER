@@ -118,7 +118,7 @@ public class Project extends AbstractEntity {
         this.publicUntil = bidStatusUpdateRequest.publicUntil();
     }
 
-    public void addDrawing(ProjectDrawingFile drawingFile) {
+    public void addDrawing(ProjectDrawingFile drawingFile) {                                     
         if (!this.drawingFiles.contains(drawingFile)) {
             this.drawingFiles.add(drawingFile);
             drawingFile.updateProject(this);
