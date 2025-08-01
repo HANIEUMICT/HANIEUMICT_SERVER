@@ -30,13 +30,21 @@ public class ProjectQueryService implements ProjectFinder {
 
     @Override
     public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus) {
-        List<Project> projects = (submitStatus == null)
-                ? projectRepository.findByMemberId(memberId)
-                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus);
+        List<Project> projects = findProjectsWithStatus(submitStatus, memberId);
 
         return projects.stream()
-                .map(project -> MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project)))
+                .map(project -> MemberProjectQueryResponse.from(
+                        project.getId(),
+                        ProjectRegisterRequest.from(project),
+                        project.getDrawingFiles()
+                ))
                 .collect(Collectors.toList());
+    }
+
+    private List<Project> findProjectsWithStatus(SubmitStatus submitStatus, Long memberId) {
+        return (submitStatus == null)
+                ? projectRepository.findByMemberIdAndSubmitStatusIn(memberId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT))
+                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus);
     }
 
     @Override

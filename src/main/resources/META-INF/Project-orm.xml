@@ -65,6 +65,12 @@
                 <column name="project_bid_status"/>
                 <enumerated>STRING</enumerated>
             </basic>
+
+            <one-to-many name="drawingFiles" mapped-by="project" orphan-removal="true" fetch="LAZY">
+                <cascade>
+                    <cascade-all/>
+                </cascade>
+            </one-to-many>
         </attributes>
     </entity>
 </entity-mappings>

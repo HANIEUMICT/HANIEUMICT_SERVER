@@ -28,7 +28,7 @@ public class ProjectModifyService implements ProjectSaver {
         try {
             Project project = Project.initiate(memberId);
             projectRepository.save(project);
-            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
+            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
             throw new ProjectException(ProjectErrorType.PROJECT_INITIATE_ERROR);
         }
@@ -56,7 +56,7 @@ public class ProjectModifyService implements ProjectSaver {
             Project project = projectFinder.findProject(projectId);
             project.updateBidStatusAndPublicUntil(bidStatusUpdateRequest);
             projectRepository.save(project);
-            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
+            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
             log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_BID_STATUS_UPDATE_ERROR);
@@ -68,7 +68,8 @@ public class ProjectModifyService implements ProjectSaver {
             Project project = projectFinder.findProject(projectId);
             project.update(request);
             projectRepository.save(project);
-            return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project));
+
+            return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
             log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);

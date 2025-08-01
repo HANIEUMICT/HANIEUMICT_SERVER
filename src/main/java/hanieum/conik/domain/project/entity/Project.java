@@ -6,12 +6,16 @@ import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.domain.AbstractEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -52,6 +56,9 @@ public class Project extends AbstractEntity {
     private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
 
     private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectDrawingFile> drawingFiles = new ArrayList<>();
 
     public static Project create(Long userId, String projectTitle, String category, String categoryDetail, String categoryDetailEtc,
                                  String purpose, String purposeEtc, Integer projectQuantity, String projectRequests,
@@ -107,5 +114,14 @@ public class Project extends AbstractEntity {
     public void updateBidStatusAndPublicUntil(BidStatusUpdateRequest bidStatusUpdateRequest) {
         this.projectBidStatus = bidStatusUpdateRequest.projectBidStatus();
         this.publicUntil = bidStatusUpdateRequest.publicUntil();
+    }
+
+    public void addDrawing(ProjectDrawingFile drawingFile) {
+        this.drawingFiles.add(drawingFile);
+        drawingFile.updateProject(this);
+    }
+
+    public void removeDrawing(ProjectDrawingFile drawingFile) {
+        this.drawingFiles.remove(drawingFile);
     }
 }
