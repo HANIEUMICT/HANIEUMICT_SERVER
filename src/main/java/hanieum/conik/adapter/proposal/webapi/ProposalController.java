@@ -8,7 +8,6 @@ import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
-import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
@@ -17,9 +16,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @Tag(name = "PROPOSAL")
@@ -63,10 +64,11 @@ public class ProposalController {
     @Operation(summary = "프로젝트별 기업 견적서(입찰) 조회 API", description = "기업 견적서(입찰) 목록을 조회합니다.")
     @GetMapping("/{memberId}")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
-    public ApiResponse<List<ProposalDetailResponse>> getCompanyProposals(@PathVariable("memberId") Long memberId,
+    public ApiResponse<Page<ProposalDetailResponse>> getCompanyProposals(@PathVariable("memberId") Long memberId,
                                                                          @RequestParam(required = false) SubmitStatus status,
-                                                                         @RequestParam(required = false) Long projectId) {
-        return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, projectId, status));
+                                                                         @RequestParam(required = false) Long projectId,
+                                                                         @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, projectId, status, pageable)) ;
     }
 
     @Operation(summary = "기업 견적서(입찰) 요청 API", description = "입찰에 참여한 기업 중에 골라서 거래를 요청합니다.")

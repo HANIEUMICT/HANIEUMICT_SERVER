@@ -24,6 +24,9 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 20)
+    private String name;
+
     @NaturalId
     @Convert(converter = EmailAttributeConverter.class)
     @Column(name = "email", nullable = false, unique = true, length = 100)
@@ -45,10 +48,11 @@ public class Member extends BaseEntity {
     @Column(name = "company_id", nullable = true)
     private Long companyId;
 
-    private Member(Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role) {
+    private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role) {
         if (!termsOfServiceAgreed) {
             throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
         }
+        this.name = name;
         this.email = email;
         this.hashedPassword = hashedPassword;
         this.phoneNumber = phoneNumber;
@@ -60,14 +64,28 @@ public class Member extends BaseEntity {
      * 개인 회원가입
      * */
     public static Member signUpIndividual(MemberSignUpRequest request) {
-        return new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), MemberRole.INDIVIDUAL);
+        return new Member(
+                request.name(),
+                new Email(request.email()),
+                request.password(),
+                request.phoneNumber(),
+                request.termsOfServiceAgreed(),
+                MemberRole.INDIVIDUAL
+        );
     }
 
     /**
      * 기업 회원가입
      * */
     public static Member signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
-        Member member = new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), MemberRole.OWNER);
+        Member member = new Member(
+                request.name(),
+                new Email(request.email()),
+                request.password(),
+                request.phoneNumber(),
+                request.termsOfServiceAgreed(),
+                MemberRole.OWNER
+        );
         member.assignCompany(companyId);
         return member;
     }

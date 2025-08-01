@@ -2,16 +2,13 @@ package hanieum.conik.application.member;
 
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.member.provided.TokenRefresh;
-import hanieum.conik.domain.member.dto.MemberLoginResponse;
+import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
-import hanieum.conik.domain.member.dto.MemberLoginRequest;
-import hanieum.conik.domain.member.dto.MemberSignUpRequest;
-import hanieum.conik.domain.member.dto.TokenResponse;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
@@ -24,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-
 
 @Service
 @Transactional
@@ -41,12 +37,10 @@ public class AuthService implements Auth, TokenRefresh {
     @Override
     public MemberLoginResponse signUpIndividual(MemberSignUpRequest request) {
         checkDuplicateEmail(request);
-
         Member member = Member.signUpIndividual(getHashedRequest(request));
-
         memberRepository.save(member);
 
-        return login(new MemberLoginRequest(member.getEmail().address(), request.password()));
+        return login(MemberLoginRequest.from(request));
     }
 
     @Override
@@ -59,7 +53,7 @@ public class AuthService implements Auth, TokenRefresh {
 
         memberRepository.save(member);
 
-        return login(new MemberLoginRequest(member.getEmail().address(), request.password()));
+        return login(MemberLoginRequest.from(request));
     }
 
     @Override
@@ -74,7 +68,7 @@ public class AuthService implements Auth, TokenRefresh {
             String key = "auth:refresh:" + member.getId();
             memoryMap.setValue(key, refreshToken, jwtTokenProviderPort.getRefreshTokenExpiration());
 
-            return new MemberLoginResponse(accessToken, refreshToken, member.getId());
+            return new MemberLoginResponse(TokenInfo.of(accessToken, refreshToken), MemberInfo.from(member));
         } else {
             throw new MemberException(MemberErrorType.INVALID_PASSWORD);
         }
@@ -115,6 +109,6 @@ public class AuthService implements Auth, TokenRefresh {
     private MemberSignUpRequest getHashedRequest(MemberSignUpRequest request) {
         String hashedPassword = passwordEncoder.encode(request.password());
 
-        return new MemberSignUpRequest(request.email(), hashedPassword, request.phoneNumber(), request.termsOfServiceAgreed());
+        return request.withHashedPassword(hashedPassword);
     }
 }

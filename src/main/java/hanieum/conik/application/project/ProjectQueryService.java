@@ -9,12 +9,13 @@ import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,14 +30,21 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
-    public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus) {
-        List<Project> projects = (submitStatus == null)
-                ? projectRepository.findByMemberId(memberId)
-                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus);
+    public Page<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
+        Page<Project> projects = findProjectsWithStatus(submitStatus, memberId, pageable);
 
-        return projects.stream()
-                .map(project -> MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project)))
-                .collect(Collectors.toList());
+        return projects.map(project -> MemberProjectQueryResponse.from(
+                        project.getId(),
+                        project.getModifiedAt(),
+                        ProjectRegisterRequest.from(project),
+                        project.getDrawingFiles()
+                ));
+    }
+
+    private Page<Project> findProjectsWithStatus(SubmitStatus submitStatus, Long memberId, Pageable pageable) {
+        return (submitStatus == null)
+                ? projectRepository.findByMemberIdAndSubmitStatusIn(memberId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
+                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus, pageable);
     }
 
     @Override

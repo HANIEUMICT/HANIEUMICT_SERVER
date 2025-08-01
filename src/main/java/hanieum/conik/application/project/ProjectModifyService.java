@@ -7,13 +7,16 @@ import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.entity.ProjectDrawingFile;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -26,7 +29,7 @@ public class ProjectModifyService implements ProjectSaver {
         try {
             Project project = Project.initiate(memberId);
             projectRepository.save(project);
-            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
+            return MemberProjectQueryResponse.from(project.getId(), project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
             throw new ProjectException(ProjectErrorType.PROJECT_INITIATE_ERROR);
         }
@@ -54,8 +57,9 @@ public class ProjectModifyService implements ProjectSaver {
             Project project = projectFinder.findProject(projectId);
             project.updateBidStatusAndPublicUntil(bidStatusUpdateRequest);
             projectRepository.save(project);
-            return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
+            return MemberProjectQueryResponse.from(project.getId(), project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
+            log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_BID_STATUS_UPDATE_ERROR);
         }
     }
@@ -64,9 +68,14 @@ public class ProjectModifyService implements ProjectSaver {
         try {
             Project project = projectFinder.findProject(projectId);
             project.update(request);
+
+            project.getDrawingFiles().forEach(ProjectDrawingFile::updateUploadStatus);
+
             projectRepository.save(project);
-            return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project));
+
+            return MemberProjectQueryResponse.from(projectId, project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
+            log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
         }
     }
