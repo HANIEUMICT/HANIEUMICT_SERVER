@@ -27,7 +27,7 @@ public class ProjectDrawingModifyService implements ProjectDrawingSaver {
      public void saveDrawingFileTemp(ProjectDrawingUploadRequest projectDrawingUploadRequest) {
          try {
              Project project = projectFinder.findProject(projectDrawingUploadRequest.projectId());
-             ProjectDrawingFile drawingFile = ProjectDrawingFile.create(projectDrawingUploadRequest);
+             ProjectDrawingFile drawingFile = ProjectDrawingFile.create(project, projectDrawingUploadRequest);
 
              project.addDrawing(drawingFile);
              projectDrawingRepository.save(drawingFile);

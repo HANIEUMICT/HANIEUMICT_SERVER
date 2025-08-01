@@ -2,7 +2,6 @@ package hanieum.conik.domain.member.shared;
 
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.regex.Pattern;
 

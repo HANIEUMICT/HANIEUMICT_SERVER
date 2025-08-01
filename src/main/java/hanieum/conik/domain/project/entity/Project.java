@@ -119,12 +119,15 @@ public class Project extends AbstractEntity {
     }
 
     public void addDrawing(ProjectDrawingFile drawingFile) {
-        this.drawingFiles.add(drawingFile);
-        drawingFile.updateProject(this);
+        if (!this.drawingFiles.contains(drawingFile)) {
+            this.drawingFiles.add(drawingFile);
+            drawingFile.updateProject(this);
+        }
     }
 
     public void removeDrawing(ProjectDrawingFile drawingFile) {
         this.drawingFiles.remove(drawingFile);
+        drawingFile.updateProject(null);
     }
 
     public void finalizeDrawingFiles() {

@@ -18,8 +18,9 @@ public class ProjectDrawingFile extends AbstractEntity {
 
     private FileStatus uploadStatus;
 
-    public static ProjectDrawingFile create(ProjectDrawingUploadRequest request) {
+    public static ProjectDrawingFile create(Project project, ProjectDrawingUploadRequest request) {
         ProjectDrawingFile projectDrawingFile = new ProjectDrawingFile();
+        projectDrawingFile.project = project;
         projectDrawingFile.drawingUrl = request.drawingUrl();
         projectDrawingFile.uploadStatus = FileStatus.TEMPORARY;
         return projectDrawingFile;
