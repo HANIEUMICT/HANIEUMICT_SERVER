@@ -35,11 +35,8 @@ public class AuthService implements Auth, TokenRefresh {
 
     @Override
     public MemberLoginResponse signUpIndividual(MemberSignUpRequest request) {
-        System.out.println(1);
         checkDuplicateEmail(request);
-        System.out.println(2);
         Member member = Member.signUpIndividual(getHashedRequest(request));
-        System.out.println(3);
         memberRepository.save(member);
 
         return login(MemberLoginRequest.from(request));

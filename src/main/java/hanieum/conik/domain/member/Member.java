@@ -64,7 +64,6 @@ public class Member extends BaseEntity {
      * 개인 회원가입
      * */
     public static Member signUpIndividual(MemberSignUpRequest request) {
-        System.out.println(request.email());
         return new Member(
                 request.name(),
                 new Email(request.email()),
