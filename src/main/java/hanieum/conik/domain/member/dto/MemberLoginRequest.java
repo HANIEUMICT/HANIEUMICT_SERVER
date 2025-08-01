@@ -1,13 +1,23 @@
 package hanieum.conik.domain.member.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record MemberLoginRequest(
-        @NotBlank(message = "이메일은 필수 입력입니다.")
-        @Email(message = "유효한 이메일 형식이어야 합니다.")
+        @Schema(description = "이메일", example = "kjeng7897@gmail.com")
+        @Email(message = "올바른 이메일 형식이 아닙니다.")
+        @NotBlank(message = "이메일은 필수입니다.")
         String email,
 
-        @NotBlank(message = "비밀번호는 필수 입력입니다.")
+        @Schema(description = "비밀번호", example = "7897")
+        @NotBlank(message = "비밀번호는 필수입니다.")
         String password
-) {}
+) {
+        public static MemberLoginRequest from(MemberSignUpRequest signUpRequest) {
+                return new MemberLoginRequest(
+                        signUpRequest.email(),
+                        signUpRequest.password()
+                );
+        }
+}

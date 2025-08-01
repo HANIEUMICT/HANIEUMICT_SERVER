@@ -11,9 +11,11 @@ import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -56,6 +58,7 @@ public class ProjectModifyService implements ProjectSaver {
             projectRepository.save(project);
             return MemberProjectQueryResponse.from(project.getId(), ProjectRegisterRequest.from(project));
         } catch (Exception e) {
+            log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_BID_STATUS_UPDATE_ERROR);
         }
     }
@@ -67,6 +70,7 @@ public class ProjectModifyService implements ProjectSaver {
             projectRepository.save(project);
             return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project));
         } catch (Exception e) {
+            log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
         }
     }
