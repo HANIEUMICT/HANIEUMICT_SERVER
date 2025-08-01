@@ -4,14 +4,17 @@ import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
 import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
 import hanieum.conik.application.member.provided.MemberFinder;
+import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.application.proposal.required.ProposalDrawingFileRepository;
 import hanieum.conik.application.proposal.required.ProposalRepository;
+import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.domain.entity.ProposalDrawingFile;
+import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import hanieum.conik.domain.proposal.exception.ProposalErrorType;
 import hanieum.conik.domain.proposal.exception.ProposalException;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +29,9 @@ import java.util.function.Consumer;
 @RequiredArgsConstructor
 public class ProposalModifyService implements ProposalSaver, ProposalDrawingSaver {
     private final ProposalDrawingFileRepository proposalDrawingFileRepository;
-    private final ProposalFinder proposalFinder;
     private final ProposalRepository proposalRepository;
+    private final ProposalFinder proposalFinder;
+    private final ProjectFinder projectFinder;
     private final MemberFinder memberFinder;
 
     private final Map<SubmitStatus, Consumer<Proposal>> statusHandlers = Map.of(
@@ -36,10 +40,13 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     );
 
     @Override
-    public ProposalResponse initiate(Long memberId) {
+    public ProposalResponse initiate(Long memberId, Long projectId) {
         try {
-            Proposal proposal = Proposal.initiate(memberFinder.find(memberId));
+            Project project = projectFinder.validateProjectOpenStatus(projectId);
+
+            Proposal proposal = Proposal.initiate(memberFinder.find(memberId), project);
             proposalRepository.save(proposal);
+
             return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
         } catch (Exception e) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_INITIATE_ERROR);
@@ -85,5 +92,36 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         proposal.addDrawing(drawingFile);
 
         proposalDrawingFileRepository.save(drawingFile);
+    }
+
+    @Override
+    public ProposalResponse updateToDealRequested(Long proposalId, ProposalBidStatus proposalBidStatus) {
+        if (!proposalBidStatus.equals(ProposalBidStatus.DEAL_REQUESTED)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_REQUEST_ERROR);
+        }
+        Proposal proposal = proposalFinder.findProposal(proposalId);
+        proposal.updateToBidRequested();
+        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+    }
+
+    @Override
+    public ProposalResponse AcceptDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
+        if (!proposalBidStatus.equals(ProposalBidStatus.ACCEPT_DEAL)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_ACCEPT_ERROR);
+        }
+        Proposal proposal = proposalFinder.findProposal(proposalId);
+        proposal.acceptDeal();
+        /** 거래 상태 레코드 생성 로직 추가**/
+        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
+    }
+
+    @Override
+    public ProposalResponse RejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
+        if (!proposalBidStatus.equals(ProposalBidStatus.REJECT_DEAL)) {
+            throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_REJECT_ERROR);
+        }
+        Proposal proposal = proposalFinder.findProposal(proposalId);
+        proposal.rejectDeal();
+        return ProposalResponse.from(proposal.getId(), ProposalRegisterRequest.from(proposal));
     }
 }

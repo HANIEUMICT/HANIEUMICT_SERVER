@@ -1,5 +1,6 @@
 package hanieum.conik.adapter.project.webapi;
 
+import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectDrawingUploadRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
@@ -39,7 +40,7 @@ public class ProjectController {
     @Operation(summary = "초기 프로젝트(공고) 생성 API", description = "초기에 프로젝트(공고) 페이지를 생성합니다.")
     @PostMapping("{memberId}/init")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
-    public ApiResponse<Long> initProject(@PathVariable("memberId") Long memberId) {
+    public ApiResponse<MemberProjectQueryResponse> initProject(@PathVariable("memberId") Long memberId) {
         return ApiResponse.success(projectSaver.initiate(memberId));
     }
 
@@ -65,5 +66,13 @@ public class ProjectController {
     public ApiResponse<List<MemberProjectQueryResponse>> getMemberProjects(@RequestParam(value = "status", required = false) SubmitStatus submitStatus,
                                                                            @PathVariable("memberId") Long memberId) {
         return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus));
+    }
+
+    @Operation(summary = "프로젝트(공고) 입찰 상태 변경 API", description = "프로젝트(공고)의 입찰 상태를 변경합니다.")
+    @PatchMapping("/{projectId}/status")
+    @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
+    public ApiResponse<MemberProjectQueryResponse> changeProjectStatus(@PathVariable("projectId") Long projectId,
+                                                                       @RequestBody @Valid  BidStatusUpdateRequest bidStatusUpdateRequest) {
+        return ApiResponse.success(projectSaver.updateProjectBidStatus(projectId, bidStatusUpdateRequest));
     }
 }

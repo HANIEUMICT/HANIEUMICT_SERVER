@@ -23,9 +23,6 @@
             <basic name="secondPrice">
                 <column name="second_price"/>
             </basic>
-            <basic name="proposalDrawing">
-                <column name="proposal_drawing"/>
-            </basic>
             <basic name="proposalNote">
                 <column name="proposal_note"/>
             </basic>
@@ -33,7 +30,10 @@
                 <column name="submit_status"/>
                 <enumerated>STRING</enumerated>
             </basic>
-
+            <basic name="proposalBidStatus">
+                <column name="proposal_bid_status"/>
+                <enumerated>STRING</enumerated>
+            </basic>
             <one-to-many name="items" mapped-by="proposal" orphan-removal="true">
                 <cascade>
                     <cascade-all/>

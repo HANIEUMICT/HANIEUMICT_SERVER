@@ -1,15 +1,17 @@
 package hanieum.conik.domain.proposal.domain.entity;
 
-import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalItemRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
+import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import hanieum.conik.global.domain.AbstractEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,8 @@ public class Proposal extends AbstractEntity {
 
     private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
 
+    private ProposalBidStatus proposalBidStatus = ProposalBidStatus.PRE_BID;
+
     private List<ProposalItem> items = new ArrayList<>();
 
     private List<ProposalDrawingFile> drawingFiles = new ArrayList<>();
@@ -48,11 +52,10 @@ public class Proposal extends AbstractEntity {
         return proposal;
     }
 
-    public static Proposal initiate(Member member) {
+    public static Proposal initiate(Member member, Project project) {
         Proposal proposal = new Proposal();
-        proposal.projectId = member.getId();
+        proposal.projectId = project.getId();
         proposal.companyId = member.getCompanyId();
-        proposal.submitStatus = SubmitStatus.INITIALIZE;
         return proposal;
     }
 
@@ -96,5 +99,17 @@ public class Proposal extends AbstractEntity {
 
     public void updateToFinal() {
         this.submitStatus = SubmitStatus.SUBMIT;
+    }
+
+    public void updateToBidRequested() {
+        this.proposalBidStatus = ProposalBidStatus.DEAL_REQUESTED;
+    }
+
+    public void acceptDeal() { this.proposalBidStatus = ProposalBidStatus.ACCEPT_DEAL; }
+
+    public void rejectDeal() { this.proposalBidStatus = ProposalBidStatus.REJECT_DEAL; }
+
+    public void updateToBidRejected() {
+        this.proposalBidStatus = ProposalBidStatus.BID_REJECTED;
     }
 }

@@ -2,6 +2,7 @@ package hanieum.conik.adapter.proposal.dto.request;
 
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
+import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -35,6 +36,10 @@ public record ProposalRegisterRequest(
 
         @NotNull
         @Schema(description = "작성 상태", example = "INITIALIZE | TEMPORARY_SAVE | SUBMIT")
+        ProposalBidStatus proposalBidStatus,
+
+        @NotNull
+        @Schema(description = "작성 상태", example = "INITIALIZE | TEMPORARY_SAVE | SUBMIT")
         SubmitStatus submitStatus
 ) {
     public static ProposalRegisterRequest from(Proposal proposal) {
@@ -48,6 +53,7 @@ public record ProposalRegisterRequest(
                 proposal.getItems().stream()
                         .map(ProposalItemRequest::from)
                         .toList(),
+                proposal.getProposalBidStatus(),
                 proposal.getSubmitStatus()
         );
     }

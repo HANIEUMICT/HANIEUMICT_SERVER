@@ -1,6 +1,8 @@
 package hanieum.conik.domain.project.entity;
 
+import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
+import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.domain.AbstractEntity;
@@ -47,7 +49,9 @@ public class Project extends AbstractEntity {
 
     private String deliveryAddress;
 
-    private SubmitStatus submitStatus;
+    private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
+
+    private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
 
     public static Project create(Long userId, String projectTitle, String category, String categoryDetail, String categoryDetailEtc,
                                  String purpose, String purposeEtc, Integer projectQuantity, String projectRequests,
@@ -77,7 +81,6 @@ public class Project extends AbstractEntity {
     public static Project initiate(Long memberId) {
         Project project = new Project();
         project.memberId = memberId;
-        project.submitStatus = SubmitStatus.INITIALIZE;
         return project;
     }
 
@@ -99,5 +102,10 @@ public class Project extends AbstractEntity {
         this.canPhoneConsult = request.canPhoneConsult();
         this.deliveryAddress = request.deliveryAddress();
         this.submitStatus = request.submitStatus();
+    }
+
+    public void updateBidStatusAndPublicUntil(BidStatusUpdateRequest bidStatusUpdateRequest) {
+        this.projectBidStatus = bidStatusUpdateRequest.projectBidStatus();
+        this.publicUntil = bidStatusUpdateRequest.publicUntil();
     }
 }

@@ -61,6 +61,10 @@
                 <column name="submit_status"/>
                 <enumerated>STRING</enumerated>
             </basic>
+            <basic name="projectBidStatus">
+                <column name="project_bid_status"/>
+                <enumerated>STRING</enumerated>
+            </basic>
         </attributes>
     </entity>
 </entity-mappings>
