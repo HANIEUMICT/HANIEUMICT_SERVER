@@ -109,6 +109,8 @@ public class Project extends AbstractEntity {
         this.canPhoneConsult = request.canPhoneConsult();
         this.deliveryAddress = request.deliveryAddress();
         this.submitStatus = request.submitStatus();
+
+        finalizeDrawingFiles();
     }
 
     public void updateBidStatusAndPublicUntil(BidStatusUpdateRequest bidStatusUpdateRequest) {
@@ -123,5 +125,9 @@ public class Project extends AbstractEntity {
 
     public void removeDrawing(ProjectDrawingFile drawingFile) {
         this.drawingFiles.remove(drawingFile);
+    }
+
+    public void finalizeDrawingFiles() {
+        this.drawingFiles.forEach(ProjectDrawingFile::updateUploadStatus);
     }
 }

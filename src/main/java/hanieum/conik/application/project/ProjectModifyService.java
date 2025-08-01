@@ -7,6 +7,7 @@ import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.entity.ProjectDrawingFile;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
@@ -67,6 +68,9 @@ public class ProjectModifyService implements ProjectSaver {
         try {
             Project project = projectFinder.findProject(projectId);
             project.update(request);
+
+            project.getDrawingFiles().forEach(ProjectDrawingFile::updateUploadStatus);
+
             projectRepository.save(project);
 
             return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project), project.getDrawingFiles());
