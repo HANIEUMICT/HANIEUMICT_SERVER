@@ -1,6 +1,7 @@
 package hanieum.conik.application.member;
 
 import hanieum.conik.application.company.required.CompanyRepository;
+import hanieum.conik.application.member.provided.TokenRefresh;
 import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
