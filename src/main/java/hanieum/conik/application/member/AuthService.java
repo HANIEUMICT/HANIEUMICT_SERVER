@@ -87,6 +87,6 @@ public class AuthService implements Auth {
     private MemberSignUpRequest getHashedRequest(MemberSignUpRequest request) {
         String hashedPassword = passwordEncoder.encode(request.password());
 
-        return new MemberSignUpRequest(request.email(), hashedPassword, request.phoneNumber(), request.termsOfServiceAgreed());
+        return new MemberSignUpRequest(request.email(), hashedPassword, request.phoneNumber(), request.termsOfServiceAgreed(), request.addressRegisterRequest());
     }
 }
