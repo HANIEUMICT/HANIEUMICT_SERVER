@@ -1,5 +1,6 @@
 package hanieum.conik.domain.member.dto;
 
+import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,5 +18,8 @@ public record MemberSignUpRequest(
         String phoneNumber,
 
         @NotNull(message = "약관 동의 여부를 선택해주세요.")
-        Boolean termsOfServiceAgreed
+        Boolean termsOfServiceAgreed,
+
+        @NotNull(message = "주소는 필수 입력입니다.")
+        AddressRegisterRequest addressRegisterRequest
 ) {}
