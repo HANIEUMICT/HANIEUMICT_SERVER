@@ -76,7 +76,7 @@ public class ProjectController {
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_PARAM, paramName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> getProject(@PathVariable("projectId") Long projectId,
                                                               @RequestParam("memberId") Long memberId) {
-        return ApiResponse.success(projectFinder.QueryProjectDetail(projectId, memberId));
+        return ApiResponse.success(projectFinder.queryProjectDetail(projectId, memberId));
     }
 
     @Operation(summary = "프로젝트(공고) 입찰 상태 변경 API", description = "프로젝트(공고)의 입찰 상태를 변경합니다.")
