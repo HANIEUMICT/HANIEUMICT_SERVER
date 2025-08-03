@@ -1,5 +1,6 @@
 package hanieum.conik.domain.company.dto;
 
+import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,5 +36,8 @@ public record CompanyRegisterRequest(
     String bankbookCopy,
 
     @NotNull(message = "회사 소개서 파일을 첨부해주세요.")
-    String profileUrl
+    String profileUrl,
+
+    @NotNull(message = "주소는 필수 입력입니다.")
+    AddressRegisterRequest addressRegisterRequest
 ) {}

@@ -7,5 +7,5 @@ import jakarta.validation.Valid;
  * 기업 등록을 구현한다.
  */
 public interface CompanyRegister {
-    Long register(@Valid CompanyRegisterRequest request);
+    Long register(CompanyRegisterRequest request);
 }

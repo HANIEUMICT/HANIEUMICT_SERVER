@@ -8,8 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum CompanyErrorType implements ErrorType {
-    COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 기업입니다."),
-
+    COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 기업입니다.")
     ;
 
     public final HttpStatus status;
