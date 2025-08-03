@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://www.hibernate.org/xsd/orm/mapping"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.hibernate.org/xsd/orm/mapping
+                                     https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
+    <access>FIELD</access>
+
+    <entity class="hanieum.conik.domain.project.entity.ProjectDrawingFile" access="FIELD">
+        <table name="project_drawing_file"/>
+        <attributes>
+            <basic name="drawingUrl">
+                <column name="drawing_url" nullable="false"/>
+            </basic>
+            <basic name="uploadStatus">
+                <column name="upload_status" nullable="false"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+
+            <many-to-one name="project" fetch="LAZY">
+                <join-column name="project_id" nullable="false"/>
+            </many-to-one>
+        </attributes>
+    </entity>
+</entity-mappings>

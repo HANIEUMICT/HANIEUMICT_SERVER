@@ -1,6 +1,7 @@
 package hanieum.conik.domain.company;
 
-import hanieum.conik.domain.address.Address;
+import hanieum.conik.domain.address.AddressBase;
+import hanieum.conik.domain.address.CompanyAddress;
 import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
@@ -29,6 +30,7 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private String owner;
 
+    @Embedded
     @Column(nullable = false)
     private Email email;
 
@@ -58,8 +60,8 @@ public class Company extends BaseEntity {
     private CompanyStatus status;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "member_id", nullable = false)
-    private List<Address> addresses = new ArrayList<>();
+    @JoinColumn(name = "company_id", nullable = false)
+    private List<CompanyAddress> addresses = new ArrayList<>();
 
     private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, AddressRegisterRequest address) {
         this.businessType = businessType;
@@ -73,7 +75,7 @@ public class Company extends BaseEntity {
         this.registrationCertificateUrl = registrationCertificateUrl;
         this.registrationNumber = registrationNumber;
         this.status = CompanyStatus.REGISTER_APPROVED;
-        this.addresses.add(Address.register(address));
+        this.addresses.add(CompanyAddress.register(address));
     }
 
     /**

@@ -1,17 +1,22 @@
 package hanieum.conik.application.project;
 
+import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.entity.ProjectDrawingFile;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -20,11 +25,11 @@ public class ProjectModifyService implements ProjectSaver {
     private final ProjectFinder projectFinder;
 
     @Override
-    public Long initiate(Long memberId) {
+    public MemberProjectQueryResponse initiate(Long memberId) {
         try {
-            Project project = Project.create(memberId);
+            Project project = Project.initiate(memberId);
             projectRepository.save(project);
-            return project.getId();
+            return MemberProjectQueryResponse.from(project.getId(), project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
             throw new ProjectException(ProjectErrorType.PROJECT_INITIATE_ERROR);
         }
@@ -32,7 +37,7 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public MemberProjectQueryResponse saveProjectDraft(Long projectId, ProjectRegisterRequest request) {
-        if (request.isFinalized()) {
+        if (!request.submitStatus().equals(SubmitStatus.TEMPORARY_SAVE)) {
             throw new ProjectException(ProjectErrorType.PROJECT_DRAFT_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
@@ -40,20 +45,40 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public MemberProjectQueryResponse saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
-        if (!request.isFinalized()) {
-            throw new ProjectException(ProjectErrorType.FINAL_PROJECT_SAVE_ERROR);
+        if (!request.submitStatus().equals(SubmitStatus.SUBMIT)) {
+            throw new ProjectException(ProjectErrorType.PROJECT_FINAL_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
+    }
+
+    @Override
+    public MemberProjectQueryResponse updateProjectBidStatus(Long projectId, BidStatusUpdateRequest bidStatusUpdateRequest) {
+        try {
+            Project project = projectFinder.findProject(projectId);
+            project.updateBidStatusAndPublicUntil(bidStatusUpdateRequest);
+            projectRepository.save(project);
+            return MemberProjectQueryResponse.from(project.getId(), project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
+        } catch (Exception e) {
+            log.error("에러 발생", e);
+            throw new ProjectException(ProjectErrorType.PROJECT_BID_STATUS_UPDATE_ERROR);
+        }
     }
 
     private MemberProjectQueryResponse getSavedProject(Long projectId, ProjectRegisterRequest request) {
         try {
             Project project = projectFinder.findProject(projectId);
-            project.updateDraft(request);
+            project.update(request);
+
+            project.getDrawingFiles().forEach(ProjectDrawingFile::updateUploadStatus);
+
             projectRepository.save(project);
-            return MemberProjectQueryResponse.from(projectId, ProjectRegisterRequest.from(project));
+
+            return MemberProjectQueryResponse.from(projectId, project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
         } catch (Exception e) {
+            log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
         }
     }
+
+
 }

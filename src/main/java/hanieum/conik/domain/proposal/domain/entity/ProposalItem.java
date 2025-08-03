@@ -33,7 +33,7 @@ public class ProposalItem extends AbstractEntity {
         return item;
     }
 
-    void setProposal(Proposal proposal) {
+    void updateProposal(Proposal proposal) {
         this.proposal = proposal;
     }
 }

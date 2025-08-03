@@ -28,7 +28,6 @@ class ProposalOrphanRemovalTest {
                 1000000L,          // totalPrice
                 500000L,           // firstPrice
                 500000L,           // secondPrice
-                "drawing.jpg",     // proposalDrawing
                 "테스트 노트"       // proposalNote
         );
 
@@ -81,7 +80,7 @@ class ProposalOrphanRemovalTest {
         // given
         Proposal proposal = Proposal.create(
                 1L, 1L, 1000000L, 500000L,
-                500000L, "drawing.jpg", "테스트 노트"
+                500000L,  "테스트 노트"
         );
 
         ProposalItem item = ProposalItem.create(

@@ -5,20 +5,21 @@ import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectQueryService implements ProjectFinder {
     private final ProjectRepository projectRepository;
 
@@ -29,18 +30,29 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
-    public List<MemberProjectQueryResponse> getMemberProjects(Long memberId, String status) {
-        Map<String, Supplier<List<Project>>> strategies = Map.of(
-                "finalized", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, true),
-                "draft", () -> projectRepository.findByMemberIdAndIsFinalized(memberId, false)
-        );
+    public Page<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
+        Page<Project> projects = findProjectsWithStatus(submitStatus, memberId, pageable);
 
-        List<Project> projects = strategies.getOrDefault(status != null ? status.toLowerCase() : "all",
-                () -> projectRepository.findByMemberId(memberId)).get();
+        return projects.map(project -> MemberProjectQueryResponse.from(
+                        project.getId(),
+                        project.getModifiedAt(),
+                        ProjectRegisterRequest.from(project),
+                        project.getDrawingFiles()
+                ));
+    }
 
-        return projects.stream()
-                .map(project -> MemberProjectQueryResponse.from(project.getId(),
-                        ProjectRegisterRequest.from(project)))
-                .collect(Collectors.toList());
+    private Page<Project> findProjectsWithStatus(SubmitStatus submitStatus, Long memberId, Pageable pageable) {
+        return (submitStatus == null)
+                ? projectRepository.findByMemberIdAndSubmitStatusIn(memberId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
+                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus, pageable);
+    }
+
+    @Override
+    public Project validateProjectOpenStatus(Long projectId){
+        Project project = findProject(projectId);
+        if (project.getPublicUntil().isBefore(LocalDate.now())) {
+            throw new ProjectException(ProjectErrorType.PROJECT_EXPIRED);
+        }
+        return project;
     }
 }

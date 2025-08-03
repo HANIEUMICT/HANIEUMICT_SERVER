@@ -5,18 +5,21 @@
                                      https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
     <access>FIELD</access>
 
-    <entity class="hanieum.conik.domain.project.entity.ProjectPicture">
+    <entity class="hanieum.conik.domain.proposal.domain.entity.ProposalDrawingFile" access="FIELD">
+        <table name="proposal_drawing_file"/>
         <attributes>
-            <basic name="projectProgressId">
-                <column name="project_progress_id"/>
+            <basic name="drawingUrl">
+                <column nullable="false"/>
             </basic>
-            <basic name="projectProgressStep">
+            <basic name="uploadStatus">
+                <column name="upload_status" nullable="false"/>
                 <enumerated>STRING</enumerated>
-                <column name="project_progress_step"/>
             </basic>
-            <basic name="pictureUrl">
-                <column name="picture_url"/>
-            </basic>
+
+            <many-to-one name="proposal" fetch="LAZY">
+                <join-column name="proposal_id" nullable="false"/>
+            </many-to-one>
         </attributes>
     </entity>
+
 </entity-mappings>

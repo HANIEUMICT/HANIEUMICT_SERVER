@@ -43,4 +43,6 @@ public interface JwtTokenProviderPort {
     Long parseRefreshToken(String refreshToken);
 
     Long getRefreshTokenExpiration();
+
+    Long getAccessTokenExpiration();
 }

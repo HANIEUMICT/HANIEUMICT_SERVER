@@ -1,7 +1,7 @@
 package hanieum.conik.domain.member;
 
-import hanieum.conik.domain.address.Address;
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.address.AddressBase;
+import hanieum.conik.domain.address.MemberAddress;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
@@ -25,10 +25,12 @@ import java.util.List;
 @Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, length = 20)
+    private String name;
 
     @NaturalId
     @Convert(converter = EmailAttributeConverter.class)
@@ -53,40 +55,60 @@ public class Member extends BaseEntity {
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "member_id", nullable = false)
-    private List<Address> addresses = new ArrayList<>();
+    private List<MemberAddress> addresses = new ArrayList<>();
 
-    private Member(Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, Address initialAddress) {
+    private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, MemberAddress initialAddressBase) {
         if (!termsOfServiceAgreed) {
             throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
         }
+        this.name = name;
         this.email = email;
         this.hashedPassword = hashedPassword;
         this.phoneNumber = phoneNumber;
         this.termsOfServiceAgreed = termsOfServiceAgreed;
         this.role = role;
-        this.addresses.add(initialAddress);
+        this.addresses.add(initialAddressBase);
     }
 
     /**
      * 개인 회원가입
      * */
     public static Member signUpIndividual(MemberSignUpRequest request) {
-        Address addr = Address.register(request.addressRegisterRequest());
-        return new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), MemberRole.INDIVIDUAL, addr);
+        MemberAddress address = MemberAddress.register(request.addressRegisterRequest());
+        return new Member(
+                request.name(),
+                new Email(request.email()),
+                request.password(),
+                request.phoneNumber(),
+                request.termsOfServiceAgreed(),
+                MemberRole.INDIVIDUAL,
+                address
+        );
     }
 
     /**
-     * 기업 회원가입
+     * 기업 회원 회원가입
      * */
     public static Member signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
-        Address addr = Address.register(request.addressRegisterRequest());
-        Member member = new Member(new Email(request.email()), request.password(), request.phoneNumber(), request.termsOfServiceAgreed(), MemberRole.OWNER, addr);
+        MemberAddress address = MemberAddress.register(request.addressRegisterRequest());
+        Member member = new Member(
+                request.name(),
+                new Email(request.email()),
+                request.password(),
+                request.phoneNumber(),
+                request.termsOfServiceAgreed(),
+                MemberRole.OWNER,
+                address
+        );
         member.assignCompany(companyId);
         return member;
     }
 
     /**
      * 비밀번호 검증
+     * @param rawPassword
+     * @param encoder
+     * @return
      */
     public boolean verifyPassword(String rawPassword, PasswordEncoder encoder) {
         return encoder.matches(rawPassword, this.hashedPassword);
@@ -109,7 +131,7 @@ public class Member extends BaseEntity {
     /**
      * 회원 주소 추가
      */
-    public void addAddress(Address address) {
+    public void addAddress(MemberAddress address) {
         this.addresses.add(address);
     }
 
