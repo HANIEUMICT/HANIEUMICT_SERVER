@@ -1,16 +1,15 @@
 package hanieum.conik.domain.address;
 
 import hanieum.conik.domain.address.dto.AddressRegisterRequest;
-import hanieum.conik.domain.member.Member;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
+@MappedSuperclass
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Address {
+public class AddressBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,17 +23,10 @@ public class Address {
     @Column(nullable = false)
     private String addressDetailAddress;
 
-    private Address(String addressPostalCode, String addressStreetAddress, String addressDetailAddress) {
+    protected AddressBase(String addressPostalCode, String addressStreetAddress, String addressDetailAddress) {
         this.addressPostalCode = addressPostalCode;
         this.addressStreetAddress = addressStreetAddress;
         this.addressDetailAddress = addressDetailAddress;
-    }
-
-    /**
-     * 주소를 등록한다
-     */
-    public static Address register(AddressRegisterRequest request) {
-        return new Address(request.addressPostalCode(), request.addressStreetAddress(), request.addressDetailAddress());
     }
 
     /**

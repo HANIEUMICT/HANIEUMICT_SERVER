@@ -2,10 +2,12 @@ package hanieum.conik.application.member;
 
 import hanieum.conik.application.member.provided.MemberSaver;
 import hanieum.conik.application.member.required.MemberRepository;
-import hanieum.conik.domain.address.Address;
+import hanieum.conik.domain.address.AddressBase;
+import hanieum.conik.domain.address.MemberAddress;
 import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
+import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.domain.member.dto.PasswordChangeRequest;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
@@ -48,7 +50,7 @@ public class MemberModifyService implements MemberSaver {
     public void addAddress(Long memberId, AddressRegisterRequest request) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
-        Address address = Address.register(request);
+        MemberAddress address = MemberAddress.register(request);
         member.addAddress(address);
     }
 }
