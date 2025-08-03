@@ -1,6 +1,7 @@
 package hanieum.conik.domain.member.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -25,7 +26,11 @@ public record MemberSignUpRequest(
 
         @Schema(description = "서비스 이용약관 동의 여부")
         @NotNull(message = "서비스 이용약관 동의는 필수입니다.")
-        Boolean termsOfServiceAgreed
+        Boolean termsOfServiceAgreed,
+
+        @Schema(description = "주소")
+        @NotNull(message = "주소는 필수 입력입니다.")
+        AddressRegisterRequest addressRegisterRequest
 ) {
         public MemberSignUpRequest withHashedPassword(String hashedPassword) {
                 return new MemberSignUpRequest(
@@ -33,7 +38,8 @@ public record MemberSignUpRequest(
                         this.email,
                         hashedPassword,
                         this.phoneNumber,
-                        this.termsOfServiceAgreed
+                        this.termsOfServiceAgreed,
+                        this.addressRegisterRequest
                 );
         }
 }
