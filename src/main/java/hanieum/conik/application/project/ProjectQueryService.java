@@ -33,6 +33,12 @@ public class ProjectQueryService implements ProjectFinder {
     public Page<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
         Page<Project> projects = findProjectsWithStatus(submitStatus, memberId, pageable);
 
+        if (memberId != null) {
+            projects = findProjectsWithStatus(submitStatus, memberId, pageable);
+        } else {
+            projects = findAllProjectsWithStatus(submitStatus, pageable);
+        }
+
         return projects.map(project -> MemberProjectQueryResponse.from(
                         project.getId(),
                         project.getModifiedAt(),
@@ -45,6 +51,12 @@ public class ProjectQueryService implements ProjectFinder {
         return (submitStatus == null)
                 ? projectRepository.findByMemberIdAndSubmitStatusIn(memberId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
                 : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus, pageable);
+    }
+
+    private Page<Project> findAllProjectsWithStatus(SubmitStatus submitStatus, Pageable pageable) {
+        return (submitStatus == null)
+                ? projectRepository.findBySubmitStatusIn(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
+                : projectRepository.findBySubmitStatus(submitStatus, pageable);
     }
 
     @Override

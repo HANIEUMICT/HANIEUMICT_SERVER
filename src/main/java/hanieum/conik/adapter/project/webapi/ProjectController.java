@@ -63,10 +63,9 @@ public class ProjectController {
     }
 
     @Operation(summary = "사용자 프로젝트(공고) 조회 API", description = "사용자의 프로젝트(공고) 목록을 조회합니다.")
-    @GetMapping("/{memberId}")
-    @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
+    @GetMapping
     public ApiResponse<Page<MemberProjectQueryResponse>> getMemberProjects(@RequestParam(value = "status", required = false) SubmitStatus submitStatus,
-                                                                           @PathVariable("memberId") Long memberId,
+                                                                           @RequestParam(value = "memberId", required = false) Long memberId,
                                                                            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus, pageable));
     }
