@@ -71,6 +71,14 @@ public class ProjectController {
         return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus, pageable));
     }
 
+    @Operation(summary = "특정 프로젝트(공고) 조회 API", description = "프로젝트 ID로 특정 프로젝트를 조회합니다.")
+    @GetMapping("/detail/{projectId}")
+    @AuthorizeUser(sourceType = AuthSourceType.REQUEST_PARAM, paramName = "memberId")
+    public ApiResponse<MemberProjectQueryResponse> getProject(@PathVariable("projectId") Long projectId,
+                                                              @RequestParam("memberId") Long memberId) {
+        return ApiResponse.success(projectFinder.QueryProjectDetail(projectId, memberId));
+    }
+
     @Operation(summary = "프로젝트(공고) 입찰 상태 변경 API", description = "프로젝트(공고)의 입찰 상태를 변경합니다.")
     @PatchMapping("/{projectId}/status")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")

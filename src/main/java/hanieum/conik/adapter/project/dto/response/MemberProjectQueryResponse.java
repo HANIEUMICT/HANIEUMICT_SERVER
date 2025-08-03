@@ -1,6 +1,7 @@
 package hanieum.conik.adapter.project.dto.response;
 
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
+import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.entity.ProjectDrawingFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -25,5 +26,16 @@ public record MemberProjectQueryResponse(
                 .map(ProjectDrawingFile::getDrawingUrl)
                 .toList();
         return new MemberProjectQueryResponse(projectId, modifiedAt, projectRegisterRequest, drawingUrls);
+    }
+
+    public static MemberProjectQueryResponse of(Project project){
+        return new MemberProjectQueryResponse(
+                project.getId(),
+                project.getModifiedAt(),
+                ProjectRegisterRequest.from(project),
+                project.getDrawingFiles().stream()
+                        .map(ProjectDrawingFile::getDrawingUrl)
+                        .toList()
+        );
     }
 }
