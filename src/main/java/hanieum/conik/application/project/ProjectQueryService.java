@@ -69,7 +69,7 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
-    public MemberProjectQueryResponse queryProjectDetail(Long projectId, Long memberId){
+    public MemberProjectQueryResponse getProjectDetail(Long projectId, Long memberId){
         return MemberProjectQueryResponse.of(findProject(projectId));
     }
 }
