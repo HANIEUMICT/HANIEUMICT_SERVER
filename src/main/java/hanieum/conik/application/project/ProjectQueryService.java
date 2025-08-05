@@ -31,7 +31,7 @@ public class ProjectQueryService implements ProjectFinder {
 
     @Override
     public Page<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
-        Page<Project> projects = findProjectsWithStatus(submitStatus, memberId, pageable);
+        Page<Project> projects;
 
         if (memberId != null) {
             projects = findProjectsWithStatus(submitStatus, memberId, pageable);

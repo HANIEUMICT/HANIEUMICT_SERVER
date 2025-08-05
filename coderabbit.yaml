@@ -1,6 +1,7 @@
 language: ko-KR
 
 enable_free_tier: true
+
 reviews:
   profile: chill
   request_changes_workflow: false
@@ -18,6 +19,7 @@ reviews:
     drafts: false
 chat:
   auto_reply: true
+
 knowledge_base:
   learnings:
     scope: auto
