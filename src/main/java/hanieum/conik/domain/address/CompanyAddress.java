@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class CompanyAddress extends AddressBase{
+public class CompanyAddress extends AddressBase {
     protected CompanyAddress() { super(null,null,null); }
 
     private CompanyAddress(String postal, String street, String detail) {

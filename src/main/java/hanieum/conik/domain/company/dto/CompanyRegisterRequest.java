@@ -4,7 +4,6 @@ import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.web.multipart.MultipartFile;
 
 public record CompanyRegisterRequest(
     @NotBlank(message = "기업 이름은 필수 입력입니다.")
