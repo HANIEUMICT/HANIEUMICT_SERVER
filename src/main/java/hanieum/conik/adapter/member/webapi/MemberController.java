@@ -4,12 +4,13 @@ import hanieum.conik.application.member.MemberModifyService;
 import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.PasswordChangeRequest;
-import hanieum.conik.global.adapter.security.CurrentUser;
+import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,10 +32,10 @@ public class MemberController {
     """)
     @PutMapping("/profile")
     public ApiResponse<?> updateMemberProfile(
-            @CurrentUser Long memberId,
+            @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid MemberProfileUpdateRequest request
     ) {
-        memberModifyService.updateProfile(memberId, request);
+        memberModifyService.updateProfile(authDetails.getMemberId(), request);
         return ApiResponse.success();
     }
 
@@ -46,10 +47,10 @@ public class MemberController {
     """)
     @PutMapping("/password")
     public ApiResponse<?> updatePassword(
-            @CurrentUser Long memberId,
+            @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid PasswordChangeRequest request
     ){
-        memberModifyService.updatePassword(memberId, request);
+        memberModifyService.updatePassword(authDetails.getMemberId(), request);
         return ApiResponse.success();
     }
 
@@ -59,10 +60,10 @@ public class MemberController {
     """)
     @PutMapping("/addresses")
     public ApiResponse<?> addAddress(
-            @CurrentUser Long memberId,
+            @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid AddressRegisterRequest request
     ) {
-        memberModifyService.addAddress(memberId, request);
+        memberModifyService.addAddress(authDetails.getMemberId(), request);
         return ApiResponse.success();
     }
 }
