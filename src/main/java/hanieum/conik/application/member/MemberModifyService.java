@@ -1,13 +1,12 @@
 package hanieum.conik.application.member;
 
+import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.provided.MemberSaver;
 import hanieum.conik.application.member.required.MemberRepository;
-import hanieum.conik.domain.address.AddressBase;
 import hanieum.conik.domain.address.MemberAddress;
 import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
-import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.domain.member.dto.PasswordChangeRequest;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
@@ -24,19 +23,18 @@ import org.springframework.validation.annotation.Validated;
 public class MemberModifyService implements MemberSaver {
 
     private final MemberRepository memberRepository;
+    private final MemberFinder memberFinder;
     private final PasswordEncoder passwordEncoder;  // 비밀번호 검증용
 
     @Override
     public void updateProfile(Long memberId, MemberProfileUpdateRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+        Member member = memberFinder.find(memberId);
         member.updateProfile(request);
     }
 
     @Override
     public void updatePassword(Long memberId, PasswordChangeRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+        Member member = memberFinder.find(memberId);
 
         if (!passwordEncoder.matches(request.currentPassword(), member.getHashedPassword())) {
             throw new MemberException(MemberErrorType.INVALID_PASSWORD);
@@ -48,8 +46,7 @@ public class MemberModifyService implements MemberSaver {
 
     @Override
     public void addAddress(Long memberId, AddressRegisterRequest request) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+        Member member = memberFinder.find(memberId);
         MemberAddress address = MemberAddress.register(request);
         member.addAddress(address);
     }
