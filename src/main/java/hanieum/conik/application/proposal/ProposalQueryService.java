@@ -52,4 +52,10 @@ public class ProposalQueryService implements ProposalFinder {
         }
     }
 
+    @Override
+    public ProposalDetailResponse getProposalDetail(Long proposalId){
+        Proposal proposal = findProposal(proposalId);
+        return ProposalDetailResponse.from(proposal);
+    }
+
 }

@@ -71,6 +71,14 @@ public class ProposalController {
         return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, projectId, status, pageable)) ;
     }
 
+
+    @Operation(summary = "기업 견적서(입찰) 단일 조회 API", description = "특정 기업 견적서(입찰)를 조회합니다.")
+    @GetMapping("/{proposalId}/detail")
+    public ApiResponse<ProposalDetailResponse> getProposal(@PathVariable("proposalId") Long proposalId) {
+        return ApiResponse.success(proposalFinder.getProposalDetail(proposalId));
+    }
+
+
     @Operation(summary = "기업 견적서(입찰) 요청 API", description = "입찰에 참여한 기업 중에 골라서 거래를 요청합니다.")
     @PatchMapping("/{proposalId}/request")
     public ApiResponse<ProposalResponse> requestDeal(@PathVariable("proposalId") Long proposalId,

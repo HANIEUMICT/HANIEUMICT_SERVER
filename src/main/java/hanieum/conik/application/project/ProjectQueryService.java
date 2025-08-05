@@ -31,7 +31,13 @@ public class ProjectQueryService implements ProjectFinder {
 
     @Override
     public Page<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
-        Page<Project> projects = findProjectsWithStatus(submitStatus, memberId, pageable);
+        Page<Project> projects;
+
+        if (memberId != null) {
+            projects = findProjectsWithStatus(submitStatus, memberId, pageable);
+        } else {
+            projects = findAllProjectsWithStatus(submitStatus, pageable);
+        }
 
         return projects.map(project -> MemberProjectQueryResponse.from(
                         project.getId(),
@@ -47,6 +53,12 @@ public class ProjectQueryService implements ProjectFinder {
                 : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus, pageable);
     }
 
+    private Page<Project> findAllProjectsWithStatus(SubmitStatus submitStatus, Pageable pageable) {
+        return (submitStatus == null)
+                ? projectRepository.findBySubmitStatusIn(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
+                : projectRepository.findBySubmitStatus(submitStatus, pageable);
+    }
+
     @Override
     public Project validateProjectOpenStatus(Long projectId){
         Project project = findProject(projectId);
@@ -54,5 +66,10 @@ public class ProjectQueryService implements ProjectFinder {
             throw new ProjectException(ProjectErrorType.PROJECT_EXPIRED);
         }
         return project;
+    }
+
+    @Override
+    public MemberProjectQueryResponse getProjectDetail(Long projectId, Long memberId){
+        return MemberProjectQueryResponse.of(findProject(projectId));
     }
 }

@@ -14,5 +14,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findByMemberIdAndSubmitStatus(Long memberId, SubmitStatus submitStatus, Pageable pageable);
 
     Page<Project> findByMemberIdAndSubmitStatusIn(Long memberId, List<SubmitStatus> submitStatuses, Pageable pageable);
+
+    Page<Project> findBySubmitStatusIn(List<SubmitStatus> submitStatuses, Pageable pageable);
+
+    Page<Project> findBySubmitStatus(SubmitStatus submitStatus, Pageable pageable);
 }
 
