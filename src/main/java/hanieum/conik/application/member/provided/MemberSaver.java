@@ -1,6 +1,6 @@
 package hanieum.conik.application.member.provided;
 
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.PasswordChangeRequest;
 

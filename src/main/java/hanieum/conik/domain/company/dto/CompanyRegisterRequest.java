@@ -1,6 +1,6 @@
 package hanieum.conik.domain.company.dto;
 
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

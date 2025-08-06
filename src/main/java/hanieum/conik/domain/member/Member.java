@@ -1,6 +1,5 @@
 package hanieum.conik.domain.member;
 
-import hanieum.conik.domain.address.MemberAddress;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;

@@ -1,7 +1,6 @@
 package hanieum.conik.domain.company;
 
-import hanieum.conik.domain.address.CompanyAddress;
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
 import hanieum.conik.domain.member.shared.Email;

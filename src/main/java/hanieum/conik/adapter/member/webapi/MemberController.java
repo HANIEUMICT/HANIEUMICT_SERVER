@@ -1,7 +1,7 @@
 package hanieum.conik.adapter.member.webapi;
 
 import hanieum.conik.application.member.MemberModifyService;
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.PasswordChangeRequest;
 import hanieum.conik.global.adapter.security.AuthDetails;

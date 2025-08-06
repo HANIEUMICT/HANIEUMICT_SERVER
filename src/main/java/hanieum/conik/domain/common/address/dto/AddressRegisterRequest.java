@@ -1,6 +1,5 @@
-package hanieum.conik.domain.address.dto;
+package hanieum.conik.domain.common.address.dto;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 
 public record AddressRegisterRequest(

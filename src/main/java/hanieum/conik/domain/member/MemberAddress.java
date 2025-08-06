@@ -1,6 +1,7 @@
-package hanieum.conik.domain.address;
+package hanieum.conik.domain.member;
 
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.AddressBase;
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 

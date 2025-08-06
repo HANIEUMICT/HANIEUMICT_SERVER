@@ -1,6 +1,6 @@
-package hanieum.conik.domain.address;
+package hanieum.conik.domain.common.address;
 
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
