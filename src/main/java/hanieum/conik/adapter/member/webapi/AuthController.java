@@ -5,6 +5,7 @@ import hanieum.conik.application.member.provided.TokenRefresh;
 import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/v1/auth")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "AUTH", description = "회원가입/로그인 로직 API")
 public class AuthController {
 
     private final Auth auth;

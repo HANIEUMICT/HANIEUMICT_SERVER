@@ -6,6 +6,7 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/company")
+@Tag(name = "COMPANY", description = "기업 관련 API")
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyFinder companyFinder;
@@ -25,8 +27,8 @@ public class CompanyController {
     - 기업 정보를 모두 기입한 후에 기업 등록을 진행합니다.
     - 기업 등록 완료시 기업 id를 반환 받습니다.
     """)
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<Long> registerCompany(@Valid @ModelAttribute CompanyRegisterRequest request) {
+    @PostMapping()
+    public ApiResponse<Long> registerCompany(@Valid @RequestBody CompanyRegisterRequest request) {
         return ApiResponse.success(companyRegister.register(request));
     }
 

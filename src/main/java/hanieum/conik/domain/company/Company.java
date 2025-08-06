@@ -1,5 +1,6 @@
 package hanieum.conik.domain.company;
 
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
 import hanieum.conik.domain.member.shared.Email;
@@ -8,6 +9,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -53,7 +57,11 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private CompanyStatus status;
 
-    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy) {
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "company_id", nullable = false)
+    private List<CompanyAddress> addresses = new ArrayList<>();
+
+    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, AddressRegisterRequest address) {
         this.businessType = businessType;
         this.email = email;
         this.industry = industry;
@@ -65,6 +73,7 @@ public class Company extends BaseEntity {
         this.registrationCertificateUrl = registrationCertificateUrl;
         this.registrationNumber = registrationNumber;
         this.status = CompanyStatus.REGISTER_APPROVED;
+        this.addresses.add(CompanyAddress.register(address));
     }
 
     /**
@@ -81,7 +90,8 @@ public class Company extends BaseEntity {
                 request.registrationNumber(),
                 request.registrationCertificateUrl(),
                 request.profileUrl(),
-                request.bankbookCopy()
+                request.bankbookCopy(),
+                request.addressRegisterRequest()
         );
     }
 }
