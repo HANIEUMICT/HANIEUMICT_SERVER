@@ -9,6 +9,7 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
@@ -21,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -45,7 +48,8 @@ public class AuthService implements Auth, TokenRefresh {
 
     @Override
     public MemberLoginResponse signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+        Company company = companyRepository.findById(companyId)
+                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
 
         checkDuplicateEmail(request);
 
@@ -61,17 +65,15 @@ public class AuthService implements Auth, TokenRefresh {
         Member member = memberRepository.findByEmail(new Email(request.email()))
                 .orElseThrow(() -> new AuthException(AuthErrorType.MEMBER_NOT_FOUND));
 
-        if (member.verifyPassword(request.password(), passwordEncoder)) {
-            String accessToken = jwtTokenProviderPort.createAccessToken(member.getId());
-            String refreshToken = jwtTokenProviderPort.createRefreshToken(member.getId());
-
-            String key = "auth:refresh:" + member.getId();
-            memoryMap.setValue(key, refreshToken, jwtTokenProviderPort.getRefreshTokenExpiration());
-
-            return new MemberLoginResponse(TokenInfo.of(accessToken, refreshToken), MemberInfo.from(member));
-        } else {
+        if (!member.verifyPassword(request.password(), passwordEncoder)) {
             throw new MemberException(MemberErrorType.INVALID_PASSWORD);
         }
+
+        TokenInfo tokenInfo = getTokenInfo(member);
+
+        Optional<Long> companyId = getCompanyId(member);
+
+        return new MemberLoginResponse(tokenInfo, MemberInfo.from(member), companyId);
     }
 
     @Override
@@ -98,6 +100,21 @@ public class AuthService implements Auth, TokenRefresh {
                 accessTtl,
                 refreshTtl
         );
+    }
+
+    private TokenInfo getTokenInfo(Member member) {
+        String accessToken  = jwtTokenProviderPort.createAccessToken(member.getId());
+        String refreshToken = jwtTokenProviderPort.createRefreshToken(member.getId());
+        String redisKey     = "auth:refresh:" + member.getId();
+        memoryMap.setValue(redisKey, refreshToken, jwtTokenProviderPort.getRefreshTokenExpiration());
+
+        return TokenInfo.of(accessToken, refreshToken);
+    }
+
+    private static Optional<Long> getCompanyId(Member member) {
+        return member.getRole() == MemberRole.INDIVIDUAL
+                ? Optional.empty()
+                : Optional.of(member.getCompanyId());
     }
 
     private void checkDuplicateEmail(MemberSignUpRequest signUpRequest){
