@@ -1,6 +1,9 @@
 package hanieum.conik.domain.common.address;
 
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.exception.AddressErrorType;
+import hanieum.conik.domain.common.address.exception.AddressException;
+import jakarta.mail.Address;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,13 +37,13 @@ public class AddressBase {
      */
     public void update(AddressRegisterRequest request) {
         if (request.addressPostalCode() == null || request.addressPostalCode().isBlank()) {
-            throw new IllegalArgumentException("우편번호는 필수입니다.");
+            throw new AddressException(AddressErrorType.INVALID_POSTAL_CODE);
         }
         if (request.addressStreetAddress() == null || request.addressStreetAddress().isBlank()) {
-            throw new IllegalArgumentException("도로명 주소는 필수입니다.");
+            throw new AddressException(AddressErrorType.INVALID_STREET_ADDRESS);
         }
         if (request.addressDetailAddress() == null || request.addressDetailAddress().isBlank()) {
-            throw new IllegalArgumentException("상세 주소는 필수입니다.");
+            throw new AddressException(AddressErrorType.INVALID_DETAIL_ADDRESS);
         }
         this.addressPostalCode = request.addressPostalCode();
         this.addressStreetAddress = request.addressStreetAddress();
