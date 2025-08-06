@@ -1,6 +1,5 @@
 package hanieum.conik.domain.company;
 
-import hanieum.conik.domain.address.AddressBase;
 import hanieum.conik.domain.address.CompanyAddress;
 import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;

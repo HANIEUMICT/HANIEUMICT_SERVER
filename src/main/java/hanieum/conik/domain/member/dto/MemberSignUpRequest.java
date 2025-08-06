@@ -1,8 +1,6 @@
 package hanieum.conik.domain.member.dto;
 
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
-import hanieum.conik.domain.address.dto.AddressRegisterRequest;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
