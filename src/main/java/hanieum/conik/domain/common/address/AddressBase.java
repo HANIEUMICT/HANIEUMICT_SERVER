@@ -33,6 +33,15 @@ public class AddressBase {
      * 주소 정보를 업데이트 한다.
      */
     public void update(AddressRegisterRequest request) {
+        if (request.addressPostalCode() == null || request.addressPostalCode().isBlank()) {
+            throw new IllegalArgumentException("우편번호는 필수입니다.");
+        }
+        if (request.addressStreetAddress() == null || request.addressStreetAddress().isBlank()) {
+            throw new IllegalArgumentException("도로명 주소는 필수입니다.");
+        }
+        if (request.addressDetailAddress() == null || request.addressDetailAddress().isBlank()) {
+            throw new IllegalArgumentException("상세 주소는 필수입니다.");
+        }
         this.addressPostalCode = request.addressPostalCode();
         this.addressStreetAddress = request.addressStreetAddress();
         this.addressDetailAddress = request.addressDetailAddress();
