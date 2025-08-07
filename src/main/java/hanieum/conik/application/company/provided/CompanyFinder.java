@@ -1,13 +1,13 @@
 package hanieum.conik.application.company.provided;
 
 import hanieum.conik.domain.company.Company;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * 기업 조회 기능(Port)을 정의한다.
  */
 public interface CompanyFinder {
-    List<Company> findAllCompanies();
+    Page<Company> findAllCompanies(Pageable pageable);
     Company findCompany(Long companyId);
 }

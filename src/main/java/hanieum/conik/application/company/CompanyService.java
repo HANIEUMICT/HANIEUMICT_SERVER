@@ -7,12 +7,10 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.domain.member.shared.Email;
-import hanieum.conik.global.adapter.s3.dto.ImageUploadRequest;
-import hanieum.conik.global.adapter.s3.dto.ReadPreSignedUrlResponse;
-import hanieum.conik.global.application.required.BucketClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -25,14 +23,12 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class CompanyService implements CompanyFinder, CompanyRegister {
-
-    private final BucketClient bucketClient;
     private final CompanyRepository companyRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<Company> findAllCompanies() {
-        return companyRepository.findAll();
+    public Page<Company> findAllCompanies(Pageable pageable) {
+        return companyRepository.findAll(pageable);
     }
 
     @Override

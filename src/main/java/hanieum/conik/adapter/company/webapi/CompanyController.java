@@ -9,10 +9,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/company")
@@ -37,8 +38,8 @@ public class CompanyController {
     - 등록되어있는 모든 기업을 조회할 수 있습니다.
     """)
     @GetMapping
-    public ApiResponse<List<Company>> findAllCompanies() {
-        return ApiResponse.success(companyFinder.findAllCompanies());
+    public ApiResponse<Page<Company>> findAllCompanies(@PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ApiResponse.success(companyFinder.findAllCompanies(pageable));
     }
 
     @Operation(summary = "특정 기업 조회", description = """
