@@ -21,14 +21,7 @@ public record MemberProjectQueryResponse(
         @Schema(description = "프로젝트 도면 파일 목록")
         List<String> drawingUrls
 ) {
-    public static MemberProjectQueryResponse from(Long projectId, LocalDateTime modifiedAt, ProjectRegisterRequest projectRegisterRequest, List<ProjectDrawingFile> drawingFiles) {
-        List<String> drawingUrls = drawingFiles.stream()
-                .map(ProjectDrawingFile::getDrawingUrl)
-                .toList();
-        return new MemberProjectQueryResponse(projectId, modifiedAt, projectRegisterRequest, drawingUrls);
-    }
-
-    public static MemberProjectQueryResponse of(Project project){
+    public static MemberProjectQueryResponse from(Project project){
         return new MemberProjectQueryResponse(
                 project.getId(),
                 project.getModifiedAt(),

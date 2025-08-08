@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface ProposalFinder {
     Proposal findProposal(Long proposalId);
 
-    ProposalDetailResponse getProposalDetail(Long proposalId);
+    Proposal getProposalDetail(Long proposalId);
 
-    Page<ProposalDetailResponse> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable);
+    Page<Proposal> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable);
 }

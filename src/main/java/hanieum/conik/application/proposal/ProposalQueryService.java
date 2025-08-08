@@ -31,13 +31,11 @@ public class ProposalQueryService implements ProposalFinder {
     }
 
     @Override
-    public Page<ProposalDetailResponse> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable) {
+    public Page<Proposal> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable) {
         Member member = memberFinder.find(memberId);
         Long companyId = member.getCompanyId();
 
-        Page<Proposal> proposals = findProposalsWithStatus(submitStatus, companyId, projectId, pageable);
-
-        return proposals.map(ProposalDetailResponse::from);
+        return findProposalsWithStatus(submitStatus, companyId, projectId, pageable);
     }
 
     private Page<Proposal> findProposalsWithStatus(SubmitStatus submitStatus, Long companyId, Long projectId, Pageable pageable) {
@@ -53,9 +51,8 @@ public class ProposalQueryService implements ProposalFinder {
     }
 
     @Override
-    public ProposalDetailResponse getProposalDetail(Long proposalId){
-        Proposal proposal = findProposal(proposalId);
-        return ProposalDetailResponse.from(proposal);
+    public Proposal getProposalDetail(Long proposalId){
+        return findProposal(proposalId);
     }
 
 }

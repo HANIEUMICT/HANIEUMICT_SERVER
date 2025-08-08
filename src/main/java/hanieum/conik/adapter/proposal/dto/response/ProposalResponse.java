@@ -1,6 +1,7 @@
 package hanieum.conik.adapter.proposal.dto.response;
 
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
+import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -15,8 +16,12 @@ public record ProposalResponse(
     @Schema(description = "기업 견적서 상세 내용")
     ProposalRegisterRequest proposalRegisterRequest
 ) {
-    public static ProposalResponse from(Long proposalId, LocalDateTime modifiedAt, ProposalRegisterRequest proposalRegisterRequest) {
-        return new ProposalResponse(proposalId, modifiedAt, proposalRegisterRequest);
+    public static ProposalResponse from(Proposal proposal) {
+        return new ProposalResponse(
+                proposal.getId(),
+                proposal.getModifiedAt(),
+                ProposalRegisterRequest.from(proposal)
+        );
     }
 }
 
