@@ -13,5 +13,5 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     @Query("SELECT c FROM Company c LEFT JOIN FETCH c.addresses WHERE c.id = :id")
     Optional<Company> findByIdWithAddresses(@Param("id") Long id);
 
-    Optional<Member> findByEmail(Email email);
+    Optional<Company> findByEmail(Email email);
 }
