@@ -7,7 +7,9 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.global.application.required.BucketClient;
+import hanieum.conik.domain.member.exception.MemberErrorType;
+import hanieum.conik.domain.member.exception.MemberException;
+import hanieum.conik.domain.member.shared.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,8 +24,6 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class CompanyService implements CompanyFinder, CompanyRegister {
-
-    private final BucketClient bucketClient;
     private final CompanyRepository companyRepository;
 
     @Override
@@ -47,12 +47,18 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
     @Override
     public Long register(CompanyRegisterRequest request) {
-
         Company company = Company.register(request);
 
+        checkDuplicateEmail(request);
+
         companyRepository.save(company);
-        log.info("기업 등록 성공: company id = {}", company.getId());
 
         return company.getId();
+    }
+
+    private void checkDuplicateEmail(CompanyRegisterRequest request){
+        if (companyRepository.findByEmail(new Email(request.email())).isPresent()) {
+            throw new MemberException(MemberErrorType.EMAIL_DUPLICATE);
+        }
     }
 }
