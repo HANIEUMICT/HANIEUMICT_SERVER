@@ -23,35 +23,35 @@ public class Company extends BaseEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String name; // 회사 이름
 
     @Column(nullable = false)
-    private String owner;
+    private String owner;  // 대표자 이름
 
     @Embedded
     @Column(nullable = false)
-    private Email email;
+    private Email email; // 회사 이메일
 
     @Column(nullable = false)
-    private String phoneNumber;
+    private String phoneNumber; // 회사 전화
 
     @Column(nullable = false)
-    private String businessType;
+    private String businessType; // 업태
 
     @Column(nullable = false)
-    private String industry;
+    private String industry; // 종목
 
     @Column(nullable = false)
-    private String registrationNumber;
+    private String registrationNumber; // 사업자 등록번호
 
     @Column(nullable = false, length = 2048)
-    private String registrationCertificateUrl;
+    private String registrationCertificateUrl; // 사업자 등록증 URL
 
     @Column(nullable = false, length = 2048)
-    private String bankbookCopy;
+    private String bankbookCopy;  // 통장사본
 
     @Column(nullable = false, length = 2048)
-    private String profileUrl;
+    private String profileUrl; // 프로필 사진 URL
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

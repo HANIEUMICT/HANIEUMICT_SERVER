@@ -7,9 +7,6 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.domain.member.shared.Email;
-import hanieum.conik.global.adapter.s3.dto.ImageUploadRequest;
-import hanieum.conik.global.adapter.s3.dto.ReadPreSignedUrlResponse;
 import hanieum.conik.global.application.required.BucketClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +36,12 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
     @Transactional(readOnly = true)
     public Company findCompany(Long companyId) {
         return companyRepository.findById(companyId)
+                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public Company findCompanyWithAddresses(Long companyId) {
+        return companyRepository.findByIdWithAddresses(companyId)
                 .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
     }
 

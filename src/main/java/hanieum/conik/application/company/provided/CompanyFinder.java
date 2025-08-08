@@ -9,5 +9,8 @@ import java.util.List;
  */
 public interface CompanyFinder {
     List<Company> findAllCompanies();
+
     Company findCompany(Long companyId);
+
+    Company findCompanyWithAddresses(Long companyId);
 }
