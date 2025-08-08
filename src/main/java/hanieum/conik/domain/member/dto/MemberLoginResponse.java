@@ -24,4 +24,12 @@ public record MemberLoginResponse(
         public static MemberLoginResponse of(TokenInfo tokenInfo, MemberInfo memberInfo, Long companyId) {
                 return new MemberLoginResponse(tokenInfo, memberInfo, companyId);
         }
+
+        // 역할 구분
+        public static MemberLoginResponse individual(TokenInfo token, MemberInfo memberInfo) {
+                return new MemberLoginResponse(token, memberInfo, null);
+        }
+        public static MemberLoginResponse corporate(TokenInfo token, MemberInfo memberInfo, Long companyId) {
+                return new MemberLoginResponse(token, memberInfo, Objects.requireNonNull(companyId));
+        }
 }
