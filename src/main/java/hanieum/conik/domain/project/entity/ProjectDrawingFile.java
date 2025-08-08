@@ -26,9 +26,7 @@ public class ProjectDrawingFile extends AbstractEntity {
         return projectDrawingFile;
     }
 
-    public void updateUploadStatus() {
-        this.uploadStatus = FileStatus.FINALIZED;
-    }
+    void finalizeFile() { this.uploadStatus = FileStatus.FINALIZED; }
 
     public void updateProject(Project project) {
         this.project = project;

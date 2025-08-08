@@ -36,11 +36,5 @@ public class ProjectDrawingModifyService implements ProjectDrawingSaver {
              throw new ProjectException(ProjectErrorType.PROJECT_DRAWING_SAVE_ERROR);
          }
      }
-
-     @Override
-     public void updateDrawingFileToFinal(ProjectDrawingUploadRequest projectDrawingUploadRequest) {
-         List<ProjectDrawingFile> drawingFiles = projectDrawingFinder.findProjectDrawingFiles(projectDrawingUploadRequest.projectId());
-         drawingFiles.forEach(ProjectDrawingFile::updateUploadStatus);
-     }
 }
 

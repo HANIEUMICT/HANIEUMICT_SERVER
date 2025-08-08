@@ -131,6 +131,6 @@ public class Project extends AbstractEntity {
     }
 
     public void finalizeDrawingFiles() {
-        this.drawingFiles.forEach(ProjectDrawingFile::updateUploadStatus);
+        this.drawingFiles.forEach(ProjectDrawingFile::finalizeFile);
     }
 }

@@ -69,7 +69,7 @@ public class ProjectModifyService implements ProjectSaver {
             Project project = projectFinder.findProject(projectId);
             project.update(request);
 
-            project.getDrawingFiles().forEach(ProjectDrawingFile::updateUploadStatus);
+            project.finalizeDrawingFiles();
 
             projectRepository.save(project);
 
