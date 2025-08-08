@@ -66,14 +66,16 @@ public class AuthService implements Auth, TokenRefresh {
         }
 
         TokenInfo tokenInfo = getTokenInfo(member);
+        MemberInfo memberInfo = MemberInfo.from(member);
 
-        Long companyId = (member.getRole() == MemberRole.INDIVIDUAL) ? null : member.getCompanyId();
-
-        if (member.getRole() != MemberRole.INDIVIDUAL && companyId == null) {
-            throw new MemberException(MemberErrorType.COMPANY_ID_MISSING);
+        if(member.getRole() == MemberRole.INDIVIDUAL) {
+            return MemberLoginResponse.individual(tokenInfo, memberInfo);
         }
 
-        return MemberLoginResponse.of(tokenInfo, MemberInfo.from(member), companyId);
+        if(member.getCompanyId() == null) {
+            throw new MemberException(MemberErrorType.COMPANY_ID_MISSING);
+        }
+        return MemberLoginResponse.corporate(tokenInfo, memberInfo, member.getCompanyId());
     }
 
     @Override

@@ -7,8 +7,6 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.domain.member.exception.MemberErrorType;
-import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,7 +56,7 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
     private void checkDuplicateEmail(CompanyRegisterRequest request){
         if (companyRepository.findByEmail(new Email(request.email())).isPresent()) {
-            throw new MemberException(MemberErrorType.EMAIL_DUPLICATE);
+            throw new CompanyException(CompanyErrorType.EMAIL_DUPLICATE);
         }
     }
 }

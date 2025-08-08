@@ -21,11 +21,6 @@ public record MemberLoginResponse(
                 Objects.requireNonNull(memberInfo, "memberInfo 는 필수입니다.");
         }
 
-        public static MemberLoginResponse of(TokenInfo tokenInfo, MemberInfo memberInfo, Long companyId) {
-                return new MemberLoginResponse(tokenInfo, memberInfo, companyId);
-        }
-
-        // 역할 구분
         public static MemberLoginResponse individual(TokenInfo token, MemberInfo memberInfo) {
                 return new MemberLoginResponse(token, memberInfo, null);
         }
