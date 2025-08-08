@@ -36,7 +36,7 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public Project saveProjectDraft(Long projectId, ProjectRegisterRequest request) {
-        if (!request.submitStatus().equals(SubmitStatus.TEMPORARY_SAVE)) {
+        if (request.submitStatus() != SubmitStatus.TEMPORARY_SAVE) {
             throw new ProjectException(ProjectErrorType.PROJECT_DRAFT_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
@@ -44,7 +44,7 @@ public class ProjectModifyService implements ProjectSaver {
 
     @Override
     public Project saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
-        if (!request.submitStatus().equals(SubmitStatus.SUBMIT)) {
+        if (request.submitStatus() != SubmitStatus.SUBMIT) {
             throw new ProjectException(ProjectErrorType.PROJECT_FINAL_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
@@ -55,7 +55,7 @@ public class ProjectModifyService implements ProjectSaver {
         try {
             Project project = projectFinder.findProject(projectId);
             project.updateBidStatusAndPublicUntil(bidStatusUpdateRequest);
-            projectRepository.save(project);
+
             return projectRepository.save(project);
         } catch (Exception e) {
             log.error("에러 발생", e);
