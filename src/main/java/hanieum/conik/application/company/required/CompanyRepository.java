@@ -1,7 +1,6 @@
 package hanieum.conik.application.company.required;
 
 import hanieum.conik.domain.company.Company;
-import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.shared.Email;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -8,6 +8,9 @@ import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.shared.Email;
+import hanieum.conik.global.adapter.s3.dto.ImageUploadRequest;
+import hanieum.conik.global.adapter.s3.dto.ReadPreSignedUrlResponse;
+import hanieum.conik.global.application.required.BucketClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class CompanyService implements CompanyFinder, CompanyRegister {
+
+    private final BucketClient bucketClient;
     private final CompanyRepository companyRepository;
 
     @Override
