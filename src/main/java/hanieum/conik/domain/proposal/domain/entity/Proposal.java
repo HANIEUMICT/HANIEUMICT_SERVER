@@ -72,6 +72,7 @@ public class Proposal extends AbstractEntity {
         this.drawingFiles.add(drawingFile);
         drawingFile.updateProposal(this);
     }
+    public void finalizeDrawings() { this.drawingFiles.forEach(ProposalDrawingFile::finalizeFile); }
 
     public void removeDrawing(ProposalDrawingFile drawingFile) {
         this.drawingFiles.remove(drawingFile);

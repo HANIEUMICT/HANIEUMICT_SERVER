@@ -74,6 +74,8 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
             Proposal proposal = proposalFinder.findProposal(proposalId);
             proposal.update(request);
 
+            proposal.finalizeDrawings();
+
             Consumer<Proposal> handler = statusHandlers.get(request.submitStatus());
             handler.accept(proposal);
 
