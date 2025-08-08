@@ -54,7 +54,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
 
     @Override
     public Proposal saveProposalDraft(Long proposalId, ProposalRegisterRequest proposalRegisterRequest) {
-        if (!proposalRegisterRequest.submitStatus().equals(SubmitStatus.TEMPORARY_SAVE)) {
+        if (!SubmitStatus.TEMPORARY_SAVE.equals(proposalRegisterRequest.submitStatus())) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_DRAFT_REQUEST_ERROR);
         }
         return getSavedProposal(proposalId, proposalRegisterRequest);
@@ -62,7 +62,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
 
     @Override
     public Proposal saveProposalFinal(Long proposalId, ProposalRegisterRequest proposalRegisterRequest) {
-        if (!proposalRegisterRequest.submitStatus().equals(SubmitStatus.SUBMIT)) {
+        if (!SubmitStatus.SUBMIT.equals(proposalRegisterRequest.submitStatus())) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_FINAL_REQUEST_ERROR);
         }
         return getSavedProposal(proposalId, proposalRegisterRequest);
