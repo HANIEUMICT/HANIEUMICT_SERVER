@@ -1,8 +1,9 @@
 package hanieum.conik.domain.member.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.util.Optional;
+import java.util.Objects;
 
 public record MemberLoginResponse(
         @Schema(description = "토큰 정보")
@@ -12,5 +13,15 @@ public record MemberLoginResponse(
         MemberInfo memberInfo,
 
         @Schema(description = "멤버가 속한 기업 id", nullable = true)
-        Optional<Long> companyId
-) {}
+        @JsonInclude(JsonInclude.Include.NON_NULL)
+        Long companyId
+) {
+        public MemberLoginResponse {
+                Objects.requireNonNull(tokenInfo, "tokenInfo 는 필수입니다.");
+                Objects.requireNonNull(memberInfo, "memberInfo 는 필수입니다.");
+        }
+
+        public static MemberLoginResponse of(TokenInfo tokenInfo, MemberInfo memberInfo, Long companyId) {
+                return new MemberLoginResponse(tokenInfo, memberInfo, companyId);
+        }
+}

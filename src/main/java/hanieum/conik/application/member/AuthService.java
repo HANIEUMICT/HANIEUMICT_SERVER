@@ -1,13 +1,12 @@
 package hanieum.conik.application.member;
 
-import hanieum.conik.application.company.required.CompanyRepository;
+import hanieum.conik.application.company.provided.CompanyFinder;
+import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.provided.TokenRefresh;
 import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.company.Company;
-import hanieum.conik.domain.company.exception.CompanyErrorType;
-import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.MemberErrorType;
@@ -23,8 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Optional;
-
 @Service
 @Transactional
 @Validated
@@ -32,7 +29,8 @@ import java.util.Optional;
 public class AuthService implements Auth, TokenRefresh {
 
     private final MemberRepository memberRepository;
-    private final CompanyRepository companyRepository;
+    private final CompanyFinder companyFinder;
+    private final MemberFinder memberFinder;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final MemoryMap memoryMap;
@@ -48,8 +46,7 @@ public class AuthService implements Auth, TokenRefresh {
 
     @Override
     public MemberLoginResponse signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+        Company company = companyFinder.findCompany(companyId);
 
         checkDuplicateEmail(request);
 
@@ -62,8 +59,7 @@ public class AuthService implements Auth, TokenRefresh {
 
     @Override
     public MemberLoginResponse login(MemberLoginRequest request) {
-        Member member = memberRepository.findByEmail(new Email(request.email()))
-                .orElseThrow(() -> new AuthException(AuthErrorType.MEMBER_NOT_FOUND));
+        Member member = memberFinder.findByEmail(new Email(request.email()));
 
         if (!member.verifyPassword(request.password(), passwordEncoder)) {
             throw new MemberException(MemberErrorType.INVALID_PASSWORD);
@@ -71,9 +67,13 @@ public class AuthService implements Auth, TokenRefresh {
 
         TokenInfo tokenInfo = getTokenInfo(member);
 
-        Optional<Long> companyId = getCompanyId(member);
+        Long companyId = (member.getRole() == MemberRole.INDIVIDUAL) ? null : member.getCompanyId();
 
-        return new MemberLoginResponse(tokenInfo, MemberInfo.from(member), companyId);
+        if (member.getRole() != MemberRole.INDIVIDUAL && companyId == null) {
+            throw new MemberException(MemberErrorType.COMPANY_ID_MISSING);
+        }
+
+        return MemberLoginResponse.of(tokenInfo, MemberInfo.from(member), companyId);
     }
 
     @Override
@@ -109,12 +109,6 @@ public class AuthService implements Auth, TokenRefresh {
         memoryMap.setValue(redisKey, refreshToken, jwtTokenProviderPort.getRefreshTokenExpiration());
 
         return TokenInfo.of(accessToken, refreshToken);
-    }
-
-    private static Optional<Long> getCompanyId(Member member) {
-        return member.getRole() == MemberRole.INDIVIDUAL
-                ? Optional.empty()
-                : Optional.of(member.getCompanyId());
     }
 
     private void checkDuplicateEmail(MemberSignUpRequest signUpRequest){
