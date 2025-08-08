@@ -8,8 +8,6 @@ import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.shared.Email;
-import hanieum.conik.global.adapter.s3.dto.ImageUploadRequest;
-import hanieum.conik.global.adapter.s3.dto.ReadPreSignedUrlResponse;
 import hanieum.conik.global.application.required.BucketClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,6 +53,7 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
         checkDuplicateEmail(request);
 
         companyRepository.save(company);
+        log.info("기업 등록 성공: company id = {}", company.getId());
 
         return company.getId();
     }
