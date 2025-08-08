@@ -28,13 +28,13 @@ public class MemberModifyService implements MemberSaver {
 
     @Override
     public void updateProfile(Long memberId, MemberProfileUpdateRequest request) {
-        Member member = memberFinder.find(memberId);
+        Member member = memberFinder.findById(memberId);
         member.updateProfile(request);
     }
 
     @Override
     public void updatePassword(Long memberId, PasswordChangeRequest request) {
-        Member member = memberFinder.find(memberId);
+        Member member = memberFinder.findById(memberId);
 
         if (!passwordEncoder.matches(request.currentPassword(), member.getHashedPassword())) {
             throw new MemberException(MemberErrorType.INVALID_PASSWORD);
@@ -46,7 +46,7 @@ public class MemberModifyService implements MemberSaver {
 
     @Override
     public void addAddress(Long memberId, AddressRegisterRequest request) {
-        Member member = memberFinder.find(memberId);
+        Member member = memberFinder.findById(memberId);
         MemberAddress address = MemberAddress.register(request);
         member.addAddress(address);
     }
