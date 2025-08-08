@@ -12,7 +12,7 @@ public interface ProposalSaver {
 
     Proposal saveProposalFinal(Long proposalId, ProposalRegisterRequest proposalRegisterRequest);
 
-    Proposal updateToDealRequested(Long proposalId, ProposalBidStatus proposalBidStatus);
+    Proposal updateToDealRequested(Long proposalId);
 
     Proposal rejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus);
 

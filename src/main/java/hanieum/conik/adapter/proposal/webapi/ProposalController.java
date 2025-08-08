@@ -91,9 +91,8 @@ public class ProposalController {
 
     @Operation(summary = "기업 견적서(입찰) 요청 API", description = "입찰에 참여한 기업 중에 골라서 거래를 요청합니다.")
     @PatchMapping("/{proposalId}/request")
-    public ApiResponse<ProposalResponse> requestDeal(@PathVariable("proposalId") Long proposalId,
-                                                     @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
-        Proposal proposal = proposalSaver.updateToDealRequested(proposalId, proposalBidStatus);
+    public ApiResponse<ProposalResponse> dealRequest(@PathVariable("proposalId") Long proposalId) {
+        Proposal proposal = proposalSaver.updateToDealRequested(proposalId);
 
         return ApiResponse.success(ProposalResponse.from(proposal));
     }

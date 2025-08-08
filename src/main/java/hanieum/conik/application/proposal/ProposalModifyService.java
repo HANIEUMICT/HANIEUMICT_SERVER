@@ -93,13 +93,13 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     }
 
     @Override
-    public Proposal updateToDealRequested(Long proposalId, ProposalBidStatus proposalBidStatus) {
-        if (!proposalBidStatus.equals(ProposalBidStatus.DEAL_REQUESTED)) {
+    public Proposal updateToDealRequested(Long proposalId) {
+        Proposal proposal = proposalFinder.findProposal(proposalId);
+        if (!proposal.getProposalBidStatus().equals(ProposalBidStatus.PRE_BID)) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_REQUEST_ERROR);
         }
-        Proposal proposal = proposalFinder.findProposal(proposalId);
-        proposal.updateToBidRequested();
-        return proposal;
+
+        return proposal.updateToBidRequested();
     }
 
     @Override

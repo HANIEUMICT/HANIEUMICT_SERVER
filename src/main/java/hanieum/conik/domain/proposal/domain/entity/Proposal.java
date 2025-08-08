@@ -106,8 +106,9 @@ public class Proposal extends AbstractEntity {
         finalizeDrawingFiles();
     }
 
-    public void updateToBidRequested() {
+    public Proposal updateToBidRequested() {
         this.proposalBidStatus = ProposalBidStatus.DEAL_REQUESTED;
+        return this;
     }
 
     public void acceptDeal() { this.proposalBidStatus = ProposalBidStatus.ACCEPT_DEAL; }
