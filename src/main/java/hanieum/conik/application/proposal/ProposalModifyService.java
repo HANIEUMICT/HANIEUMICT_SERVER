@@ -103,7 +103,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     }
 
     @Override
-    public Proposal AcceptDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
+    public Proposal acceptDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
         if (!proposalBidStatus.equals(ProposalBidStatus.ACCEPT_DEAL)) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_ACCEPT_ERROR);
         }
@@ -114,7 +114,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     }
 
     @Override
-    public Proposal RejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
+    public Proposal rejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus) {
         if (!proposalBidStatus.equals(ProposalBidStatus.REJECT_DEAL)) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_REJECT_ERROR);
         }

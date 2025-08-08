@@ -102,7 +102,7 @@ public class ProposalController {
     @PatchMapping("/{proposalId}/accept")
     public ApiResponse<ProposalResponse> acceptDeal(@PathVariable("proposalId") Long proposalId,
                                                     @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
-        Proposal proposal = proposalSaver.AcceptDeal(proposalId, proposalBidStatus);
+        Proposal proposal = proposalSaver.acceptDeal(proposalId, proposalBidStatus);
 
         return ApiResponse.success(ProposalResponse.from(proposal));
     }
@@ -111,7 +111,7 @@ public class ProposalController {
     @PatchMapping("/{proposalId}/reject")
     public ApiResponse<ProposalResponse> rejectDeal(@PathVariable("proposalId") Long proposalId,
                                                     @RequestParam(required = false) ProposalBidStatus proposalBidStatus) {
-        Proposal proposal = proposalSaver.RejectDeal(proposalId, proposalBidStatus);
+        Proposal proposal = proposalSaver.rejectDeal(proposalId, proposalBidStatus);
 
         return ApiResponse.success(ProposalResponse.from(proposal));
     }

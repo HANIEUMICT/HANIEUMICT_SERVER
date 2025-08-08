@@ -14,7 +14,7 @@ public interface ProposalSaver {
 
     Proposal updateToDealRequested(Long proposalId, ProposalBidStatus proposalBidStatus);
 
-    Proposal RejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus);
+    Proposal rejectDeal(Long proposalId, ProposalBidStatus proposalBidStatus);
 
-    Proposal AcceptDeal(Long proposalId, ProposalBidStatus proposalBidStatus);
+    Proposal acceptDeal(Long proposalId, ProposalBidStatus proposalBidStatus);
 }
