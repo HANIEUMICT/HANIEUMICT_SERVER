@@ -130,7 +130,5 @@ public class Project extends AbstractEntity {
         drawingFile.updateProject(null);
     }
 
-    public void finalizeDrawingFiles() {
-        this.drawingFiles.forEach(ProjectDrawingFile::finalizeFile);
-    }
+    public void finalizeDrawingFiles() { this.drawingFiles.forEach(ProjectDrawingFile::finalizeFile); }
 }

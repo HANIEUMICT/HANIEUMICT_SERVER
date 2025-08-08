@@ -11,9 +11,11 @@ public record CompanyResponse(
 ) {
     public static CompanyResponse from(Company company) {
         CompanyDetailResponse detail = CompanyDetailResponse.from(company);
-        List<CompanyAddressResponse> addresses = company.getAddresses().stream()
-                .map(CompanyAddressResponse::from)
-                .toList();
+        List<CompanyAddressResponse> addresses = company.getAddresses() == null
+                ? List.of()
+                : company.getAddresses().stream()
+                    .map(CompanyAddressResponse::from)
+                    .toList();
 
         return new CompanyResponse(detail, addresses);
     }

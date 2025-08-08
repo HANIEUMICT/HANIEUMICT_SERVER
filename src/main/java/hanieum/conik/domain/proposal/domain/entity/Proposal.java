@@ -72,7 +72,6 @@ public class Proposal extends AbstractEntity {
         this.drawingFiles.add(drawingFile);
         drawingFile.updateProposal(this);
     }
-    public void finalizeDrawingFiles() { this.drawingFiles.forEach(ProposalDrawingFile::finalizeFile); }
 
     public void removeDrawing(ProposalDrawingFile drawingFile) {
         this.drawingFiles.remove(drawingFile);
@@ -93,13 +92,18 @@ public class Proposal extends AbstractEntity {
             this.addItem(item);
         }
     }
+    void finalizeDrawingFiles() { this.drawingFiles.forEach(ProposalDrawingFile::finalizeFile); }
 
     public void updateToDraft() {
         this.submitStatus = SubmitStatus.TEMPORARY_SAVE;
+
+        finalizeDrawingFiles();
     }
 
     public void updateToFinal() {
         this.submitStatus = SubmitStatus.SUBMIT;
+
+        finalizeDrawingFiles();
     }
 
     public void updateToBidRequested() {
