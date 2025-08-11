@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class Project extends AbstractEntity {
 
     private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
 
+    @BatchSize( size = 250)
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectDrawingFile> drawingFiles = new ArrayList<>();
 

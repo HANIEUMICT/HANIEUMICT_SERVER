@@ -52,7 +52,7 @@ public class ProposalQueryService implements ProposalFinder {
 
     @Override
     public Proposal getProposalDetail(Long proposalId){
-        return findProposal(proposalId);
+        return proposalRepository.findDetailById(proposalId)
+                .orElseThrow(() -> new ProposalException(ProposalErrorType.PROPOSAL_NOT_FOUND));
     }
-
 }

@@ -70,7 +70,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
 
     private Proposal getSavedProposal(Long proposalId, ProposalRegisterRequest request) {
         try {
-            Proposal proposal = proposalFinder.findProposal(proposalId);
+            Proposal proposal = proposalFinder.getProposalDetail(proposalId);
             proposal.update(request);
 
             Consumer<Proposal> handler = statusHandlers.get(request.submitStatus());

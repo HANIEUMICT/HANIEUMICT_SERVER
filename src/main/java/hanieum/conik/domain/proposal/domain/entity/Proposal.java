@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +37,10 @@ public class Proposal extends AbstractEntity {
 
     private ProposalBidStatus proposalBidStatus = ProposalBidStatus.PRE_BID;
 
+    @BatchSize(size = 250)
     private List<ProposalItem> items = new ArrayList<>();
 
+    @BatchSize(size = 250)
     private List<ProposalDrawingFile> drawingFiles = new ArrayList<>();
 
     public static Proposal create(Long projectId, Long companyId, Long totalPrice,
