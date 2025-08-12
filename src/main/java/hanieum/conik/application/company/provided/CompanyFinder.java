@@ -1,5 +1,6 @@
 package hanieum.conik.application.company.provided;
 
+import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
 import hanieum.conik.domain.company.Company;
 
 import java.util.List;
@@ -8,7 +9,7 @@ import java.util.List;
  * 기업 조회 기능(Port)을 정의한다.
  */
 public interface CompanyFinder {
-    List<Company> findAllCompanies();
+    List<CompanyDetailResponse> findAllCompanies();
 
     Company findCompany(Long companyId);
 

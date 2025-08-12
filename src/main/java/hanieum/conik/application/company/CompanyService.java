@@ -1,5 +1,6 @@
 package hanieum.conik.application.company;
 
+import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanyRegister;
 import hanieum.conik.application.company.required.CompanyRepository;
@@ -8,8 +9,6 @@ import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.global.application.required.BucketClient;
-import hanieum.conik.domain.member.exception.MemberErrorType;
-import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
 import hanieum.conik.domain.member.shared.Email;
 import hanieum.conik.global.application.required.BucketClient;
@@ -33,10 +32,11 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Company> findAllCompanies() {
-        return companyRepository.findAll();
+    public List<CompanyDetailResponse> findAllCompanies() {
+        return companyRepository.findAll().stream()
+                .map(CompanyDetailResponse::from)
+                .toList();
     }
-
     @Override
     @Transactional(readOnly = true)
     public Company findCompany(Long companyId) {
