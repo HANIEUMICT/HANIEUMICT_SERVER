@@ -53,7 +53,7 @@ public class ProjectModifyService implements ProjectSaver {
     @Override
     public Project updateProjectBidStatus(Long projectId, BidStatusUpdateRequest bidStatusUpdateRequest) {
         try {
-            Project project = projectFinder.findProject(projectId);
+            Project project = projectFinder.getProjectDetail(projectId);
             project.updateBidStatusAndPublicUntil(bidStatusUpdateRequest);
 
             return projectRepository.save(project);
