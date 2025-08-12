@@ -5,11 +5,22 @@ import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findByMemberId(Long memberId);
+
+    @Query("""
+        select distinct p
+        from Project p
+        left join fetch p.drawingFiles df
+        where p.id = :id
+    """)
+    Optional<Project> findByIdWithDrawingFiles(@Param("id") Long id);
 
     Page<Project> findByMemberIdAndSubmitStatus(Long memberId, SubmitStatus submitStatus, Pageable pageable);
 

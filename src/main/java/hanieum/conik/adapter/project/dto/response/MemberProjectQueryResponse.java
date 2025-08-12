@@ -22,13 +22,17 @@ public record MemberProjectQueryResponse(
         List<String> drawingUrls
 ) {
     public static MemberProjectQueryResponse from(Project project){
+        List<String> drawingUrls = (project.getDrawingFiles() != null)
+                ? project.getDrawingFiles().stream()
+                .map(ProjectDrawingFile::getDrawingUrl)
+                .toList()
+                : List.of();
+
         return new MemberProjectQueryResponse(
                 project.getId(),
                 project.getModifiedAt(),
                 ProjectRegisterRequest.from(project),
-                project.getDrawingFiles().stream()
-                        .map(ProjectDrawingFile::getDrawingUrl)
-                        .toList()
+                drawingUrls
         );
     }
 }

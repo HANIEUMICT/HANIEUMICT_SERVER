@@ -11,7 +11,8 @@ public interface ProjectFinder {
 
     Project validateProjectOpenStatus(Long projectId);
 
-    Project getProjectDetail(Long projectId, Long memberId);
+    Project getProjectDetail(Long projectId);
 
-    Page<Project> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable);
+    Page<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable);
+
 }

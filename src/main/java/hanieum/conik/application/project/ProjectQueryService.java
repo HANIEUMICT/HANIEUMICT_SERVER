@@ -1,6 +1,5 @@
 package hanieum.conik.application.project;
 
-import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
@@ -30,13 +29,16 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
-    public Page<Project> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
+    public Page<MemberProjectQueryResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
+        Page<Project> projects;
 
         if (memberId != null) {
-            return findProjectsWithStatus(submitStatus, memberId, pageable);
+            projects = findProjectsWithStatus(submitStatus, memberId, pageable);
         } else {
-            return findAllProjectsWithStatus(submitStatus, pageable);
+            projects = findAllProjectsWithStatus(submitStatus, pageable);
         }
+
+        return projects.map(MemberProjectQueryResponse::from);
     }
 
     private Page<Project> findProjectsWithStatus(SubmitStatus submitStatus, Long memberId, Pageable pageable) {
@@ -61,7 +63,8 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
-    public Project getProjectDetail(Long projectId, Long memberId){
-        return findProject(projectId);
+    public Project getProjectDetail(Long projectId){
+        return projectRepository.findByIdWithDrawingFiles(projectId)
+                .orElseThrow(() -> new ProjectException(ProjectErrorType.PROJECT_NOT_FOUND));
     }
 }

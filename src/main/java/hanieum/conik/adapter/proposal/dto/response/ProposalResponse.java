@@ -25,5 +25,15 @@ public record ProposalResponse(
                 ProposalRegisterRequest.from(proposal)
         );
     }
+
+    public static ProposalResponse from(Proposal proposal, ProposalRegisterRequest registerRequest) {
+        Objects.requireNonNull(proposal, "proposal must not be null");
+        Objects.requireNonNull(registerRequest, "proposalRegisterRequest must not be null");
+        return new ProposalResponse(
+                proposal.getId(),
+                proposal.getModifiedAt(),
+                registerRequest
+        );
+    }
 }
 

@@ -43,6 +43,13 @@ public record ProposalRegisterRequest(
         SubmitStatus submitStatus
 ) {
     public static ProposalRegisterRequest from(Proposal proposal) {
+        List<ProposalItemRequest> items = proposal.getItems().stream()
+                .map(ProposalItemRequest::from)
+                .toList();
+        return from(proposal, items);
+    }
+
+    public static ProposalRegisterRequest from(Proposal proposal, List<ProposalItemRequest> items) {
         return new ProposalRegisterRequest(
                 proposal.getProjectId(),
                 proposal.getCompanyId(),
@@ -50,9 +57,7 @@ public record ProposalRegisterRequest(
                 proposal.getFirstPrice(),
                 proposal.getSecondPrice(),
                 proposal.getProposalNote(),
-                proposal.getItems().stream()
-                        .map(ProposalItemRequest::from)
-                        .toList(),
+                items,
                 proposal.getProposalBidStatus(),
                 proposal.getSubmitStatus()
         );
