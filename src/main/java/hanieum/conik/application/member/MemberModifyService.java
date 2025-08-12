@@ -22,7 +22,6 @@ import org.springframework.validation.annotation.Validated;
 @RequiredArgsConstructor
 public class MemberModifyService implements MemberSaver {
 
-    private final MemberRepository memberRepository;
     private final MemberFinder memberFinder;
     private final PasswordEncoder passwordEncoder;  // 비밀번호 검증용
 
