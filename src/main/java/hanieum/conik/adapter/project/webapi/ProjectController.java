@@ -79,7 +79,7 @@ public class ProjectController {
     }
 
     @Operation(summary = "특정 프로젝트(공고) 조회 API", description = "프로젝트 ID로 특정 프로젝트를 조회합니다.")
-    @GetMapping("/detail/{projectId}")
+    @GetMapping("/{projectId}/detail")
     public ApiResponse<MemberProjectQueryResponse> getProject(@PathVariable("projectId") Long projectId) {
         Project project = projectFinder.getProjectDetail(projectId);
 
