@@ -4,8 +4,6 @@ import hanieum.conik.domain.project.enumerate.DeliveryStatus;
 import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProjectProgess extends AbstractEntity {
+public class ProjectProgress extends AbstractEntity {
     private Long projectId;
 
     private ProjectProgressStep progressStep;

@@ -7,6 +7,7 @@ import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
+import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
@@ -43,7 +44,9 @@ public class ProjectController {
     @PostMapping("{memberId}/init")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> initProject(@PathVariable("memberId") Long memberId) {
-        return ApiResponse.success(projectSaver.initiate(memberId));
+        Project project = projectSaver.initiate(memberId);
+
+        return ApiResponse.success(MemberProjectQueryResponse.from(project));
     }
 
     @Operation(summary = "프로젝트(공고) 수정 및 임시저장 API", description = "임시 저장 시, 발급된 프로젝트(공고)에 대해 정보를 수정합니다.")
@@ -51,7 +54,9 @@ public class ProjectController {
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> saveProjectTemp(@PathVariable("projectId") Long projectId,
                                                                @RequestBody ProjectRegisterRequest projectRegisterRequest) {
-        return ApiResponse.success(projectSaver.saveProjectDraft(projectId, projectRegisterRequest));
+        Project project = projectSaver.saveProjectDraft(projectId, projectRegisterRequest);
+
+        return ApiResponse.success(MemberProjectQueryResponse.from(project));
     }
 
     @Operation(summary = "프로젝트(공고) 수정 및 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
@@ -59,7 +64,9 @@ public class ProjectController {
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> saveProjectFinal(@PathVariable("projectId") Long projectId,
                                                                 @RequestBody @Valid ProjectRegisterRequest projectRegisterRequest) {
-        return ApiResponse.success(projectSaver.saveProjectFinal(projectId, projectRegisterRequest));
+        Project project = projectSaver.saveProjectFinal(projectId, projectRegisterRequest);
+
+        return ApiResponse.success(MemberProjectQueryResponse.from(project));
     }
 
     @Operation(summary = "사용자 프로젝트(공고) 조회 API", description = "사용자의 프로젝트(공고) 목록을 조회합니다.")
@@ -67,7 +74,9 @@ public class ProjectController {
     public ApiResponse<Page<MemberProjectQueryResponse>> getMemberProjects(@RequestParam(value = "status", required = false) SubmitStatus submitStatus,
                                                                            @RequestParam(value = "memberId", required = false) Long memberId,
                                                                            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus, pageable));
+        Page<Project> projects = projectFinder.getMemberProjects(memberId, submitStatus, pageable);
+
+        return ApiResponse.success(projects.map(MemberProjectQueryResponse::from));
     }
 
     @Operation(summary = "특정 프로젝트(공고) 조회 API", description = "프로젝트 ID로 특정 프로젝트를 조회합니다.")
@@ -75,7 +84,9 @@ public class ProjectController {
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_PARAM, paramName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> getProject(@PathVariable("projectId") Long projectId,
                                                               @RequestParam("memberId") Long memberId) {
-        return ApiResponse.success(projectFinder.getProjectDetail(projectId, memberId));
+        Project project = projectFinder.getProjectDetail(projectId, memberId);
+
+        return ApiResponse.success(MemberProjectQueryResponse.from(project));
     }
 
     @Operation(summary = "프로젝트(공고) 입찰 상태 변경 API", description = "프로젝트(공고)의 입찰 상태를 변경합니다.")
@@ -83,6 +94,8 @@ public class ProjectController {
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
     public ApiResponse<MemberProjectQueryResponse> changeProjectStatus(@PathVariable("projectId") Long projectId,
                                                                        @RequestBody @Valid  BidStatusUpdateRequest bidStatusUpdateRequest) {
-        return ApiResponse.success(projectSaver.updateProjectBidStatus(projectId, bidStatusUpdateRequest));
+        Project project = projectSaver.updateProjectBidStatus(projectId, bidStatusUpdateRequest);
+
+        return ApiResponse.success(MemberProjectQueryResponse.from(project));
     }
 }

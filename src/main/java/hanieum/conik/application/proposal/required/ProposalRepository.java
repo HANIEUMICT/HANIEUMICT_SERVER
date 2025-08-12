@@ -5,11 +5,18 @@ import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProposalRepository extends JpaRepository<Proposal, Long> {
-    List<Proposal> findByCompanyId(Long companyId);
+    @Query("select p from Proposal p " +
+            "left join fetch p.items " +
+            "left join fetch p.drawingFiles " +
+            "where p.id = :id")
+    Optional<Proposal> findDetailById(@Param("id") Long id);
 
     Page<Proposal> findByCompanyIdAndSubmitStatusIn(Long companyId, List<SubmitStatus> submitStatuses, Pageable pageable);
 

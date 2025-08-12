@@ -1,5 +1,7 @@
 package hanieum.conik.adapter.company.webapi;
 
+import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
+import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanyRegister;
 import hanieum.conik.domain.company.Company;
@@ -46,7 +48,8 @@ public class CompanyController {
     - 기업id를 통해 특정 기업을 조회할 수 있습니다.
     """)
     @GetMapping("/{companyId}")
-    public ApiResponse<Company> findCompany(@PathVariable Long companyId) {
-        return ApiResponse.success(companyFinder.findCompany(companyId));
+    public ApiResponse<CompanyResponse> findCompany(@PathVariable Long companyId) {
+        Company company = companyFinder.findCompanyWithAddresses(companyId);
+        return ApiResponse.success(CompanyResponse.from(company));
     }
 }

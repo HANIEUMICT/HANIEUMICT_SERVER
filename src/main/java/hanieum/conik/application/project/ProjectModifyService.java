@@ -25,55 +25,54 @@ public class ProjectModifyService implements ProjectSaver {
     private final ProjectFinder projectFinder;
 
     @Override
-    public MemberProjectQueryResponse initiate(Long memberId) {
+    public Project initiate(Long memberId) {
         try {
             Project project = Project.initiate(memberId);
-            projectRepository.save(project);
-            return MemberProjectQueryResponse.from(project.getId(), project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
+            return projectRepository.save(project);
         } catch (Exception e) {
             throw new ProjectException(ProjectErrorType.PROJECT_INITIATE_ERROR);
         }
     }
 
     @Override
-    public MemberProjectQueryResponse saveProjectDraft(Long projectId, ProjectRegisterRequest request) {
-        if (!request.submitStatus().equals(SubmitStatus.TEMPORARY_SAVE)) {
+    public Project saveProjectDraft(Long projectId, ProjectRegisterRequest request) {
+        if (request.submitStatus() != SubmitStatus.TEMPORARY_SAVE) {
             throw new ProjectException(ProjectErrorType.PROJECT_DRAFT_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
     }
 
     @Override
-    public MemberProjectQueryResponse saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
-        if (!request.submitStatus().equals(SubmitStatus.SUBMIT)) {
+    public Project saveProjectFinal(Long projectId, ProjectRegisterRequest request) {
+        if (request.submitStatus() != SubmitStatus.SUBMIT) {
             throw new ProjectException(ProjectErrorType.PROJECT_FINAL_SAVE_ERROR);
         }
         return getSavedProject(projectId, request);
     }
 
     @Override
-    public MemberProjectQueryResponse updateProjectBidStatus(Long projectId, BidStatusUpdateRequest bidStatusUpdateRequest) {
+    public Project updateProjectBidStatus(Long projectId, BidStatusUpdateRequest bidStatusUpdateRequest) {
         try {
             Project project = projectFinder.findProject(projectId);
             project.updateBidStatusAndPublicUntil(bidStatusUpdateRequest);
-            projectRepository.save(project);
-            return MemberProjectQueryResponse.from(project.getId(), project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
+
+            return projectRepository.save(project);
         } catch (Exception e) {
             log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_BID_STATUS_UPDATE_ERROR);
         }
     }
 
-    private MemberProjectQueryResponse getSavedProject(Long projectId, ProjectRegisterRequest request) {
+    private Project getSavedProject(Long projectId, ProjectRegisterRequest request) {
         try {
             Project project = projectFinder.findProject(projectId);
             project.update(request);
 
-            project.getDrawingFiles().forEach(ProjectDrawingFile::updateUploadStatus);
+            project.finalizeDrawingFiles();
 
             projectRepository.save(project);
 
-            return MemberProjectQueryResponse.from(projectId, project.getModifiedAt(), ProjectRegisterRequest.from(project), project.getDrawingFiles());
+            return projectRepository.save(project);
         } catch (Exception e) {
             log.error("에러 발생", e);
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
