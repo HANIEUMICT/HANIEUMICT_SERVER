@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -60,5 +61,10 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
         log.info("기업 등록 성공: company id = {}", company.getId());
 
         return company.getId();
+    }
+
+    @Override
+    public List<Company> findCompaniesWithDetail(Collection<Long> ids) {
+        return companyRepository.findAllWithDetailByIdIn(ids);
     }
 }

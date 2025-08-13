@@ -2,6 +2,7 @@ package hanieum.conik.application.company.provided;
 
 import hanieum.conik.domain.company.Company;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -15,4 +16,6 @@ public interface CompanyFinder {
     Company findCompanyWithDetail(Long companyId);
 
     Company findCompanyWithAddresses(Long companyId);
+
+    List<Company> findCompaniesWithDetail(Collection<Long> ids);
 }

@@ -10,8 +10,6 @@ import java.util.List;
 public interface ProposalFinder {
     Proposal findProposal(Long proposalId);
 
-    Proposal getProposalDetail(Long proposalId);
-
     List<Proposal> findSubmittedProposalsByProjectId(Long projectId);
 
     Page<Proposal> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable);

@@ -18,6 +18,7 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
             "where p.id = :id")
     Optional<Proposal> findDetailById(@Param("id") Long id);
 
+
     List<Proposal> findByProjectIdAndSubmitStatus(Long projectId, SubmitStatus submitStatus);
 
     Page<Proposal> findByCompanyIdAndSubmitStatusIn(Long companyId, List<SubmitStatus> submitStatuses, Pageable pageable);

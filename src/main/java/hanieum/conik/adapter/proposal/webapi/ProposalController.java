@@ -83,7 +83,7 @@ public class ProposalController {
     @Operation(summary = "기업 견적서(입찰) 단일 조회 API", description = "특정 기업 견적서(입찰)를 조회합니다.")
     @GetMapping("/{proposalId}/detail")
     public ApiResponse<ProposalDetailResponse> getProposal(@PathVariable("proposalId") Long proposalId) {
-        Proposal proposal = proposalFinder.getProposalDetail(proposalId);
+        Proposal proposal = proposalFinder.findProposal(proposalId);
 
         return ApiResponse.success(ProposalDetailResponse.from(proposal) ) ;
     }

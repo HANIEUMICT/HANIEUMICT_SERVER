@@ -22,6 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,9 +84,17 @@ public class ProjectQueryService implements ProjectFinder {
         // 2. ProposalFinder를 통해 제안서들 조회
         List<Proposal> proposals = proposalFinder.findSubmittedProposalsByProjectId(projectId);
 
-        // 3. 제안서별 회사 정보 조회 및 DTO 조합
+        // 3. 회사들 일괄 로딩 후 매핑
+        Set<Long> companyIds = proposals.stream()
+                .map(Proposal::getCompanyId)
+                .collect(Collectors.toSet());
+
+        Map<Long, Company> companyMap = companyFinder.findCompaniesWithDetail(companyIds).stream()
+                .collect(Collectors.toMap(Company::getId, Function.identity()));
+
+        // 4) DTO 조합 (단건 조회 제거)
         List<ProposalThumbnailResponse> proposalThumbnails = proposals.stream()
-                .map(this::createProposalThumbnailResponse)
+                .map(p -> ProposalThumbnailResponse.from(p, companyMap.get(p.getCompanyId())))
                 .toList();
 
         // 4. 최종 응답 조합

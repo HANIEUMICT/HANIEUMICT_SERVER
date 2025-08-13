@@ -51,12 +51,6 @@ public class ProposalQueryService implements ProposalFinder {
     }
 
     @Override
-    public Proposal getProposalDetail(Long proposalId){
-        return proposalRepository.findById(proposalId)
-                .orElseThrow(() -> new ProposalException(ProposalErrorType.PROPOSAL_NOT_FOUND));
-    }
-
-    @Override
     public List<Proposal> findSubmittedProposalsByProjectId(Long projectId) {
         return proposalRepository.findByProjectIdAndSubmitStatus(projectId, SubmitStatus.SUBMIT);
     }
