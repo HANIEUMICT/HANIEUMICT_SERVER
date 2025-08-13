@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public record ProposalRegisterRequest(
@@ -29,6 +30,8 @@ public record ProposalRegisterRequest(
         Long secondPrice,
 
         String proposalNote,
+
+        LocalDate operateUntil,
 
         @NotEmpty(message = "견적 항목은 최소 1개 이상이어야 합니다")
         @Valid
@@ -57,6 +60,7 @@ public record ProposalRegisterRequest(
                 proposal.getFirstPrice(),
                 proposal.getSecondPrice(),
                 proposal.getProposalNote(),
+                proposal.getOperateUntil(),
                 items,
                 proposal.getProposalBidStatus(),
                 proposal.getSubmitStatus()

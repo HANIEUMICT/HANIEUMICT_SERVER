@@ -28,7 +28,9 @@ class ProposalOrphanRemovalTest {
                 1000000L,          // totalPrice
                 500000L,           // firstPrice
                 500000L,           // secondPrice
-                "테스트 노트"       // proposalNote
+                "테스트 노트",       // proposalNote
+                null
+                                // operateUntil (null로 설정)
         );
 
         // ProposalItem 생성 및 연결
@@ -80,7 +82,7 @@ class ProposalOrphanRemovalTest {
         // given
         Proposal proposal = Proposal.create(
                 1L, 1L, 1000000L, 500000L,
-                500000L,  "테스트 노트"
+                500000L,  "테스트 노트", null
         );
 
         ProposalItem item = ProposalItem.create(

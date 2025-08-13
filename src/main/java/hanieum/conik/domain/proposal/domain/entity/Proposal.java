@@ -47,7 +47,7 @@ public class Proposal extends AbstractEntity {
     private List<ProposalDrawingFile> drawingFiles = new ArrayList<>();
 
     public static Proposal create(Long projectId, Long companyId, Long totalPrice,
-                                  Long firstPrice, Long secondPrice, String proposalNote) {
+                                  Long firstPrice, Long secondPrice, String proposalNote, LocalDate operateUntil) {
         Proposal proposal = new Proposal();
         proposal.projectId = projectId;
         proposal.companyId = companyId;
@@ -55,6 +55,7 @@ public class Proposal extends AbstractEntity {
         proposal.firstPrice = firstPrice;
         proposal.secondPrice = secondPrice;
         proposal.proposalNote = proposalNote;
+        proposal.operateUntil = operateUntil;
         return proposal;
     }
 
@@ -90,7 +91,7 @@ public class Proposal extends AbstractEntity {
         this.firstPrice = proposalRegisterRequest.firstPrice();
         this.secondPrice = proposalRegisterRequest.secondPrice();
         this.proposalNote = proposalRegisterRequest.proposalNote();
-
+        this.operateUntil = proposalRegisterRequest.operateUntil();
         this.items.clear();
 
         for (ProposalItemRequest proposalItemRequest : proposalRegisterRequest.items()) {
