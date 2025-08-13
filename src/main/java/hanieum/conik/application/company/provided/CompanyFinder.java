@@ -12,5 +12,7 @@ public interface CompanyFinder {
 
     Company findCompany(Long companyId);
 
+    Company findCompanyWithDetail(Long companyId);
+
     Company findCompanyWithAddresses(Long companyId);
 }

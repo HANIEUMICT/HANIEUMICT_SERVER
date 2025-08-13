@@ -8,6 +8,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
+
     @Query("SELECT c FROM Company c LEFT JOIN FETCH c.addresses WHERE c.id = :id")
     Optional<Company> findByIdWithAddresses(@Param("id") Long id);
+
+    @Query("SELECT c FROM Company c LEFT JOIN FETCH c.companyDetail WHERE c.id = :id")
+    Optional<Company> findByIdWithDetail(@Param("id") Long id);
 }

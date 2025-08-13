@@ -46,6 +46,12 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
     }
 
     @Override
+    public Company findCompanyWithDetail(Long companyId) {
+        return companyRepository.findByIdWithDetail(companyId)
+                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+    }
+
+    @Override
     public Long register(CompanyRegisterRequest request) {
 
         Company company = Company.register(request);

@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,8 @@ public class Proposal extends AbstractEntity {
     private Long secondPrice;
 
     private String proposalNote;
+
+    private LocalDate operateUntil;
 
     private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
 
