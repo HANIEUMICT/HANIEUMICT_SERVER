@@ -1,6 +1,7 @@
 package hanieum.conik.application.project.provided;
 
-import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
+import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
+import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import org.springframework.data.domain.Page;
@@ -11,7 +12,8 @@ public interface ProjectFinder {
 
     Project validateProjectOpenStatus(Long projectId);
 
-    Project getProjectDetail(Long projectId, Long memberId);
+    ProjectWithProposalsResponse getProjectDetailWithProposals(Long projectId);
 
-    Page<Project> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable);
+    Page<ProjectDetailResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable);
+
 }

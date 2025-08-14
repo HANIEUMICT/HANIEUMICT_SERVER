@@ -26,6 +26,9 @@
             <basic name="proposalNote">
                 <column name="proposal_note"/>
             </basic>
+            <basic name="operateUntil">
+                <column name="operate_until"/>
+            </basic>
             <basic name="submitStatus">
                 <column name="submit_status"/>
                 <enumerated>STRING</enumerated>

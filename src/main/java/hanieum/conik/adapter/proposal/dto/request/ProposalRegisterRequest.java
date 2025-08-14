@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public record ProposalRegisterRequest(
@@ -30,6 +31,8 @@ public record ProposalRegisterRequest(
 
         String proposalNote,
 
+        LocalDate operateUntil,
+
         @NotEmpty(message = "견적 항목은 최소 1개 이상이어야 합니다")
         @Valid
         List<ProposalItemRequest> items,
@@ -43,6 +46,13 @@ public record ProposalRegisterRequest(
         SubmitStatus submitStatus
 ) {
     public static ProposalRegisterRequest from(Proposal proposal) {
+        List<ProposalItemRequest> items = proposal.getItems().stream()
+                .map(ProposalItemRequest::from)
+                .toList();
+        return from(proposal, items);
+    }
+
+    public static ProposalRegisterRequest from(Proposal proposal, List<ProposalItemRequest> items) {
         return new ProposalRegisterRequest(
                 proposal.getProjectId(),
                 proposal.getCompanyId(),
@@ -50,9 +60,8 @@ public record ProposalRegisterRequest(
                 proposal.getFirstPrice(),
                 proposal.getSecondPrice(),
                 proposal.getProposalNote(),
-                proposal.getItems().stream()
-                        .map(ProposalItemRequest::from)
-                        .toList(),
+                proposal.getOperateUntil(),
+                items,
                 proposal.getProposalBidStatus(),
                 proposal.getSubmitStatus()
         );

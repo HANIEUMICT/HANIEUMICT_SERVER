@@ -51,11 +51,14 @@ public class Company extends BaseEntity {
     private String bankbookCopy;  // 통장사본
 
     @Column(nullable = false, length = 2048)
-    private String profileUrl; // 프로필 사진 URL
+    private String profileUrl; // 회사 소개서
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CompanyStatus status;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private CompanyDetail companyDetail;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "company_id", nullable = false)

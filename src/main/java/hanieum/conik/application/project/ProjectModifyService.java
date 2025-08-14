@@ -2,12 +2,10 @@ package hanieum.conik.application.project;
 
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
-import hanieum.conik.adapter.project.dto.response.MemberProjectQueryResponse;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
-import hanieum.conik.domain.project.entity.ProjectDrawingFile;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
@@ -78,6 +76,4 @@ public class ProjectModifyService implements ProjectSaver {
             throw new ProjectException(ProjectErrorType.PROJECT_SAVE_ERROR);
         }
     }
-
-
 }

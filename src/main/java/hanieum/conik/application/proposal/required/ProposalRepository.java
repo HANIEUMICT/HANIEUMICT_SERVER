@@ -12,11 +12,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProposalRepository extends JpaRepository<Proposal, Long> {
-    @Query("select p from Proposal p " +
+    @Query("select distinct p from Proposal p " +
             "left join fetch p.items " +
             "left join fetch p.drawingFiles " +
             "where p.id = :id")
     Optional<Proposal> findDetailById(@Param("id") Long id);
+
+
+    List<Proposal> findByProjectIdAndSubmitStatus(Long projectId, SubmitStatus submitStatus);
 
     Page<Proposal> findByCompanyIdAndSubmitStatusIn(Long companyId, List<SubmitStatus> submitStatuses, Pageable pageable);
 

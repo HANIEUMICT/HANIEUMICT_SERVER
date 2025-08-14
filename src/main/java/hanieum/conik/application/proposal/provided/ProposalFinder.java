@@ -5,10 +5,12 @@ import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ProposalFinder {
     Proposal findProposal(Long proposalId);
 
-    Proposal getProposalDetail(Long proposalId);
+    List<Proposal> findSubmittedProposalsByProjectId(Long projectId);
 
     Page<Proposal> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable);
 }

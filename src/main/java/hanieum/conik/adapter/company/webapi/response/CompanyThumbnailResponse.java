@@ -1,0 +1,18 @@
+package hanieum.conik.adapter.company.webapi.response;
+
+import hanieum.conik.domain.company.Company;
+
+public record CompanyThumbnailResponse(
+        Long companyId,
+
+        String companyName,
+
+        String profileUrl
+) {
+    public static CompanyThumbnailResponse from(Company company) {
+        return new CompanyThumbnailResponse(
+                company.getId(),
+                company.getName(),
+                company.getCompanyDetail().getLogoUrl()
+        );
+    }}

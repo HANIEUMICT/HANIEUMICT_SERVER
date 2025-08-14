@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -51,6 +52,12 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
     }
 
     @Override
+    public Company findCompanyWithDetail(Long companyId) {
+        return companyRepository.findByIdWithDetail(companyId)
+                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+    }
+
+    @Override
     public Long register(CompanyRegisterRequest request) {
         Company company = Company.register(request);
 
@@ -62,6 +69,11 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
         return company.getId();
     }
 
+    @Override
+    public List<Company> findCompaniesWithDetail(Collection<Long> ids) {
+        return companyRepository.findAllWithDetailByIdIn(ids);
+    }
+  
     private void checkDuplicateEmail(CompanyRegisterRequest request){
         if (companyRepository.findByEmail(new Email(request.email())).isPresent()) {
             throw new CompanyException(CompanyErrorType.EMAIL_DUPLICATE);

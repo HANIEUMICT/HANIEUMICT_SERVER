@@ -70,9 +70,8 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
 
     private Proposal getSavedProposal(Long proposalId, ProposalRegisterRequest request) {
         try {
-            Proposal proposal = proposalFinder.getProposalDetail(proposalId);
+            Proposal proposal = proposalFinder.findProposal(proposalId);
             proposal.update(request);
-
             Consumer<Proposal> handler = statusHandlers.get(request.submitStatus());
             handler.accept(proposal);
 
@@ -95,7 +94,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     @Override
     public Proposal updateToDealRequested(Long proposalId) {
         Proposal proposal = proposalFinder.findProposal(proposalId);
-        if (!proposal.getProposalBidStatus().equals(ProposalBidStatus.PRE_BID)) {
+        if (!ProposalBidStatus.PRE_BID.equals(proposal.getProposalBidStatus())) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_DEAL_REQUEST_ERROR);
         }
 
