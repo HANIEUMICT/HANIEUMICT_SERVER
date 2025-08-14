@@ -1,14 +1,14 @@
 package hanieum.conik.application.member;
 
-import hanieum.conik.application.company.required.CompanyRepository;
+import hanieum.conik.application.company.provided.CompanyFinder;
+import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.provided.TokenRefresh;
 import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.company.Company;
-import hanieum.conik.domain.company.exception.CompanyErrorType;
-import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.member.shared.Email;
@@ -29,7 +29,8 @@ import org.springframework.validation.annotation.Validated;
 public class AuthService implements Auth, TokenRefresh {
 
     private final MemberRepository memberRepository;
-    private final CompanyRepository companyRepository;
+    private final CompanyFinder companyFinder;
+    private final MemberFinder memberFinder;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProviderPort jwtTokenProviderPort;
     private final MemoryMap memoryMap;
@@ -45,7 +46,7 @@ public class AuthService implements Auth, TokenRefresh {
 
     @Override
     public MemberLoginResponse signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
-        Company company = companyRepository.findById(companyId).orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+        Company company = companyFinder.findCompany(companyId);
 
         checkDuplicateEmail(request);
 
@@ -58,20 +59,23 @@ public class AuthService implements Auth, TokenRefresh {
 
     @Override
     public MemberLoginResponse login(MemberLoginRequest request) {
-        Member member = memberRepository.findByEmail(new Email(request.email()))
-                .orElseThrow(() -> new AuthException(AuthErrorType.MEMBER_NOT_FOUND));
+        Member member = memberFinder.findByEmail(new Email(request.email()));
 
-        if (member.verifyPassword(request.password(), passwordEncoder)) {
-            String accessToken = jwtTokenProviderPort.createAccessToken(member.getId());
-            String refreshToken = jwtTokenProviderPort.createRefreshToken(member.getId());
-
-            String key = "auth:refresh:" + member.getId();
-            memoryMap.setValue(key, refreshToken, jwtTokenProviderPort.getRefreshTokenExpiration());
-
-            return new MemberLoginResponse(TokenInfo.of(accessToken, refreshToken), MemberInfo.from(member));
-        } else {
+        if (!member.verifyPassword(request.password(), passwordEncoder)) {
             throw new MemberException(MemberErrorType.INVALID_PASSWORD);
         }
+
+        TokenInfo tokenInfo = getTokenInfo(member);
+        MemberInfo memberInfo = MemberInfo.from(member);
+
+        if(member.getRole() == MemberRole.INDIVIDUAL) {
+            return MemberLoginResponse.individual(tokenInfo, memberInfo);
+        }
+
+        if(member.getCompanyId() == null) {
+            throw new MemberException(MemberErrorType.COMPANY_ID_MISSING);
+        }
+        return MemberLoginResponse.corporate(tokenInfo, memberInfo, member.getCompanyId());
     }
 
     @Override
@@ -98,6 +102,15 @@ public class AuthService implements Auth, TokenRefresh {
                 accessTtl,
                 refreshTtl
         );
+    }
+
+    private TokenInfo getTokenInfo(Member member) {
+        String accessToken  = jwtTokenProviderPort.createAccessToken(member.getId());
+        String refreshToken = jwtTokenProviderPort.createRefreshToken(member.getId());
+        String redisKey     = "auth:refresh:" + member.getId();
+        memoryMap.setValue(redisKey, refreshToken, jwtTokenProviderPort.getRefreshTokenExpiration());
+
+        return TokenInfo.of(accessToken, refreshToken);
     }
 
     private void checkDuplicateEmail(MemberSignUpRequest signUpRequest){

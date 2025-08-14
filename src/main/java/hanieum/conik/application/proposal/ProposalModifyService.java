@@ -44,7 +44,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         try {
             Project project = projectFinder.validateProjectOpenStatus(projectId);
 
-            Proposal proposal = Proposal.initiate(memberFinder.find(memberId), project);
+            Proposal proposal = Proposal.initiate(memberFinder.findById(memberId), project);
 
             return proposalRepository.save(proposal);
         } catch (Exception e) {
