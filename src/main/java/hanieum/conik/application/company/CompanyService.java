@@ -1,5 +1,6 @@
 package hanieum.conik.application.company;
 
+import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanyRegister;
 import hanieum.conik.application.company.required.CompanyRepository;
@@ -7,6 +8,9 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
+import hanieum.conik.global.application.required.BucketClient;
+import hanieum.conik.domain.member.shared.Email;
+import hanieum.conik.domain.member.shared.Email;
 import hanieum.conik.global.application.required.BucketClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,10 +33,11 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Company> findAllCompanies() {
-        return companyRepository.findAll();
+    public List<CompanyDetailResponse> findAllCompanies() {
+        return companyRepository.findAll().stream()
+                .map(CompanyDetailResponse::from)
+                .toList();
     }
-
     @Override
     @Transactional(readOnly = true)
     public Company findCompany(Long companyId) {
@@ -54,8 +59,9 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
     @Override
     public Long register(CompanyRegisterRequest request) {
-
         Company company = Company.register(request);
+
+        checkDuplicateEmail(request);
 
         companyRepository.save(company);
         log.info("기업 등록 성공: company id = {}", company.getId());
@@ -66,5 +72,11 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
     @Override
     public List<Company> findCompaniesWithDetail(Collection<Long> ids) {
         return companyRepository.findAllWithDetailByIdIn(ids);
+    }
+  
+    private void checkDuplicateEmail(CompanyRegisterRequest request){
+        if (companyRepository.findByEmail(new Email(request.email())).isPresent()) {
+            throw new CompanyException(CompanyErrorType.EMAIL_DUPLICATE);
+        }
     }
 }

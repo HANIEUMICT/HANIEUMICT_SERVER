@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class CompanyController {
     - 등록되어있는 모든 기업을 조회할 수 있습니다.
     """)
     @GetMapping
-    public ApiResponse<List<Company>> findAllCompanies() {
+    public ApiResponse<List<CompanyDetailResponse>> findAllCompanies() {
         return ApiResponse.success(companyFinder.findAllCompanies());
     }
 

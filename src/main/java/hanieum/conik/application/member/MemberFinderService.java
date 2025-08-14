@@ -5,6 +5,7 @@ import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
+import hanieum.conik.domain.member.shared.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +19,12 @@ public class MemberFinderService implements MemberFinder {
     private final MemberRepository memberRepository;
 
     @Override
-    public Member find(Long memberId) {
+    public Member findById(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+    }
+
+    @Override
+    public Member findByEmail(Email email) {
+        return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
     }
 }

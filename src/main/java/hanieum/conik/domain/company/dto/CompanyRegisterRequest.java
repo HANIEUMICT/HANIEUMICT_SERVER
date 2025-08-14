@@ -1,30 +1,39 @@
 package hanieum.conik.domain.company.dto;
 
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CompanyRegisterRequest(
+
+    @Schema(description = "기업 이름", example = "행복 제조업")
     @NotBlank(message = "기업 이름은 필수 입력입니다.")
     String name,
 
+    @Schema(description = "기업 대표 이름", example = "윤도운")
     @NotBlank(message = "기업 대표 이름은 필수 입력입니다.")
     String owner,
 
+    @Schema(description = "기업 이메일", example = "d.ddablue@naver.com")
     @Email
     @NotBlank(message = "기업 이메일은 필수 입력입니다.")
     String email,
 
+    @Schema(description = "기업 전화번호", example = "010-1234-5678")
     @NotBlank(message = "기업 전화번호는 필수 입력입니다.")
     String phoneNumber,
 
+    @Schema(description = "기업 업태명", example = "데이식스")
     @NotBlank(message = "기업 업태명은 필수 입력입니다.")
     String businessType,
 
+    @Schema(description = "기업 종목", example = "행복 전도 밴드")
     @NotBlank(message = "기업 종목은 필수 입력입니다.")
     String industry,
 
+    @Schema(description = "사업자등록 번호", example = "123-45-67890")
     @NotBlank(message = "사업자등록 번호는 필수 입력입니다.")
     String registrationNumber,
 

@@ -32,7 +32,7 @@ public class ProposalQueryService implements ProposalFinder {
 
     @Override
     public Page<Proposal> getCompanyProposals(Long memberId, Long projectId, SubmitStatus submitStatus, Pageable pageable) {
-        Member member = memberFinder.find(memberId);
+        Member member = memberFinder.findById(memberId);
         Long companyId = member.getCompanyId();
 
         return findProposalsWithStatus(submitStatus, companyId, projectId, pageable);
