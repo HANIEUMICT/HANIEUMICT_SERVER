@@ -15,8 +15,6 @@ import java.util.List;
 public interface CompanyFinder {
     Page<CompanySummaryResponse> findAllCompanySummaries(Pageable pageable);
 
-    List<CompanyDetailResponse> findAllCompanies();
-
     Company findCompany(Long companyId);
 
     Company findCompanyWithDetail(Long companyId);

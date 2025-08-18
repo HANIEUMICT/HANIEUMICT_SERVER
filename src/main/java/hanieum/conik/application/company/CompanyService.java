@@ -31,14 +31,6 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CompanyDetailResponse> findAllCompanies() {
-        return companyRepository.findAll().stream()
-                .map(CompanyDetailResponse::from)
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Page<CompanySummaryResponse> findAllCompanySummaries(Pageable pageable) {
         Page<Company> page = companyRepository.findAll(pageable);
         return page.map(CompanySummaryResponse::from);
