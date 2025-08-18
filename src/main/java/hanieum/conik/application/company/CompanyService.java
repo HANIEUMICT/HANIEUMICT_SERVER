@@ -1,6 +1,7 @@
 package hanieum.conik.application.company;
 
 import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
+import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanyRegister;
 import hanieum.conik.application.company.required.CompanyRepository;
@@ -8,12 +9,11 @@ import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.global.application.required.BucketClient;
 import hanieum.conik.domain.member.shared.Email;
-import hanieum.conik.domain.member.shared.Email;
-import hanieum.conik.global.application.required.BucketClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +27,6 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class CompanyService implements CompanyFinder, CompanyRegister {
-
-    private final BucketClient bucketClient;
     private final CompanyRepository companyRepository;
 
     @Override
@@ -38,6 +36,14 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
                 .map(CompanyDetailResponse::from)
                 .toList();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CompanySummaryResponse> findAllCompanySummaries(Pageable pageable) {
+        Page<Company> page = companyRepository.findAll(pageable);
+        return page.map(CompanySummaryResponse::from);
+    }
+
     @Override
     @Transactional(readOnly = true)
     public Company findCompany(Long companyId) {
