@@ -9,7 +9,7 @@
         <table name="proposal_drawing_file"/>
         <attributes>
             <basic name="drawingUrl">
-                <column nullable="false"/>
+                <column nullable="false" length="2500"/>
             </basic>
             <basic name="uploadStatus">
                 <column name="upload_status" nullable="false"/>
