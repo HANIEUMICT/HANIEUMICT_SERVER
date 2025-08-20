@@ -1,7 +1,7 @@
 package hanieum.conik.adapter.company.webapi;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
+import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanyRegister;
 import hanieum.conik.domain.company.Company;
@@ -11,9 +11,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/company")
@@ -33,13 +36,15 @@ public class CompanyController {
         return ApiResponse.success(companyRegister.register(request));
     }
 
-    @Operation(summary = "전체 기업 조회", description = """
-    ## 전체 기업 조회를 수행합니다.
+    @Operation(summary = "전체 기업 summary 조회", description = """
+    ## 기업 회원 가입 시 전체 기업 조회를 수행합니다.
     - 등록되어있는 모든 기업을 조회할 수 있습니다.
+    - 기업명, 업종, 대표자, 사업자 등록번호, 주소 정보를 확인할 수 있습니다. 
     """)
-    @GetMapping
-    public ApiResponse<List<CompanyDetailResponse>> findAllCompanies() {
-        return ApiResponse.success(companyFinder.findAllCompanies());
+    @GetMapping("/summaries")
+    public ApiResponse<Page<CompanySummaryResponse>> findAllCompaniesSummary(
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ApiResponse.success(companyFinder.findAllCompanySummaries(pageable));
     }
 
     @Operation(summary = "특정 기업 조회", description = """
