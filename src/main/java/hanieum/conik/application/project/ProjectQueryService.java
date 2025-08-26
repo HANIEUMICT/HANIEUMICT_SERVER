@@ -1,6 +1,5 @@
 package hanieum.conik.application.project;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyThumbnailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.adapter.proposal.dto.response.ProposalThumbnailResponse;
@@ -8,7 +7,7 @@ import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
-import hanieum.conik.domain.company.Company;
+import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
@@ -89,7 +88,7 @@ public class ProjectQueryService implements ProjectFinder {
                 .map(Proposal::getCompanyId)
                 .collect(Collectors.toSet());
 
-        Map<Long, Company> companyMap = companyFinder.findCompaniesWithDetail(companyIds).stream()
+        Map<Long, Company> companyMap = companyFinder.findAllCompany().stream()
                 .collect(Collectors.toMap(Company::getId, Function.identity()));
 
         // 4) DTO 조합 (단건 조회 제거)
@@ -105,7 +104,7 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     private ProposalThumbnailResponse createProposalThumbnailResponse(Proposal proposal) {
-        Company companyWithDetail = companyFinder.findCompanyWithDetail(proposal.getCompanyId());
+        Company companyWithDetail = companyFinder.findCompany(proposal.getCompanyId());
 
         return ProposalThumbnailResponse.from(proposal, companyWithDetail);
     }
