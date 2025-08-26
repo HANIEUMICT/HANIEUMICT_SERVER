@@ -1,23 +1,20 @@
-package hanieum.conik.domain.company;
+package hanieum.conik.domain.company.entity;
 
-import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
-import hanieum.conik.domain.member.shared.Email;
+import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Company extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,7 +25,6 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private String owner;  // 대표자 이름
 
-    @Embedded
     @Column(nullable = false)
     private Email email; // 회사 이메일
 
@@ -95,5 +91,40 @@ public class Company extends BaseEntity {
                 request.bankbookCopy(),
                 CompanyAddress.from(request.addressRegisterRequest())
         );
+    }
+
+    /**
+     * 기업 정보 수정
+     * */
+    public void update(CompanyRegisterRequest request){
+        this.name = request.name();
+        this.owner = request.owner();
+        this.email = new Email(request.email());
+        this.phoneNumber = request.phoneNumber();
+        this.businessType = request.businessType();
+        this.industry = request.industry();
+        this.registrationNumber = request.registrationNumber();
+        this.registrationCertificateUrl = request.registrationCertificateUrl();
+        this.profileUrl = request.profileUrl();
+        this.bankbookCopy = request.bankbookCopy();
+        this.address = CompanyAddress.from(request.addressRegisterRequest());
+    }
+
+    /**
+     * 기업 상세 정보 등록
+     * */
+    public void attachDetail(CompanyDetail companyDetail) {
+        this.companyDetail = companyDetail;
+        if (companyDetail != null) companyDetail.setCompany(this);
+    }
+
+    /**
+     * 기업 상세 정보 삭제
+     */
+    public void removeDetail() {
+        if (this.companyDetail == null) return;
+        CompanyDetail d = this.companyDetail;
+        this.companyDetail = null; // ← orphanRemoval 트리거 (Detail DELETE)
+        d.setCompany(null);        // 양방향 정리
     }
 }
