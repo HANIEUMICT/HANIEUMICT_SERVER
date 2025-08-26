@@ -96,7 +96,7 @@ public class CompanyController {
     @Operation(summary = "기업 상세 마이페이지 조회", description = """
             ## 기업 회원 상세페이지 조회합니다.
             - 기업 회원이 자신의 기업 상세 페이지를 조회합니다.
-            - 기업 상세 내용이 등록되지 않으면 상세 내용은 null로 반환됩니다ㅏ.
+            - 기업 상세 내용이 등록되지 않으면 상세 내용은 null로 반환됩니다.
             """)
     @GetMapping("/detail/me")
     public ApiResponse<CompanyDetailResponse> findMyCompanyWithDetail(@AuthenticationPrincipal AuthDetails authDetails){
