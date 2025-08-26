@@ -20,9 +20,9 @@ public class MemberAddress extends AddressBase {
      */
     public static MemberAddress register(AddressRegisterRequest req) {
         return new MemberAddress(
-                req.addressPostalCode(),
-                req.addressStreetAddress(),
-                req.addressDetailAddress()
+                req.postalCode(),
+                req.streetAddress(),
+                req.detailAddress()
         );
     }
 }

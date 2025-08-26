@@ -36,13 +36,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/v1/api-docs",
             "/v1/api-docs/",
             "/v1/api-docs/swagger-config",
-            // 인증 없이 접근할 API
-            "/v1/auth/signup/**",
-            "/v1/auth/login",
-            "/v1/email",
-            "/v1/email/certificate",
-            "/v1/company",
-            "/v1/company/**",
             // Health check endpoint
             "/actuator/health/readiness",
             "/actuator/health/liveness"
@@ -63,6 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (token != null) {
                 Authentication auth = jwtTokenProviderPort.getAuthentication(token);
+                log.info("auth name={}, authorities={}", auth.getName(), auth.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 log.info("Authentication set in SecurityContext.");
             }
