@@ -1,6 +1,6 @@
 package hanieum.conik.adapter.company.webapi.response;
 
-import hanieum.conik.domain.company.CompanyAddress;
+import hanieum.conik.domain.company.entity.CompanyAddress;
 
 public record CompanyAddressResponse(
         String postal,
@@ -11,9 +11,9 @@ public record CompanyAddressResponse(
 ) {
     public static CompanyAddressResponse from(CompanyAddress address) {
         return new CompanyAddressResponse(
-                address.getAddressPostalCode(),
-                address.getAddressStreetAddress(),
-                address.getAddressDetailAddress()
+                address.getPostalCode(),
+                address.getStreetAddress(),
+                address.getDetailAddress()
         );
     }
 }

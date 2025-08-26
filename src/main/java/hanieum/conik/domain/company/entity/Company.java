@@ -57,14 +57,13 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private CompanyStatus status;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @Embedded
+    private CompanyAddress address;
+
+    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
     private CompanyDetail companyDetail;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "company_id", nullable = false)
-    private List<CompanyAddress> addresses = new ArrayList<>();
-
-    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, AddressRegisterRequest address) {
+    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, CompanyAddress address) {
         this.businessType = businessType;
         this.email = email;
         this.industry = industry;
@@ -76,7 +75,7 @@ public class Company extends BaseEntity {
         this.registrationCertificateUrl = registrationCertificateUrl;
         this.registrationNumber = registrationNumber;
         this.status = CompanyStatus.REGISTER_APPROVED;
-        this.addresses.add(CompanyAddress.register(address));
+        this.address = address;
     }
 
     /**
@@ -94,7 +93,7 @@ public class Company extends BaseEntity {
                 request.registrationCertificateUrl(),
                 request.profileUrl(),
                 request.bankbookCopy(),
-                request.addressRegisterRequest()
+                CompanyAddress.from(request.addressRegisterRequest())
         );
     }
 }
