@@ -27,14 +27,20 @@ public class Portfolio extends AbstractEntity {
     private String category;
 
     private Portfolio(Integer quantity, String description, String imageUrl, String category){
-        this.quantity = quantity;
+        this.quantity = (quantity == null ? 0 : Math.max(0, quantity));
         this.description = description;
         this.imageUrl = imageUrl;
         this.category = category;
     }
 
     public static Portfolio create(PortfolioRequest request){
-        return new Portfolio(request.quantity(), request.description(), request.imageUrl(), request.category());
+        Integer quantity = request.quantity();
+        return new Portfolio(
+                (quantity == null ? 0 : Math.max(0, quantity)),
+                request.description(),
+                request.imageUrl(),
+                request.category()
+        );
     }
 
     void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail; }
