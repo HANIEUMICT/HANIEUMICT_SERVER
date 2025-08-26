@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,6 +83,15 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
     @Transactional(readOnly = true)
     public List<Company> findAllCompany() {
         return companyRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Company> findCompaniesByIds(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return companyRepository.findByIdIn(ids);
     }
 
     @Override

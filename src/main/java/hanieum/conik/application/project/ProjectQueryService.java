@@ -88,7 +88,7 @@ public class ProjectQueryService implements ProjectFinder {
                 .map(Proposal::getCompanyId)
                 .collect(Collectors.toSet());
 
-        Map<Long, Company> companyMap = companyFinder.findAllCompany().stream()
+        Map<Long, Company> companyMap = companyFinder.findCompaniesByIds(companyIds).stream()
                 .collect(Collectors.toMap(Company::getId, Function.identity()));
 
         // 4) DTO 조합 (단건 조회 제거)

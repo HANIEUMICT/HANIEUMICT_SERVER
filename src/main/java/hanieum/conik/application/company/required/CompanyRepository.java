@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,4 +26,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long>, Company
 
     @Query("select c from Company c left join fetch c.companyDetail")
     List<Company> findAllWithDetail();
+
+    List<Company> findByIdIn(Collection<Long> ids);
 }

@@ -8,6 +8,7 @@ import hanieum.conik.domain.company.entity.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,6 +22,8 @@ public interface CompanyFinder {
     CompanyDetailResponse findMyCompanyWithDetail(Long memberId);
 
     List<Company> findAllCompany();
+
+    List<Company> findCompaniesByIds(Collection<Long> ids);
 
     CompanyDetailResponse findCompanyWithDetail(Long companyId);
 
