@@ -33,7 +33,7 @@ public record CompanyDetailResponse(
     }
 
     public record DetailDto(
-            Long companyId,
+            Long detailId,
             LocalDate establishedAt,
             String logoUrl,
             Integer employeeCount,
