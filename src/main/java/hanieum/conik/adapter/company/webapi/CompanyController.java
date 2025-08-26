@@ -10,7 +10,6 @@ import hanieum.conik.domain.company.dto.CompanyDetailCreateRequest;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
-import hanieum.conik.domain.company.entity.CompanyDetail;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import hanieum.conik.global.domain.exception.AuthErrorType;
@@ -77,11 +76,11 @@ public class CompanyController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @Valid @RequestBody CompanyDetailCreateRequest request
     ) {
-        return ApiResponse.success(
-                companyRegister.registerCompanyDetail(
-                        authDetails.getMemberId(),
-                        request
-                )
+        Long memberId = Optional.ofNullable(authDetails)
+                .map(AuthDetails::getMemberId)
+                .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
+
+        return ApiResponse.success(companyRegister.registerCompanyDetail(memberId, request)
         );
     }
 
