@@ -18,13 +18,13 @@ public class Equipment extends AbstractEntity {
     @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(length = 512)
+    @Column(nullable = false, length = 512)
     private String imageUrl;
 
     private Equipment(String name, String description, Integer quantity, String imageUrl) {
