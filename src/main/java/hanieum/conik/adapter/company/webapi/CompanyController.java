@@ -114,7 +114,7 @@ public class CompanyController {
             - 필터가 존재하지 않으면 거래 건수가 많은 순서대로 조회됩니다.
             """)
     @GetMapping("/profiles")
-    public Page<CompanyProfileResponse> searchProfiles(
+    public ApiResponse<Page<CompanyProfileResponse>> searchProfiles(
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) Integer minRating,
             @RequestParam(required = false) Integer maxResponseMinutes,
@@ -123,6 +123,6 @@ public class CompanyController {
             @PageableDefault(size = 20, sort = "rating", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         var cond = new CompanyProfileSearchCondition(keyword, minRating, maxResponseMinutes, minTotalOrderCount, maxProductionHours);
-        return companyFinder.findAllCompanyWithFilter(cond, pageable);
+        return ApiResponse.success(companyFinder.findAllCompanyWithFilter(cond, pageable));
     }
 }
