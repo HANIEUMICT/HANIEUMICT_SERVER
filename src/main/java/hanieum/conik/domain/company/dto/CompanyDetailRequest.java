@@ -1,15 +1,14 @@
 package hanieum.conik.domain.company.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.PositiveOrZero;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
 
 public record CompanyDetailRequest(
     @Schema(description = "설립일", example = "2020-01-01")
+    @NotNull
+    @PastOrPresent
     LocalDate establishedAt,
 
     @Schema(description = "회사 로고 URL", example = "https://cdn.example.com/logo.png")
