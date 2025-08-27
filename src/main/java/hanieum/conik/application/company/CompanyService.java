@@ -111,9 +111,14 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
         if (memberId == null || memberId <= 0) {
             throw new CompanyException(CompanyErrorType.INVALID_INPUT);
         }
-        if (request == null || request.detail().establishedAt() == null
-                || request.detail().logoUrl() == null || request.detail().logoUrl().isBlank()) {
+
+        if (request == null || request.detail() == null) {
             throw new CompanyException(CompanyErrorType.INVALID_INPUT);
+        }
+
+        var detail = request.detail();
+        if (detail.establishedAt() == null || detail.logoUrl() == null || detail.logoUrl().isBlank()) {
+                    throw new CompanyException(CompanyErrorType.INVALID_INPUT);
         }
 
         var member = memberFinder.findById(memberId);
