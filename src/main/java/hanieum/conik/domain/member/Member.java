@@ -6,7 +6,7 @@ import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
-import hanieum.conik.domain.member.shared.Email;
+import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

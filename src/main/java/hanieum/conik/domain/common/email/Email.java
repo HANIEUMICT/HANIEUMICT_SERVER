@@ -1,4 +1,4 @@
-package hanieum.conik.domain.member.shared;
+package hanieum.conik.domain.common.email;
 
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
