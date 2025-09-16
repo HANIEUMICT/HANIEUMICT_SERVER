@@ -5,7 +5,7 @@ import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
-import hanieum.conik.domain.common.email.Email;
+import hanieum.conik.domain.member.shared.Email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,66 +1,47 @@
 package hanieum.conik.adapter.company.webapi.response;
 
-import hanieum.conik.domain.company.entity.*;
+import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
 
-import java.time.LocalDate;
-import java.util.List;
-
 public record CompanyDetailResponse(
-        CompanyResponse company,                    // ← Company 전용 DTO 재사용
-        DetailDto detail,                           // 상세(1:1)
-        List<EquipmentResponse> equipments,     // 장비 목록
-        List<PortfolioResponse> portfolios      // 포트폴리오 목록
+        Long id,
+
+        String name,
+
+        String owner,
+
+        String email,
+
+        String phoneNumber,
+
+        String businessType,
+
+        String industry,
+
+        String registrationNumber,
+
+        String registrationCertificateUrl,
+
+        String bankbookCopy,
+
+        String profileUrl,
+
+        CompanyStatus status
 ) {
-
-    public static CompanyDetailResponse fromCompanyOnly(Company c) {
+    public static CompanyDetailResponse from(Company company) {
         return new CompanyDetailResponse(
-                CompanyResponse.from(c),
-                null,
-                List.of(),
-                List.of()
+                company.getId(),
+                company.getName(),
+                company.getOwner(),
+                company.getEmail().address(),
+                company.getPhoneNumber(),
+                company.getBusinessType(),
+                company.getIndustry(),
+                company.getRegistrationNumber(),
+                company.getRegistrationCertificateUrl(),
+                company.getBankbookCopy(),
+                company.getProfileUrl(),
+                company.getStatus()
         );
-    }
-
-    public static CompanyDetailResponse from(Company c, List<Equipment> eqs, List<Portfolio> pfs) {
-        CompanyDetail d = c.getCompanyDetail();
-        return new CompanyDetailResponse(
-                CompanyResponse.from(c),
-                d != null ? DetailDto.from(d) : null,
-                eqs == null ? List.of() : eqs.stream().map(EquipmentResponse::from).toList(),
-                pfs == null ? List.of() : pfs.stream().map(PortfolioResponse::from).toList()
-        );
-    }
-
-    public record DetailDto(
-            Long detailId,
-            LocalDate establishedAt,
-            String logoUrl,
-            Integer employeeCount,
-            String websiteUrl,
-            String contactAvailableTime,
-            String description,
-            Integer rating,
-            Integer totalOrderCount,
-            Integer repeatOrderCount,
-            Integer avgProductionLeadHours,
-            Integer avgResponseMinutes
-    ) {
-        public static DetailDto from(CompanyDetail d) {
-            return new DetailDto(
-                    d.getId(),
-                    d.getEstablishedAt(),
-                    d.getLogoUrl(),
-                    d.getEmployeeCount(),
-                    d.getWebsiteUrl(),
-                    d.getContactAvailableTime(),
-                    d.getDescription(),
-                    d.getRating(),
-                    d.getTotalOrderCount(),
-                    d.getRepeatOrderCount(),
-                    d.getAvgProductionLeadHours(),
-                    d.getAvgResponseMinutes()
-            );
-        }
     }
 }

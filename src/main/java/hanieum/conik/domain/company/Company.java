@@ -1,20 +1,23 @@
-package hanieum.conik.domain.company.entity;
+package hanieum.conik.domain.company;
 
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
-import hanieum.conik.domain.common.email.Email;
+import hanieum.conik.domain.member.shared.Email;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static jakarta.persistence.FetchType.LAZY;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Company extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +28,7 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private String owner;  // 대표자 이름
 
+    @Embedded
     @Column(nullable = false)
     private Email email; // 회사 이메일
 
@@ -53,13 +57,14 @@ public class Company extends BaseEntity {
     @Column(nullable = false)
     private CompanyStatus status;
 
-    @Embedded
-    private CompanyAddress address;
-
-    @OneToOne(mappedBy = "company", cascade = CascadeType.ALL, orphanRemoval = true, fetch = LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private CompanyDetail companyDetail;
 
-    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, CompanyAddress address) {
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "company_id", nullable = false)
+    private List<CompanyAddress> addresses = new ArrayList<>();
+
+    private Company(String name, String owner, Email email, String phoneNumber, String businessType, String industry, String registrationNumber, String registrationCertificateUrl, String profileUrl, String bankbookCopy, AddressRegisterRequest address) {
         this.businessType = businessType;
         this.email = email;
         this.industry = industry;
@@ -71,7 +76,7 @@ public class Company extends BaseEntity {
         this.registrationCertificateUrl = registrationCertificateUrl;
         this.registrationNumber = registrationNumber;
         this.status = CompanyStatus.REGISTER_APPROVED;
-        this.address = address;
+        this.addresses.add(CompanyAddress.register(address));
     }
 
     /**
@@ -89,42 +94,7 @@ public class Company extends BaseEntity {
                 request.registrationCertificateUrl(),
                 request.profileUrl(),
                 request.bankbookCopy(),
-                CompanyAddress.from(request.addressRegisterRequest())
+                request.addressRegisterRequest()
         );
-    }
-
-    /**
-     * 기업 정보 수정
-     * */
-    public void update(CompanyRegisterRequest request){
-        this.name = request.name();
-        this.owner = request.owner();
-        this.email = new Email(request.email());
-        this.phoneNumber = request.phoneNumber();
-        this.businessType = request.businessType();
-        this.industry = request.industry();
-        this.registrationNumber = request.registrationNumber();
-        this.registrationCertificateUrl = request.registrationCertificateUrl();
-        this.profileUrl = request.profileUrl();
-        this.bankbookCopy = request.bankbookCopy();
-        this.address = CompanyAddress.from(request.addressRegisterRequest());
-    }
-
-    /**
-     * 기업 상세 정보 등록
-     * */
-    public void attachDetail(CompanyDetail companyDetail) {
-        this.companyDetail = companyDetail;
-        if (companyDetail != null) companyDetail.setCompany(this);
-    }
-
-    /**
-     * 기업 상세 정보 삭제
-     */
-    public void removeDetail() {
-        if (this.companyDetail == null) return;
-        CompanyDetail d = this.companyDetail;
-        this.companyDetail = null; // ← orphanRemoval 트리거 (Detail DELETE)
-        d.setCompany(null);        // 양방향 정리
     }
 }

@@ -1,6 +1,6 @@
 package hanieum.conik.adapter.company.webapi.response;
 
-import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.Company;
 
 public record CompanyThumbnailResponse(
         Long companyId,

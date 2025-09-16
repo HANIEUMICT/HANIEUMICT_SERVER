@@ -1,6 +1,5 @@
 package hanieum.conik.global.config;
 
-import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.global.adapter.security.jwt.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -49,10 +48,8 @@ public class SecurityConfig {
                                 ).permitAll()
                                 .requestMatchers(
                                         "/v1/company",
-                                        "/v1/company/*",
-                                        "/v1/company/summaries"
+                                        "/v1/company/{id}"
                                 ).permitAll()
-                                .requestMatchers(HttpMethod.POST, "/v1/company/detail/**").hasAuthority("OWNER")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

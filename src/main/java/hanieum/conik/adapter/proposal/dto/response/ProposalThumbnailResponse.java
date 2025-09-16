@@ -1,7 +1,7 @@
 package hanieum.conik.adapter.proposal.dto.response;
 
 import hanieum.conik.adapter.company.webapi.response.CompanyThumbnailResponse;
-import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.Company;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 
 import java.time.LocalDate;

@@ -1,31 +1,30 @@
 package hanieum.conik.application.company.required;
 
-import hanieum.conik.domain.company.entity.Company;
-import hanieum.conik.domain.common.email.Email;
+import hanieum.conik.domain.company.Company;
+import hanieum.conik.domain.member.shared.Email;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface CompanyRepository extends JpaRepository<Company, Long>, CompanyRepositoryCustom{
+public interface CompanyRepository extends JpaRepository<Company, Long> {
+
+    @Query("SELECT c FROM Company c LEFT JOIN FETCH c.addresses WHERE c.id = :id")
+    Optional<Company> findByIdWithAddresses(@Param("id") Long id);
+
+
+    @Query("SELECT c FROM Company c LEFT JOIN FETCH c.companyDetail WHERE c.id = :id")
+    Optional<Company> findByIdWithDetail(@Param("id") Long id);
+
+    @Query("SELECT c from Company c LEFT JOIN FETCH c.companyDetail where c.id in :ids")
+    List<Company> findAllWithDetailByIdIn(@Param("ids") Collection<Long> ids);
+
     Optional<Company> findByEmail(Email email);
 
     Page<Company> findAll(Pageable pageable);
-
-    @Query("""
-            select c
-            from Company c
-            join fetch c.companyDetail
-            where c.id = :id
-            """)
-    Optional<Company> findWithDetailById(Long id);
-
-    @Query("select c from Company c left join fetch c.companyDetail")
-    List<Company> findAllWithDetail();
-
-    List<Company> findByIdIn(Collection<Long> ids);
 }

@@ -1,6 +1,6 @@
 package hanieum.conik.adapter.member.persistence;
 
-import hanieum.conik.domain.common.email.Email;
+import hanieum.conik.domain.member.shared.Email;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

@@ -1,7 +1,7 @@
 package hanieum.conik.application.member.provided;
 
 import hanieum.conik.domain.member.Member;
-import hanieum.conik.domain.common.email.Email;
+import hanieum.conik.domain.member.shared.Email;
 
 /**
  * 회원을 조회한다

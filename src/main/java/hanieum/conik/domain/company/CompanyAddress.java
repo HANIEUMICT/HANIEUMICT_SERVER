@@ -1,4 +1,4 @@
-package hanieum.conik.domain.member;
+package hanieum.conik.domain.company;
 
 import hanieum.conik.domain.common.address.AddressBase;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
@@ -7,19 +7,15 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class MemberAddress extends AddressBase {
+public class CompanyAddress extends AddressBase {
+    protected CompanyAddress() { super(null,null,null); }
 
-    protected MemberAddress() { super(null,null,null); }
-
-    private MemberAddress(String postal, String street, String detail) {
+    private CompanyAddress(String postal, String street, String detail) {
         super(postal, street, detail);
     }
 
-    /**
-     * 주소를 등록한다
-     */
-    public static MemberAddress register(AddressRegisterRequest req) {
-        return new MemberAddress(
+    public static CompanyAddress register(AddressRegisterRequest req) {
+        return new CompanyAddress(
                 req.addressPostalCode(),
                 req.addressStreetAddress(),
                 req.addressDetailAddress()

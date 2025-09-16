@@ -3,6 +3,7 @@ package hanieum.conik.domain.common.address;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.common.address.exception.AddressErrorType;
 import hanieum.conik.domain.common.address.exception.AddressException;
+import jakarta.mail.Address;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -35,17 +36,17 @@ public class AddressBase {
      * 주소 정보를 업데이트 한다.
      */
     public void update(AddressRegisterRequest request) {
-        if (request.postalCode() == null || request.postalCode().isBlank()) {
+        if (request.addressPostalCode() == null || request.addressPostalCode().isBlank()) {
             throw new AddressException(AddressErrorType.INVALID_POSTAL_CODE);
         }
-        if (request.streetAddress() == null || request.streetAddress().isBlank()) {
+        if (request.addressStreetAddress() == null || request.addressStreetAddress().isBlank()) {
             throw new AddressException(AddressErrorType.INVALID_STREET_ADDRESS);
         }
-        if (request.detailAddress() == null || request.detailAddress().isBlank()) {
+        if (request.addressDetailAddress() == null || request.addressDetailAddress().isBlank()) {
             throw new AddressException(AddressErrorType.INVALID_DETAIL_ADDRESS);
         }
-        this.addressPostalCode = request.postalCode();
-        this.addressStreetAddress = request.streetAddress();
-        this.addressDetailAddress = request.detailAddress();
+        this.addressPostalCode = request.addressPostalCode();
+        this.addressStreetAddress = request.addressStreetAddress();
+        this.addressDetailAddress = request.addressDetailAddress();
     }
 }

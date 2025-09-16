@@ -1,6 +1,8 @@
 package hanieum.conik.adapter.company.webapi.response;
 
-import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.Company;
+
+import java.util.List;
 
 public record CompanySummaryResponse(
         Long id,
@@ -8,16 +10,22 @@ public record CompanySummaryResponse(
         String businessType,
         String owner,
         String registrationNumber,
-        CompanyAddressResponse address
+        List<CompanyAddressResponse> addresses
 ) {
     public static CompanySummaryResponse from(Company company) {
+        List<CompanyAddressResponse> addresses = company.getAddresses() == null
+                ? List.of()
+                : company.getAddresses().stream()
+                .map(CompanyAddressResponse::from)
+                .toList();
+
         return new CompanySummaryResponse(
                 company.getId(),
                 company.getName(),
                 company.getBusinessType(),
                 company.getOwner(),
                 company.getRegistrationNumber(),
-                CompanyAddressResponse.from(company.getAddress())
+                addresses
         );
     }
 }
