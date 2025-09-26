@@ -1,5 +1,6 @@
 package hanieum.conik.domain.company.entity;
 
+import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
 import hanieum.conik.domain.common.email.Email;
@@ -26,6 +27,7 @@ public class Company extends BaseEntity {
     private String owner;  // 대표자 이름
 
     @Column(nullable = false)
+    @Convert(converter = EmailAttributeConverter.class)
     private Email email; // 회사 이메일
 
     @Column(nullable = false)
