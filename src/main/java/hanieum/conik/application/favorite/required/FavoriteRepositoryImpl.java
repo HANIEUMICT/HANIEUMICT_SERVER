@@ -1,9 +1,7 @@
 package hanieum.conik.application.favorite.required;
 
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.domain.favorite.QFavorite;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.entity.QProject;
@@ -19,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -31,10 +30,9 @@ public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom{
 
 
     @Override
-    public Page<ProjectDetailResponse> findFavoriteProjects(Long companyId, Pageable pageable) {
-        Pageable safe = pageable == null ? Pageable.unpaged() : pageable;
+    public Page<Project> findFavoriteProjects(Long companyId, Pageable pageable) {
+        Pageable safe = (pageable == null) ? Pageable.unpaged() : pageable;
 
-        // 1) Favorite 기준으로 페이지 자르기 (기본: createdAt DESC)
         OrderSpecifier<?> order = toFavoriteOrder(safe.getSort());
         List<Long> pageProjectIds = query
                 .select(f.projectId)
@@ -56,23 +54,21 @@ public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom{
             return new PageImpl<>(List.of(), safe, total);
         }
 
-        // 2) 선택된 page 범위의 Project들 로드 (도면파일 fetch join, 중복 제거)
         List<Project> projects = query
                 .selectFrom(p).distinct()
                 .leftJoin(p.drawingFiles, df).fetchJoin()
                 .where(p.id.in(pageProjectIds), p.isDeleted.isFalse())
                 .fetch();
 
-        // 3) DTO 매핑 + Favorite 페이지 순서 유지
-        Map<Long, ProjectDetailResponse> byId = projects.stream()
-                .collect(Collectors.toMap(Project::getId, ProjectDetailResponse::from));
+        Map<Long, Project> byId = projects.stream()
+                .collect(Collectors.toMap(Project::getId, Function.identity()));
 
-        List<ProjectDetailResponse> ordered = pageProjectIds.stream()
+        List<Project> orderedProjects = pageProjectIds.stream()
                 .map(byId::get)
                 .filter(Objects::nonNull)
                 .toList();
 
-        return new PageImpl<>(ordered, safe, total);
+        return new PageImpl<>(orderedProjects, safe, total);
     }
 
     private OrderSpecifier<?> toFavoriteOrder(Sort sort) {

@@ -5,7 +5,9 @@ import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.favorite.provided.FavoriteFinder;
 import hanieum.conik.application.favorite.provided.FavoriteSaver;
 import hanieum.conik.application.member.provided.MemberFinder;
+import hanieum.conik.domain.favorite.Favorite;
 import hanieum.conik.domain.favorite.dto.FavoriteRequest;
+import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,7 +58,9 @@ public class FavoriteController {
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Long companyId = memberFinder.findById(authDetails.getMemberId()).getCompanyId();
 
-        return ApiResponse.success(favoriteFinder.findFavoriteProjects(companyId, pageable));
+        Page<Project> favoriteProjects = favoriteFinder.findFavoriteProjects(companyId, pageable);
+
+        return ApiResponse.success(favoriteProjects.map(ProjectDetailResponse::from));
     }
 
     @Operation(summary = "찜 삭제 API", description = """

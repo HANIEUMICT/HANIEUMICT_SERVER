@@ -1,6 +1,5 @@
 package hanieum.conik.application.favorite;
 
-import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.favorite.required.FavoriteRepository;
 import hanieum.conik.application.project.required.ProjectRepository;
@@ -9,6 +8,7 @@ import hanieum.conik.domain.favorite.Favorite;
 import hanieum.conik.domain.favorite.dto.FavoriteRequest;
 import hanieum.conik.domain.favorite.exception.FavoriteException;
 import hanieum.conik.domain.project.ProjectFixtures;
+import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.exception.ProjectException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -108,7 +108,7 @@ public class FavoriteServiceJpaTest {
         // then: DTO 기준으로 검증 (엔티티 아님!)
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent())
-                .extracting(ProjectDetailResponse::projectId)
+                .extracting(Project::getId)
                 .containsExactlyInAnyOrder(p1.getId(), p2.getId());
     }
 

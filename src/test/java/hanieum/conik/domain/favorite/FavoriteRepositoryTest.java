@@ -71,7 +71,7 @@ class FavoriteRepositoryTest {
 
         // then
         assertThat(page.getTotalElements()).isEqualTo(2);
-        assertThat(page.getContent()).extracting(ProjectDetailResponse::projectId)
+        assertThat(page.getContent()).extracting(Project::getId)
                 .containsExactlyInAnyOrder(100L, 101L);
     }
 

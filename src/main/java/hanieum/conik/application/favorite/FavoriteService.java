@@ -12,6 +12,7 @@ import hanieum.conik.domain.favorite.Favorite;
 import hanieum.conik.domain.favorite.dto.FavoriteRequest;
 import hanieum.conik.domain.favorite.exception.FavoriteErrorType;
 import hanieum.conik.domain.favorite.exception.FavoriteException;
+import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import jakarta.transaction.Transactional;
@@ -29,10 +30,10 @@ public class FavoriteService implements FavoriteSaver, FavoriteFinder {
     private final CompanyRepository companyRepository;
 
     @Override
-    public Page<ProjectDetailResponse> findFavoriteProjects(Long companyId, Pageable pageable) {
+    public Page<Project> findFavoriteProjects(Long companyId, Pageable pageable) {
         checkCompanyIsExist(companyId);
 
-        Page<ProjectDetailResponse> favoriteProjects = favoriteRepository.findFavoriteProjects(companyId, pageable);
+        Page<Project> favoriteProjects = favoriteRepository.findFavoriteProjects(companyId, pageable);
 
         if (favoriteProjects == null) return Page.empty(pageable);
 
