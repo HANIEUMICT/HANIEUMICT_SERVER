@@ -1,6 +1,5 @@
 package hanieum.conik.domain.member;
 
-import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.member.enumerate.MemberRole;
@@ -113,10 +112,17 @@ public class Member extends BaseEntity {
     }
 
     /**
-     * 회원 정보 수정
+     * 회원 전화번호 수정
      */
-    public void updateProfile(MemberProfileUpdateRequest request) {
-        this.phoneNumber = request.newPhoneNumber();
+    public void updatePhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * 회원 이름 수정
+     */
+    public void updateName(String name){
+        this.name = name;
     }
 
     /**
@@ -133,6 +139,15 @@ public class Member extends BaseEntity {
         this.addresses.add(address);
     }
 
+    /**
+     * 회원 주소 삭제
+     */
+    public void deleteAddress(Long addressId) {
+        boolean removed = this.addresses.removeIf(address -> address.getId().equals(addressId));
+        if (!removed) {
+            throw new MemberException(MemberErrorType.ADDRESS_NOT_FOUND);
+        }
+    }
 
     /**
      * 기업 회원의 경우 기업을 할당한다.

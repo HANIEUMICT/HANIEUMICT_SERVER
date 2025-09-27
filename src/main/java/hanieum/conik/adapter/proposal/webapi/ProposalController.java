@@ -118,6 +118,12 @@ public class ProposalController {
         return ApiResponse.success(ProposalResponse.from(proposal));
     }
 
+    @Operation(summary = "내가 작성한 기업 견적서(입찰) 조회 API", description = """
+            ## 내가 작성한 기업 견적서(입찰) 목록을 조회합니다.
+            - 내가 작성한 기업 견적서(입찰) 목록을 조회합니다.
+            - 기업 견적서(입찰)의 상세 정보를 포함하여 반환합니다.
+            - 페이징 처리를 지원합니다.
+            """)
     @GetMapping("/me")
     public ApiResponse<Page<ProposalDetailResponse>> getMyProposals(
             @AuthenticationPrincipal AuthDetails authDetails,
