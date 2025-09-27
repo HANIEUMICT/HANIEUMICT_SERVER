@@ -38,6 +38,15 @@ public class ProposalQueryService implements ProposalFinder {
         return findProposalsWithStatus(submitStatus, companyId, projectId, pageable);
     }
 
+    @Override
+    public Page<ProposalDetailResponse> getCompanyProposals(Long memberId, Pageable pageable) {
+        Member member = memberFinder.findById(memberId);
+        Long companyId = member.getCompanyId();
+
+        Page<Proposal> proposals = proposalRepository.findByCompanyId(companyId, pageable);
+        return proposals.map(ProposalDetailResponse::from);
+    }
+
     private Page<Proposal> findProposalsWithStatus(SubmitStatus submitStatus, Long companyId, Long projectId, Pageable pageable) {
         if (projectId == null) {
             return (submitStatus == null)

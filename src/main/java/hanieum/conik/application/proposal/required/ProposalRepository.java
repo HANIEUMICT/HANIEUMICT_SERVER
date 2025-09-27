@@ -28,4 +28,6 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
     Page<Proposal> findByCompanyIdAndProjectIdAndSubmitStatusIn(Long companyId, Long projectId, List<SubmitStatus> submitStatuses, Pageable pageable);
 
     Page<Proposal> findByCompanyIdAndProjectIdAndSubmitStatus(Long companyId, Long projectId, SubmitStatus submitStatus, Pageable pageable);
+
+    Page<Proposal> findByCompanyId(Long companyId, Pageable pageable);
 }

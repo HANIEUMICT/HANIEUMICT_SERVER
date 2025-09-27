@@ -10,6 +10,7 @@ import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
+import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -17,10 +18,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -113,5 +116,14 @@ public class ProposalController {
         Proposal proposal = proposalSaver.rejectDeal(proposalId, proposalBidStatus);
 
         return ApiResponse.success(ProposalResponse.from(proposal));
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<Page<ProposalDetailResponse>> getMyProposals(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+        Long memberId = authDetails.getMemberId();
+
+        return ApiResponse.success(proposalFinder.getCompanyProposals(memberId, pageable));
     }
 }
