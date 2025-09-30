@@ -3,6 +3,7 @@ package hanieum.conik.domain.favorite;
 import hanieum.conik.QueryDslTestConfig;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.application.favorite.required.FavoriteRepository;
+import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class FavoriteRepositoryTest {
     @Autowired FavoriteRepository favoriteRepository;
+    @Autowired ProjectRepository projectRepository;
 
     @Test
     @DisplayName("즐겨찾기 저장")
@@ -60,10 +62,12 @@ class FavoriteRepositoryTest {
     @Test
     @DisplayName("companyId로 페이징 조회")
     void findAllByCompanyId_paging() {
-        // given
-        favoriteRepository.save(Favorite.create(1L, 100L));
-        favoriteRepository.save(Favorite.create(1L, 101L));
-        favoriteRepository.save(Favorite.create(2L, 200L));
+        Project p1 = projectRepository.save(Project.initiate(1L));
+        Project p2 = projectRepository.save(Project.initiate(2L));
+
+        favoriteRepository.save(Favorite.create(1L, p1.getId())); // company 1이 p1 찜
+        favoriteRepository.save(Favorite.create(1L, p2.getId())); // company 1이 p2 찜
+        favoriteRepository.save(Favorite.create(2L, p1.getId())); // 다른 회사 데이터
 
         // when
         var pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -71,8 +75,9 @@ class FavoriteRepositoryTest {
 
         // then
         assertThat(page.getTotalElements()).isEqualTo(2);
-        assertThat(page.getContent()).extracting(Project::getId)
-                .containsExactlyInAnyOrder(100L, 101L);
+        assertThat(page.getContent())
+                .extracting(Project::getId)
+                .containsExactlyInAnyOrder(p1.getId(), p2.getId());
     }
 
     @Test
