@@ -29,5 +29,13 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findBySubmitStatusIn(List<SubmitStatus> submitStatuses, Pageable pageable);
 
     Page<Project> findBySubmitStatus(SubmitStatus submitStatus, Pageable pageable);
+
+    @Query("""
+        select distinct p
+        from Project p, ProjectRequest pr
+        where pr.projectId = p.id
+          and pr.companyId = :companyId
+    """)
+    Page<Project> findByCompanyId(@Param("companyId")Long companyId, Pageable pageable);
 }
 

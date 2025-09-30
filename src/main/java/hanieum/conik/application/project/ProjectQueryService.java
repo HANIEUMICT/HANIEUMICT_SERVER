@@ -53,6 +53,12 @@ public class ProjectQueryService implements ProjectFinder {
         return projects.map(ProjectDetailResponse::from);
     }
 
+    @Override
+    public Page<ProjectDetailResponse> findProjectsByCompanyId(Long companyId, Pageable pageable) {
+        Page<Project> projects = projectRepository.findByCompanyId(companyId, pageable);
+        return projects.map(ProjectDetailResponse::from);
+    }
+
     private Page<Project> findProjectsWithStatus(SubmitStatus submitStatus, Long memberId, Pageable pageable) {
         return (submitStatus == null)
                 ? projectRepository.findByMemberIdAndSubmitStatusIn(memberId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)

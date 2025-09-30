@@ -150,6 +150,13 @@ public class Member extends BaseEntity {
     }
 
     /**
+     * 기업 회원인지
+     */
+    public boolean isCompanyMember() {
+        return this.role == MemberRole.OWNER;
+    }
+
+    /**
      * 기업 회원의 경우 기업을 할당한다.
      */
     private void assignCompany(Long companyId) {

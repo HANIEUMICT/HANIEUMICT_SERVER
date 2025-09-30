@@ -16,4 +16,5 @@ public interface ProjectFinder {
 
     Page<ProjectDetailResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable);
 
+    Page<ProjectDetailResponse> findProjectsByCompanyId(Long companyId, Pageable pageable);
 }
