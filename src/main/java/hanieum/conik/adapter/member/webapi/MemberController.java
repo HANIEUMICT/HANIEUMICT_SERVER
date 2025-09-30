@@ -1,9 +1,8 @@
 package hanieum.conik.adapter.member.webapi;
 
 import hanieum.conik.adapter.member.dto.MemberAddressResponse;
-import hanieum.conik.application.member.MemberFinderService;
-import hanieum.conik.application.member.MemberModifyService;
-import hanieum.conik.application.member.required.MemberRepository;
+import hanieum.conik.application.member.provided.MemberFinder;
+import hanieum.conik.application.member.provided.MemberSaver;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
@@ -30,9 +29,8 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "MEMBER", description = "회원 정보를 조회하고 수정하는 API")
 public class MemberController {
 
-    private final MemberModifyService memberModifyService;
-    private final MemberFinderService memberFinderService;
-    private final MemberRepository memberRepository;
+    private final MemberSaver memberSaver;
+    private final MemberFinder memberFinder;
 
     @Operation(summary = "회원 정보 수정", description = """
     ## 회원 정보 수정을 수행합니다.
@@ -43,7 +41,7 @@ public class MemberController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid MemberProfileUpdateRequest request
     ) {
-        memberModifyService.updateProfile(authDetails.getMemberId(), request);
+        memberSaver.updateProfile(authDetails.getMemberId(), request);
         return ApiResponse.success("회원 정보 수정이 완료되었습니다.");
     }
 
@@ -56,7 +54,7 @@ public class MemberController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid PasswordChangeRequest request
     ){
-        memberModifyService.certificatePassword(authDetails.getMemberId(), request.currentPassword());
+        memberSaver.certificatePassword(authDetails.getMemberId(), request.currentPassword());
         return ApiResponse.success("비밀번호 인증이 완료되었습니다.");
     }
 
@@ -69,8 +67,8 @@ public class MemberController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Member member = memberFinderService.findById(authDetails.getMemberId());
-        return ApiResponse.success(memberFinderService.findAddresses(member.getId(), pageable));
+        Member member = memberFinder.findById(authDetails.getMemberId());
+        return ApiResponse.success(memberFinder.findAddresses(member.getId(), pageable));
     }
 
     @Operation(summary = "주소 추가", description = """
@@ -82,7 +80,7 @@ public class MemberController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid AddressRegisterRequest request
     ) {
-        memberModifyService.addAddress(authDetails.getMemberId(), request);
+        memberSaver.addAddress(authDetails.getMemberId(), request);
         return ApiResponse.success("주소 추가가 완료되었습니다.");
     }
 
@@ -95,7 +93,7 @@ public class MemberController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long addressId
     ) {
-        memberModifyService.deleteAddress(authDetails.getMemberId(), addressId);
+        memberSaver.deleteAddress(authDetails.getMemberId(), addressId);
         return ApiResponse.success("주소 삭제가 완료되었습니다.");
     }
 }
