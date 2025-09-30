@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CompanyRegisterRequest(
-
     @Schema(description = "기업 이름", example = "행복 제조업")
     @NotBlank(message = "기업 이름은 필수 입력입니다.")
     String name,

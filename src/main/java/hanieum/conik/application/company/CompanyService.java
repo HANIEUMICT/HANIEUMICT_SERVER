@@ -4,7 +4,7 @@ import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
-import hanieum.conik.application.company.provided.CompanyRegister;
+import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.company.required.EquipmentRepository;
 import hanieum.conik.application.company.required.PortfolioRepository;
@@ -26,16 +26,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
 @Transactional
 @Validated
 @RequiredArgsConstructor
-public class CompanyService implements CompanyFinder, CompanyRegister {
+public class CompanyService implements CompanyFinder, CompanySaver {
     private final MemberFinder memberFinder;
     private final CompanyRepository companyRepository;
     private final EquipmentRepository equipmentRepository;
@@ -77,12 +75,6 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
         } catch (RuntimeException e) {
             throw new CompanyException(CompanyErrorType.MAPPING_ERROR);
         }
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Company> findAllCompany() {
-        return companyRepository.findAll();
     }
 
     @Override
@@ -145,6 +137,14 @@ public class CompanyService implements CompanyFinder, CompanyRegister {
 
         return companyDetail.getId();
     }
+
+    @Override
+    public void updateCompanyInfo(Long companyId, CompanyUpdateRequest request) {
+        Company company = findCompany(companyId);
+        company.update(request);
+    }
+
+
 
     @Override
     @Transactional(readOnly = true)

@@ -2,6 +2,7 @@ package hanieum.conik.domain.company.entity;
 
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
+import hanieum.conik.domain.company.dto.CompanyUpdateRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
 import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.global.domain.BaseEntity;
@@ -98,7 +99,7 @@ public class Company extends BaseEntity {
     /**
      * 기업 정보 수정
      * */
-    public void update(CompanyRegisterRequest request){
+    public void update(CompanyUpdateRequest request){
         this.name = request.name();
         this.owner = request.owner();
         this.email = new Email(request.email());
@@ -109,7 +110,6 @@ public class Company extends BaseEntity {
         this.registrationCertificateUrl = request.registrationCertificateUrl();
         this.profileUrl = request.profileUrl();
         this.bankbookCopy = request.bankbookCopy();
-        this.address = CompanyAddress.from(request.addressRegisterRequest());
     }
 
     /**
