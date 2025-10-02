@@ -1,6 +1,6 @@
 package hanieum.conik.application.favorite;
 
-import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
+import hanieum.conik.adapter.favorite.dto.FavoriteResponse;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.favorite.provided.FavoriteFinder;
 import hanieum.conik.application.favorite.provided.FavoriteSaver;
@@ -30,14 +30,14 @@ public class FavoriteService implements FavoriteSaver, FavoriteFinder {
     private final CompanyRepository companyRepository;
 
     @Override
-    public Page<Project> findFavoriteProjects(Long companyId, Pageable pageable) {
+    public Page<FavoriteResponse> findFavoriteProjects(Long companyId, Pageable pageable) {
         checkCompanyIsExist(companyId);
 
-        Page<Project> favoriteProjects = favoriteRepository.findFavoriteProjects(companyId, pageable);
+        Page<Project> favoriteProjects = favoriteRepository.findAllByCompanyId(companyId, pageable);
 
         if (favoriteProjects == null) return Page.empty(pageable);
 
-        return favoriteProjects;
+        return favoriteProjects.map(FavoriteResponse::from);
     }
 
     @Override

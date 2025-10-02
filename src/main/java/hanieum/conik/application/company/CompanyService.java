@@ -90,7 +90,7 @@ public class CompanyService implements CompanyFinder, CompanySaver {
     public Long register(CompanyRegisterRequest request) {
         Company company = Company.register(request);
 
-        checkDuplicateEmail(request);
+        checkDuplicateEmail(new Email(request.email()));
 
         companyRepository.save(company);
         log.info("기업 등록 성공: company id = {}", company.getId());
@@ -140,7 +140,10 @@ public class CompanyService implements CompanyFinder, CompanySaver {
 
     @Override
     public void updateCompanyInfo(Long companyId, CompanyUpdateRequest request) {
+        checkDuplicateEmail(new Email(request.email()));
+
         Company company = findCompany(companyId);
+
         company.update(request);
     }
 
@@ -174,8 +177,8 @@ public class CompanyService implements CompanyFinder, CompanySaver {
         return companyRepository.findCompaniesWithFilter(cond, pageable);
     }
 
-    private void checkDuplicateEmail(CompanyRegisterRequest request){
-        if (companyRepository.findByEmail(new Email(request.email())).isPresent()) {
+    private void checkDuplicateEmail(Email email){
+        if (companyRepository.findByEmail(email).isPresent()) {
             throw new CompanyException(CompanyErrorType.EMAIL_DUPLICATE);
         }
     }

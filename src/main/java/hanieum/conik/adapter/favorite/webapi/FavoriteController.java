@@ -1,13 +1,10 @@
 package hanieum.conik.adapter.favorite.webapi;
 
-import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
-import hanieum.conik.application.company.provided.CompanyFinder;
+import hanieum.conik.adapter.favorite.dto.FavoriteResponse;
 import hanieum.conik.application.favorite.provided.FavoriteFinder;
 import hanieum.conik.application.favorite.provided.FavoriteSaver;
 import hanieum.conik.application.member.provided.MemberFinder;
-import hanieum.conik.domain.favorite.Favorite;
 import hanieum.conik.domain.favorite.dto.FavoriteRequest;
-import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +37,7 @@ public class FavoriteController {
     public ApiResponse<Long> registerFavorite(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long projectId) {
-        Long companyId = memberFinder.findById(authDetails.getMemberId()).getCompanyId();
+        Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 
         Long saved = favoriteSaver.save(FavoriteRequest.of(companyId, projectId));
         return ApiResponse.success(saved);
@@ -53,14 +50,14 @@ public class FavoriteController {
             - 페이징 처리를 지원합니다.
             """)
     @GetMapping()
-    public ApiResponse<Page<ProjectDetailResponse>> getFavoriteList(
+    public ApiResponse<Page<FavoriteResponse>> getFavoriteList(
             @AuthenticationPrincipal AuthDetails authDetails,
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Long companyId = memberFinder.findById(authDetails.getMemberId()).getCompanyId();
+        Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 
-        Page<Project> favoriteProjects = favoriteFinder.findFavoriteProjects(companyId, pageable);
+        Page<FavoriteResponse> favoriteProjects = favoriteFinder.findFavoriteProjects(companyId, pageable);
 
-        return ApiResponse.success(favoriteProjects.map(ProjectDetailResponse::from));
+        return ApiResponse.success(favoriteProjects);
     }
 
     @Operation(summary = "찜 삭제 API", description = """
@@ -72,7 +69,7 @@ public class FavoriteController {
     public ApiResponse<Long> deleteFavorite(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long favoriteId) {
-        Long companyId = memberFinder.findById(authDetails.getMemberId()).getCompanyId();
+        Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 
         Long deletedId = favoriteSaver.delete(companyId, favoriteId);
 

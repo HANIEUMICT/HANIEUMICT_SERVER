@@ -30,7 +30,7 @@ public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom{
 
 
     @Override
-    public Page<Project> findFavoriteProjects(Long companyId, Pageable pageable) {
+    public Page<Project> findAllByCompanyId(Long companyId, Pageable pageable) {
         Pageable safe = (pageable == null) ? Pageable.unpaged() : pageable;
 
         OrderSpecifier<?> order = toFavoriteOrder(safe.getSort());

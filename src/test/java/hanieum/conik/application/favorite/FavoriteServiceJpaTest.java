@@ -108,7 +108,7 @@ public class FavoriteServiceJpaTest {
         // then: DTO 기준으로 검증 (엔티티 아님!)
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent())
-                .extracting(Project::getId)
+                .extracting(fav -> fav.project().projectId())
                 .containsExactlyInAnyOrder(p1.getId(), p2.getId());
     }
 

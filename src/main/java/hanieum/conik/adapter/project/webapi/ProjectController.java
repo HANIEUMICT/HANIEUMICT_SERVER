@@ -109,7 +109,7 @@ public class ProjectController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Long companyId = memberFinder.findById(authDetails.getMemberId()).getCompanyId();
+        Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 
         return ApiResponse.success(projectFinder.findProjectsByCompanyId(companyId, pageable));
     }

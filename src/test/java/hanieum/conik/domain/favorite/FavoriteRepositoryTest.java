@@ -1,7 +1,6 @@
 package hanieum.conik.domain.favorite;
 
 import hanieum.conik.QueryDslTestConfig;
-import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.application.favorite.required.FavoriteRepository;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.project.entity.Project;
@@ -71,7 +70,7 @@ class FavoriteRepositoryTest {
 
         // when
         var pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-        var page = favoriteRepository.findFavoriteProjects(1L, pageable);
+        var page = favoriteRepository.findAllByCompanyId(1L, pageable);
 
         // then
         assertThat(page.getTotalElements()).isEqualTo(2);
