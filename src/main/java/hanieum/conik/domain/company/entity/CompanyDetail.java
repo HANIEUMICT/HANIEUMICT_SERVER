@@ -161,12 +161,12 @@ public class CompanyDetail extends BaseEntity {
 
     public void update(CompanyDetailUpdateRequest detail) {
         if (detail == null) return;
-        this.establishedAt = detail.establishedAt();
-        this.logoUrl = detail.logoUrl();
-        this.employeeCount = detail.employeeCount();
-        this.websiteUrl = detail.websiteUrl();
-        this.contactAvailableTime = detail.contactAvailableTime();
-        this.description = detail.description();
+        if (detail.establishedAt() != null) this.establishedAt = detail.establishedAt();
+        if (detail.logoUrl() != null) this.logoUrl = detail.logoUrl();
+        if (detail.employeeCount() != null) this.employeeCount = detail.employeeCount();
+        if (detail.websiteUrl() != null) this.websiteUrl = detail.websiteUrl();
+        if (detail.contactAvailableTime() != null) this.contactAvailableTime = detail.contactAvailableTime();
+        if (detail.description() != null) this.description = detail.description();
     }
 }
 
