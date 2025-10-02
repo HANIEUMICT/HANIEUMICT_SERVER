@@ -112,9 +112,9 @@ class MemberModifyServiceTest {
         then(member).should().addAddress(addressCaptor.capture());
         MemberAddress capturedAddress = addressCaptor.getValue();
 
-        assertEquals("12345", capturedAddress.getAddressPostalCode());
-        assertEquals("행복로", capturedAddress.getAddressStreetAddress());
-        assertEquals("101호", capturedAddress.getAddressDetailAddress());
+        assertEquals("12345", capturedAddress.getPostalCode());
+        assertEquals("행복로", capturedAddress.getStreetAddress());
+        assertEquals("101호", capturedAddress.getDetailAddress());
     }
 
     @Test

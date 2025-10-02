@@ -50,11 +50,10 @@ public class Member extends BaseEntity {
     @Column(name = "company_id", nullable = true)
     private Long companyId;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "member_id", nullable = false)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberAddress> addresses = new ArrayList<>();
 
-    private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, MemberAddress initialAddressBase) {
+    private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, MemberAddress memberAddress) {
         if (!termsOfServiceAgreed) {
             throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
         }
@@ -64,7 +63,9 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.termsOfServiceAgreed = termsOfServiceAgreed;
         this.role = role;
-        this.addresses.add(initialAddressBase);
+        if (memberAddress != null) {
+            addAddress(memberAddress);
+        }
     }
 
     /**
@@ -72,6 +73,7 @@ public class Member extends BaseEntity {
      * */
     public static Member signUpIndividual(MemberSignUpRequest request) {
         MemberAddress address = MemberAddress.register(request.addressRegisterRequest());
+
         return new Member(
                 request.name(),
                 new Email(request.email()),
@@ -136,7 +138,8 @@ public class Member extends BaseEntity {
      * 회원 주소 추가
      */
     public void addAddress(MemberAddress address) {
-        this.addresses.add(address);
+        addresses.add(address);
+        address.setMember(this);
     }
 
     /**

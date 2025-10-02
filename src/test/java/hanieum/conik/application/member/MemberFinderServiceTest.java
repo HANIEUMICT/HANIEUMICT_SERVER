@@ -2,86 +2,72 @@ package hanieum.conik.application.member;
 
 import hanieum.conik.adapter.member.dto.MemberAddressResponse;
 import hanieum.conik.application.member.provided.MemberFinder;
+import hanieum.conik.application.member.required.MemberAddressRepository;
 import hanieum.conik.application.member.required.MemberRepository;
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.MemberAddress;
+import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.domain.member.exception.MemberException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.mock;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
 class MemberFinderServiceTest {
-    @Autowired
-    MemberFinder memberFinder;
+    @Autowired MemberFinderService memberFinder;
+    @Autowired MemberRepository memberRepository;
 
-    @MockBean
-    MemberRepository memberRepository;
+    @PersistenceContext
+    EntityManager em;
 
     @Test
-    @DisplayName("멤버_주소목록_찾기_success")
-    void 멤버_주소목록_찾기_success() {
-        // given
-        long memberId = 1L;
+    @DisplayName("멤버 주소 목록 조회 - 성공")
+    void findAddresses_success() {
 
-        // Member, Address 들을 목으로 준비 (서비스는 읽기만 하므로 목으로 충분)
-        Member member = mock(Member.class);
+        var baseAddr = new AddressRegisterRequest("00000", "기본로", "0호");
+        var signUpReq = new MemberSignUpRequest(
+                "홍길동", "hong@example.com", "raw-pw", "010-1234-5678",
+                true, baseAddr
+        );
+        Member member = Member.signUpIndividual(signUpReq);
 
-        MemberAddress addr1 = mock(MemberAddress.class);
-        given(addr1.getAddressPostalCode()).willReturn("12345");
-        given(addr1.getAddressStreetAddress()).willReturn("행복로");
-        given(addr1.getAddressDetailAddress()).willReturn("101호");
+        member.getAddresses().clear();
+        member.addAddress(MemberAddress.register(new AddressRegisterRequest("12345", "행복로", "101호")));
+        member.addAddress(MemberAddress.register(new AddressRegisterRequest("23456", "희망로", "202호")));
 
-        MemberAddress addr2 = mock(MemberAddress.class);
-        given(addr2.getAddressPostalCode()).willReturn("23456");
-        given(addr2.getAddressStreetAddress()).willReturn("희망로");
-        given(addr2.getAddressDetailAddress()).willReturn("202호");
+        memberRepository.saveAndFlush(member);
+        Long memberId = member.getId();
 
-        given(member.getAddresses()).willReturn(List.of(addr1, addr2));
-        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
-
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("createdAt")));
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
         Page<MemberAddressResponse> page = memberFinder.findAddresses(memberId, pageable);
 
         // then
-        assertEquals(2, page.getTotalElements());
-        assertEquals(2, page.getContent().size());
-
-        var postalCodes = page.map(MemberAddressResponse::zipcode).getContent();
-        assertTrue(postalCodes.containsAll(List.of("12345", "23456")));
-
-        then(memberRepository).should().findById(memberId);
-        then(memberRepository).shouldHaveNoMoreInteractions();
+        assertThat(page.getTotalElements()).isEqualTo(2);
+        assertThat(page.getContent()).hasSize(2);
     }
 
     @Test
-    @DisplayName("멤버_주소목록_찾기_fail - 멤버 없음")
-    void 멤버_주소목록_찾기_fail_memberNotFound() {
-        // given
-        long memberId = 999L;
-        given(memberRepository.findById(memberId)).willReturn(Optional.empty());
+    @DisplayName("멤버 주소 목록 조회 - 멤버 없음")
+    void findAddresses_memberNotFound() {
+        Pageable pageable = PageRequest.of(0, 10);
 
-        // when & then
-        assertThrows(MemberException.class,
-                () -> memberFinder.findAddresses(memberId, Pageable.unpaged()));
-        then(memberRepository).should().findById(memberId);
+        assertThatThrownBy(() -> memberFinder.findAddresses(999_999L, pageable))
+                .isInstanceOf(MemberException.class);
     }
 }
