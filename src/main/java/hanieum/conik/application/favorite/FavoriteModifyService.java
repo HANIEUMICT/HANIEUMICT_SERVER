@@ -1,8 +1,6 @@
 package hanieum.conik.application.favorite;
 
-import hanieum.conik.adapter.favorite.dto.FavoriteResponse;
 import hanieum.conik.application.company.required.CompanyRepository;
-import hanieum.conik.application.favorite.provided.FavoriteFinder;
 import hanieum.conik.application.favorite.provided.FavoriteSaver;
 import hanieum.conik.application.favorite.required.FavoriteRepository;
 import hanieum.conik.application.project.required.ProjectRepository;
@@ -12,33 +10,19 @@ import hanieum.conik.domain.favorite.Favorite;
 import hanieum.conik.domain.favorite.dto.FavoriteRequest;
 import hanieum.conik.domain.favorite.exception.FavoriteErrorType;
 import hanieum.conik.domain.favorite.exception.FavoriteException;
-import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
-public class FavoriteService implements FavoriteSaver, FavoriteFinder {
+@Transactional
+public class FavoriteModifyService implements FavoriteSaver {
     private final FavoriteRepository favoriteRepository;
     private final ProjectRepository projectRepository;
     private final CompanyRepository companyRepository;
-
-    @Override
-    public Page<FavoriteResponse> findFavoriteProjects(Long companyId, Pageable pageable) {
-        checkCompanyIsExist(companyId);
-
-        Page<Project> favoriteProjects = favoriteRepository.findAllByCompanyId(companyId, pageable);
-
-        if (favoriteProjects == null) return Page.empty(pageable);
-
-        return favoriteProjects.map(FavoriteResponse::from);
-    }
 
     @Override
     public Long save(FavoriteRequest request) {

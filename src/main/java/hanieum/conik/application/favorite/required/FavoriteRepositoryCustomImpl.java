@@ -2,6 +2,8 @@ package hanieum.conik.application.favorite.required;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import hanieum.conik.domain.company.exception.CompanyErrorType;
+import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.favorite.QFavorite;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.entity.QProject;
@@ -22,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom{
+public class FavoriteRepositoryCustomImpl implements FavoriteRepositoryCustom{
     private final JPAQueryFactory query;
     private static final QFavorite f = QFavorite.favorite;
     private static final QProject p = QProject.project;
@@ -31,6 +33,9 @@ public class FavoriteRepositoryImpl implements FavoriteRepositoryCustom{
 
     @Override
     public Page<Project> findAllByCompanyId(Long companyId, Pageable pageable) {
+        if (companyId == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
+        }
         Pageable safe = (pageable == null) ? Pageable.unpaged() : pageable;
 
         OrderSpecifier<?> order = toFavoriteOrder(safe.getSort());

@@ -42,7 +42,7 @@ public class MemberModifyService implements MemberSaver {
     }
 
     @Override
-    public void certificatePassword(Long memberId, String currentPassword) {
+    public void validateCurrentPassword(Long memberId, String currentPassword) {
         Member member = memberFinder.findById(memberId);
 
         if (!passwordEncoder.matches(currentPassword, member.getHashedPassword())) {

@@ -34,13 +34,13 @@ public class FavoriteController {
             - 찜 등록 성공 시, 찜 ID를 반환합니다.
             """)
     @PostMapping("/{projectId}")
-    public ApiResponse<Long> registerFavorite(
+    public ApiResponse<?> registerFavorite(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long projectId) {
         Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 
-        Long saved = favoriteSaver.save(FavoriteRequest.of(companyId, projectId));
-        return ApiResponse.success(saved);
+        favoriteSaver.save(FavoriteRequest.of(companyId, projectId));
+        return ApiResponse.success("찜 등록이 완료되었습니다.");
     }
 
     @Operation(summary = "찜 목록 조회 API", description = """

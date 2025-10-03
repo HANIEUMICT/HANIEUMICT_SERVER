@@ -13,7 +13,7 @@ public enum FavoriteErrorType implements ErrorType {
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "권한이 없습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력 값이 유효하지 않습니다.");
 
-    public final HttpStatus status;
+    private final HttpStatus status;
 
-    public final String message;
+    private final String message;
 }

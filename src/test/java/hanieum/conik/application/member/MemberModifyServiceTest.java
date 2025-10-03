@@ -40,14 +40,14 @@ class MemberModifyServiceTest {
 
     @Test
     @DisplayName("updateProfile 실패 - 멤버 없음이면 예외 전파 및 encode/update 미호출")
-    void updatePhoneNumber_memberNotFound() {
+    void updateProfile_memberNotFound() {
         // given
         long memberId = 999L;
         MemberProfileUpdateRequest req = mock(MemberProfileUpdateRequest.class);
         given(memberFinder.findById(memberId)).willThrow(new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
 
         // when / then
-        assertThrows(RuntimeException.class, () -> memberModifyService.updateProfile(memberId, req));
+        assertThrows(MemberException.class, () -> memberModifyService.updateProfile(memberId, req));
 
         then(passwordEncoder).should(never()).encode(anyString());
     }
@@ -59,7 +59,7 @@ class MemberModifyServiceTest {
 
     @Test
     @DisplayName("certificatePassword 성공")
-    void certificatePassword_success() {
+    void validateCurrentPassword_success() {
         //given
         long memberId = 1L;
         String currentPassword = "currentPassword";
@@ -69,7 +69,7 @@ class MemberModifyServiceTest {
         given(passwordEncoder.matches(currentPassword, member.getHashedPassword())).willReturn(true);
 
         //when
-        memberModifyService.certificatePassword(memberId, currentPassword);
+        memberModifyService.validateCurrentPassword(memberId, currentPassword);
 
         //then
         then(passwordEncoder).should().matches(currentPassword, member.getHashedPassword());
@@ -77,7 +77,7 @@ class MemberModifyServiceTest {
 
     @Test
     @DisplayName("certificatePassword 실패")
-    void certificatePassword_fail() {
+    void validateCurrentPassword_fail() {
         //given
         long memberId = 1L;
         String currentPassword = "currentPassword";
@@ -88,7 +88,7 @@ class MemberModifyServiceTest {
         given(passwordEncoder.matches(currentPassword, member.getHashedPassword())).willReturn(true);
 
         //when
-        assertThrows(MemberException.class, () -> memberModifyService.certificatePassword(memberId, wrongPassword));
+        assertThrows(MemberException.class, () -> memberModifyService.validateCurrentPassword(memberId, wrongPassword));
     }
 
     /***
@@ -149,5 +149,9 @@ class MemberModifyServiceTest {
         //when
         doThrow(new MemberException(MemberErrorType.ADDRESS_NOT_FOUND))
                 .when(member).deleteAddress(addressId);
+
+        //then
+        assertThrows(MemberException.class,
+                () -> memberModifyService.deleteAddress(memberId, addressId));
     }
 }

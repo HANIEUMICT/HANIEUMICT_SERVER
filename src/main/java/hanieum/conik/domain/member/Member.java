@@ -1,5 +1,6 @@
 package hanieum.conik.domain.member;
 
+import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.member.enumerate.MemberRole;
@@ -117,6 +118,9 @@ public class Member extends BaseEntity {
      * 회원 전화번호 수정
      */
     public void updatePhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            throw new MemberException(MemberErrorType.INVALID_PHONE_NUMBER);
+        }
         this.phoneNumber = phoneNumber;
     }
 
@@ -124,6 +128,9 @@ public class Member extends BaseEntity {
      * 회원 이름 수정
      */
     public void updateName(String name){
+        if (name == null || name.isBlank()) {
+            throw new MemberException(MemberErrorType.INVALID_NAME);
+        }
         this.name = name;
     }
 
@@ -156,7 +163,8 @@ public class Member extends BaseEntity {
      * 기업 회원인지
      */
     public boolean isCompanyMember() {
-        return this.role == MemberRole.OWNER;
+
+        return this.role == MemberRole.OWNER || this.role == MemberRole.STAFF;
     }
 
     /**

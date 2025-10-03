@@ -15,7 +15,7 @@ public interface MemberSaver {
      */
     void updateProfile(Long memberId, MemberProfileUpdateRequest updateReq);
 
-    void certificatePassword(Long memberId, String currentPassword);
+    void validateCurrentPassword(Long memberId, String currentPassword);
 
     /**
      * 회원에게 새 주소를 추가합니다.

@@ -1,6 +1,8 @@
 package hanieum.conik.application.favorite;
 
 import hanieum.conik.application.company.required.CompanyRepository;
+import hanieum.conik.application.favorite.provided.FavoriteFinder;
+import hanieum.conik.application.favorite.provided.FavoriteSaver;
 import hanieum.conik.application.favorite.required.FavoriteRepository;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.domain.company.exception.CompanyException;
@@ -28,7 +30,8 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest
 @Transactional
 public class FavoriteServiceJpaTest {
-    @Autowired FavoriteService favoriteService;
+    @Autowired FavoriteFinder favoriteFinder;
+    @Autowired FavoriteSaver favoriteSaver;
     @Autowired FavoriteRepository favoriteRepository;
     @Autowired ProjectRepository projectRepository;
 
@@ -45,7 +48,7 @@ public class FavoriteServiceJpaTest {
         given(companyRepository.existsById(1L)).willReturn(true);
         var p1 = projectRepository.save(ProjectFixtures.minimal("P1"));
 
-        Long id = favoriteService.save(new FavoriteRequest(1L, p1.getId()));
+        Long id = favoriteSaver.save(new FavoriteRequest(1L, p1.getId()));
 
         assertThat(id).isNotNull();
         assertThat(favoriteRepository.existsByCompanyIdAndProjectId(1L, p1.getId())).isTrue();
@@ -56,7 +59,7 @@ public class FavoriteServiceJpaTest {
     void save_companyNotFound() {
         given(companyRepository.existsById(1L)).willReturn(false);
 
-        assertThatThrownBy(() -> favoriteService.save(new FavoriteRequest(1L, 100L)))
+        assertThatThrownBy(() -> favoriteSaver.save(new FavoriteRequest(1L, 100L)))
                 .isInstanceOf(CompanyException.class);
     }
 
@@ -65,7 +68,7 @@ public class FavoriteServiceJpaTest {
     void save_projectNotFound() {
         given(companyRepository.existsById(1L)).willReturn(true);
 
-        assertThatThrownBy(() -> favoriteService.save(new FavoriteRequest(1L, -1L)))
+        assertThatThrownBy(() -> favoriteSaver.save(new FavoriteRequest(1L, -1L)))
                 .isInstanceOf(ProjectException.class);
     }
 
@@ -77,7 +80,7 @@ public class FavoriteServiceJpaTest {
 
         favoriteRepository.save(Favorite.create(1L, p1.getId()));
 
-        assertThatThrownBy(() -> favoriteService.save(new FavoriteRequest(1L, p1.getId())))
+        assertThatThrownBy(() -> favoriteSaver.save(new FavoriteRequest(1L, p1.getId())))
                 .isInstanceOf(FavoriteException.class);
     }
 
@@ -96,16 +99,16 @@ public class FavoriteServiceJpaTest {
         var p2 = projectRepository.save(ProjectFixtures.minimal("P2"));
         var p3 = projectRepository.save(ProjectFixtures.minimal("P3"));
 
-        favoriteService.save(FavoriteRequest.of(1L, p1.getId()));
-        favoriteService.save(FavoriteRequest.of(1L, p2.getId()));
-        favoriteService.save(FavoriteRequest.of(2L, p3.getId()));
+        favoriteSaver.save(FavoriteRequest.of(1L, p1.getId()));
+        favoriteSaver.save(FavoriteRequest.of(1L, p2.getId()));
+        favoriteSaver.save(FavoriteRequest.of(2L, p3.getId()));
 
         var pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        var page = favoriteService.findFavoriteProjects(1L, pageable); // Page<ProjectDetailResponse>
+        var page = favoriteFinder.findFavoriteProjects(1L, pageable);
 
-        // then: DTO 기준으로 검증 (엔티티 아님!)
+        // then
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent())
                 .extracting(fav -> fav.project().projectId())
@@ -119,7 +122,7 @@ public class FavoriteServiceJpaTest {
 
         var pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        assertThatThrownBy(() -> favoriteService.findFavoriteProjects(1L, pageable))
+        assertThatThrownBy(() -> favoriteFinder.findFavoriteProjects(1L, pageable))
                 .isInstanceOf(CompanyException.class);
     }
 
@@ -129,7 +132,7 @@ public class FavoriteServiceJpaTest {
         given(companyRepository.existsById(1L)).willReturn(true);
 
         var pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-        var page = favoriteService.findFavoriteProjects(1L, pageable);
+        var page = favoriteFinder.findFavoriteProjects(1L, pageable);
 
         assertThat(page.getTotalElements()).isEqualTo(0L);
         assertThat(page.getContent()).isEmpty();
@@ -146,12 +149,13 @@ public class FavoriteServiceJpaTest {
         given(companyRepository.existsById(1L)).willReturn(true);
         var p1 = projectRepository.save(ProjectFixtures.minimal("P1"));
 
-        Long favoriteId = favoriteService.save(new FavoriteRequest(1L, p1.getId()));
+        Long favoriteId = favoriteSaver.save(new FavoriteRequest(1L, p1.getId()));
         assertThat(favoriteRepository.existsByCompanyIdAndProjectId(1L, p1.getId())).isTrue();
 
         Optional<Favorite> favorite = favoriteRepository.findById(favoriteId);
+        assertThat(favorite).isPresent();
 
-        favoriteService.delete(favorite.get().getCompanyId(),favoriteId);
+        favoriteSaver.delete(favorite.get().getCompanyId(), favoriteId);
 
         assertThat(favoriteRepository.existsByCompanyIdAndProjectId(1L, p1.getId())).isFalse();
     }

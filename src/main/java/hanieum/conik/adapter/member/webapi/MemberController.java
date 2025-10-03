@@ -4,7 +4,6 @@ import hanieum.conik.adapter.member.dto.MemberAddressResponse;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.provided.MemberSaver;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
-import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.PasswordChangeRequest;
 import hanieum.conik.global.adapter.security.AuthDetails;
@@ -54,7 +53,7 @@ public class MemberController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid PasswordChangeRequest request
     ){
-        memberSaver.certificatePassword(authDetails.getMemberId(), request.currentPassword());
+        memberSaver.validateCurrentPassword(authDetails.getMemberId(), request.currentPassword());
         return ApiResponse.success("비밀번호 인증이 완료되었습니다.");
     }
 
@@ -67,15 +66,14 @@ public class MemberController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        Member member = memberFinder.findById(authDetails.getMemberId());
-        return ApiResponse.success(memberFinder.findAddresses(member.getId(), pageable));
+        return ApiResponse.success(memberFinder.findAddresses(authDetails.getMemberId(), pageable));
     }
 
     @Operation(summary = "주소 추가", description = """
     ## 주소 추가를 수행합니다.
     - 사용자가 주소를 추가할 수 있습니다.
     """)
-    @PutMapping("/addresses")
+    @PatchMapping("/addresses")
     public ApiResponse<?> addAddress(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid AddressRegisterRequest request
