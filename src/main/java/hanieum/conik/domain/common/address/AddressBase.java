@@ -3,6 +3,7 @@ package hanieum.conik.domain.common.address;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.common.address.exception.AddressErrorType;
 import hanieum.conik.domain.common.address.exception.AddressException;
+import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,24 +12,24 @@ import lombok.NoArgsConstructor;
 @MappedSuperclass
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AddressBase {
+public class AddressBase extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String addressPostalCode;
+    private String postalCode;
 
     @Column(nullable = false)
-    private String addressStreetAddress;
+    private String streetAddress;
 
     @Column(nullable = false)
-    private String addressDetailAddress;
+    private String detailAddress;
 
-    protected AddressBase(String addressPostalCode, String addressStreetAddress, String addressDetailAddress) {
-        this.addressPostalCode = addressPostalCode;
-        this.addressStreetAddress = addressStreetAddress;
-        this.addressDetailAddress = addressDetailAddress;
+    protected AddressBase(String postalCode, String streetAddress, String detailAddress) {
+        this.postalCode = postalCode;
+        this.streetAddress = streetAddress;
+        this.detailAddress = detailAddress;
     }
 
     /**
@@ -44,8 +45,8 @@ public class AddressBase {
         if (request.detailAddress() == null || request.detailAddress().isBlank()) {
             throw new AddressException(AddressErrorType.INVALID_DETAIL_ADDRESS);
         }
-        this.addressPostalCode = request.postalCode();
-        this.addressStreetAddress = request.streetAddress();
-        this.addressDetailAddress = request.detailAddress();
+        this.postalCode = request.postalCode();
+        this.streetAddress = request.streetAddress();
+        this.detailAddress = request.detailAddress();
     }
 }

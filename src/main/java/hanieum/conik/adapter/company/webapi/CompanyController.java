@@ -5,7 +5,7 @@ import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
-import hanieum.conik.application.company.provided.CompanyRegister;
+import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.domain.company.dto.CompanyDetailCreateRequest;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.entity.Company;
@@ -34,7 +34,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyFinder companyFinder;
-    private final CompanyRegister companyRegister;
+    private final CompanySaver companySaver;
 
     @Operation(summary = "기업 등록", description = """
     ## 기업 등록을 수행합니다.
@@ -43,7 +43,7 @@ public class CompanyController {
     """)
     @PostMapping()
     public ApiResponse<Long> registerCompany(@Valid @RequestBody CompanyRegisterRequest request) {
-        return ApiResponse.success(companyRegister.register(request));
+        return ApiResponse.success(companySaver.register(request));
     }
 
     @Operation(summary = "전체 기업 summary 조회", description = """
@@ -80,7 +80,7 @@ public class CompanyController {
                 .map(AuthDetails::getMemberId)
                 .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
 
-        return ApiResponse.success(companyRegister.registerCompanyDetail(memberId, request)
+        return ApiResponse.success(companySaver.registerCompanyDetail(memberId, request)
         );
     }
 
@@ -120,7 +120,7 @@ public class CompanyController {
             @RequestParam(required = false) Integer maxResponseMinutes,
             @RequestParam(required = false) Integer minTotalOrderCount,
             @RequestParam(required = false) Integer maxProductionHours,
-            @PageableDefault(size = 20, sort = "rating", direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject @PageableDefault(size = 20, sort = "rating", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         var cond = new CompanyProfileSearchCondition(keyword, minRating, maxResponseMinutes, minTotalOrderCount, maxProductionHours);
         return ApiResponse.success(companyFinder.findAllCompanyWithFilter(cond, pageable));

@@ -38,7 +38,6 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -65,9 +64,6 @@ dependencies {
 	//feign Client
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.5'
 
-	//SpringSecurity
-	implementation "org.springframework.boot:spring-boot-starter-security"
-
 	// Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	testImplementation 'org.springframework.security:spring-security-test'
@@ -82,9 +78,11 @@ dependencies {
 	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api:3.1.0'
 	annotationProcessor 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "failed", "skipped"
+    }
 }

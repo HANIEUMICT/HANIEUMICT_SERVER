@@ -21,8 +21,6 @@ public interface CompanyFinder {
 
     CompanyDetailResponse findMyCompanyWithDetail(Long memberId);
 
-    List<Company> findAllCompany();
-
     List<Company> findCompaniesByIds(Collection<Long> ids);
 
     CompanyDetailResponse findCompanyWithDetail(Long companyId);

@@ -51,11 +51,10 @@ public class Member extends BaseEntity {
     @Column(name = "company_id", nullable = true)
     private Long companyId;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "member_id", nullable = false)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberAddress> addresses = new ArrayList<>();
 
-    private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, MemberAddress initialAddressBase) {
+    private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, MemberAddress memberAddress) {
         if (!termsOfServiceAgreed) {
             throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
         }
@@ -65,7 +64,9 @@ public class Member extends BaseEntity {
         this.phoneNumber = phoneNumber;
         this.termsOfServiceAgreed = termsOfServiceAgreed;
         this.role = role;
-        this.addresses.add(initialAddressBase);
+        if (memberAddress != null) {
+            addAddress(memberAddress);
+        }
     }
 
     /**
@@ -73,6 +74,7 @@ public class Member extends BaseEntity {
      * */
     public static Member signUpIndividual(MemberSignUpRequest request) {
         MemberAddress address = MemberAddress.register(request.addressRegisterRequest());
+
         return new Member(
                 request.name(),
                 new Email(request.email()),
@@ -113,10 +115,23 @@ public class Member extends BaseEntity {
     }
 
     /**
-     * 회원 정보 수정
+     * 회원 전화번호 수정
      */
-    public void updateProfile(MemberProfileUpdateRequest request) {
-        this.phoneNumber = request.newPhoneNumber();
+    public void updatePhoneNumber(String phoneNumber) {
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            throw new MemberException(MemberErrorType.INVALID_PHONE_NUMBER);
+        }
+        this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * 회원 이름 수정
+     */
+    public void updateName(String name){
+        if (name == null || name.isBlank()) {
+            throw new MemberException(MemberErrorType.INVALID_NAME);
+        }
+        this.name = name;
     }
 
     /**
@@ -130,9 +145,27 @@ public class Member extends BaseEntity {
      * 회원 주소 추가
      */
     public void addAddress(MemberAddress address) {
-        this.addresses.add(address);
+        addresses.add(address);
+        address.setMember(this);
     }
 
+    /**
+     * 회원 주소 삭제
+     */
+    public void deleteAddress(Long addressId) {
+        boolean removed = this.addresses.removeIf(address -> address.getId().equals(addressId));
+        if (!removed) {
+            throw new MemberException(MemberErrorType.ADDRESS_NOT_FOUND);
+        }
+    }
+
+    /**
+     * 기업 회원인지
+     */
+    public boolean isCompanyMember() {
+
+        return this.role == MemberRole.OWNER || this.role == MemberRole.STAFF;
+    }
 
     /**
      * 기업 회원의 경우 기업을 할당한다.

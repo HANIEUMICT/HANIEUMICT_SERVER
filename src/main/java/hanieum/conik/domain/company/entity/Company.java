@@ -1,6 +1,8 @@
 package hanieum.conik.domain.company.entity;
 
+import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
+import hanieum.conik.domain.company.dto.CompanyUpdateRequest;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
 import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.global.domain.BaseEntity;
@@ -26,6 +28,7 @@ public class Company extends BaseEntity {
     private String owner;  // 대표자 이름
 
     @Column(nullable = false)
+    @Convert(converter = EmailAttributeConverter.class)
     private Email email; // 회사 이메일
 
     @Column(nullable = false)
@@ -96,18 +99,17 @@ public class Company extends BaseEntity {
     /**
      * 기업 정보 수정
      * */
-    public void update(CompanyRegisterRequest request){
-        this.name = request.name();
-        this.owner = request.owner();
-        this.email = new Email(request.email());
-        this.phoneNumber = request.phoneNumber();
-        this.businessType = request.businessType();
-        this.industry = request.industry();
-        this.registrationNumber = request.registrationNumber();
-        this.registrationCertificateUrl = request.registrationCertificateUrl();
-        this.profileUrl = request.profileUrl();
-        this.bankbookCopy = request.bankbookCopy();
-        this.address = CompanyAddress.from(request.addressRegisterRequest());
+    public void update(CompanyUpdateRequest request){
+        if (request.name() != null) this.name = request.name();
+        if (request.owner() != null) this.owner = request.owner();
+        if (request.email() != null) this.email = new Email(request.email());
+        if (request.phoneNumber() != null) this.phoneNumber = request.phoneNumber();
+        if (request.businessType() != null) this.businessType = request.businessType();
+        if (request.industry() != null) this.industry = request.industry();
+        if (request.registrationNumber() != null) this.registrationNumber = request.registrationNumber();
+        if (request.registrationCertificateUrl() != null) this.registrationCertificateUrl = request.registrationCertificateUrl();
+        if (request.profileUrl() != null) this.profileUrl = request.profileUrl();
+        if (request.bankbookCopy() != null) this.bankbookCopy = request.bankbookCopy();
     }
 
     /**

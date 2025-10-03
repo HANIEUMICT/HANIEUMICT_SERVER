@@ -5,11 +5,13 @@ import hanieum.conik.adapter.project.dto.request.ProjectDrawingUploadRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
+import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
+import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.adapter.security.AuthSourceType;
 import hanieum.conik.global.adapter.security.AuthorizeUser;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -17,10 +19,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -31,6 +35,7 @@ public class ProjectController {
     private final ProjectDrawingSaver projectDrawingSaver;
     private final ProjectSaver projectSaver;
     private final ProjectFinder projectFinder;
+    private final MemberFinder memberFinder;
 
     @Operation(summary = "프로젝트(공고) 도면 파일 업로드 API", description = "프로젝트(공고) 생성 중 도면 파일을 업로드합니다.")
     @PostMapping("{memberId}/image")
@@ -94,5 +99,19 @@ public class ProjectController {
         Project project = projectSaver.updateProjectBidStatus(projectId, bidStatusUpdateRequest);
 
         return ApiResponse.success(ProjectDetailResponse.from(project));
+    }
+
+    @Operation(summary = "기업 마이페이지 - 나에게 온 견적서 목록 조회", description = """
+            ## 기업 회원이 자신의 기업에 전송된 프로젝트(공고) 목록을 조회합니다.
+            - 자신의 기업에 전송된 프로젝트(공고) 목록을 조회합니다.
+            """)
+    @GetMapping("/me/company")
+    public ApiResponse<Page<ProjectDetailResponse>> getProjectsByCompanyId(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
+
+        return ApiResponse.success(projectFinder.findProjectsByCompanyId(companyId, pageable));
     }
 }

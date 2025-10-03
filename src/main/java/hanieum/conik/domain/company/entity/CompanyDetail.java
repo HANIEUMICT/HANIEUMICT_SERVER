@@ -1,6 +1,7 @@
 package hanieum.conik.domain.company.entity;
 
 import hanieum.conik.domain.company.dto.CompanyDetailRequest;
+import hanieum.conik.domain.company.dto.CompanyDetailUpdateRequest;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -156,6 +157,16 @@ public class CompanyDetail extends BaseEntity {
             }
         }
         return false;
+    }
+
+    public void update(CompanyDetailUpdateRequest detail) {
+        if (detail == null) return;
+        if (detail.establishedAt() != null) this.establishedAt = detail.establishedAt();
+        if (detail.logoUrl() != null) this.logoUrl = detail.logoUrl();
+        if (detail.employeeCount() != null) this.employeeCount = detail.employeeCount();
+        if (detail.websiteUrl() != null) this.websiteUrl = detail.websiteUrl();
+        if (detail.contactAvailableTime() != null) this.contactAvailableTime = detail.contactAvailableTime();
+        if (detail.description() != null) this.description = detail.description();
     }
 }
 
