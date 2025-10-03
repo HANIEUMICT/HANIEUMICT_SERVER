@@ -5,6 +5,7 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.required.MemberAddressRepository;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.MemberAddress;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.common.email.Email;
@@ -37,7 +38,9 @@ public class MemberFinderService implements MemberFinder {
     public Page<MemberAddressResponse> findAddresses(Long memberId, Pageable pageable) {
        memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
 
-       return memberAddressRepository.findAllByMemberId(memberId, pageable);
+       Page<MemberAddress> memberAddresses = memberAddressRepository.findAllByMemberId(memberId, pageable);
+
+       return memberAddresses.map(MemberAddressResponse::from);
     }
 
     @Override
