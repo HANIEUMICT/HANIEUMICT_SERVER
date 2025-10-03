@@ -7,14 +7,14 @@ import hanieum.conik.application.favorite.required.FavoriteRepository;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.project.entity.Project;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class FavoriteFinderService implements FavoriteFinder {
     private final FavoriteRepository favoriteRepository;
