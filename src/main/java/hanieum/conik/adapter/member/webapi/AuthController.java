@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @Tag(name = "AUTH", description = "회원가입/로그인 로직 API")
 public class AuthController {
-
     private final Auth auth;
     private final TokenRefresh tokenRefresh;
 
@@ -69,5 +68,17 @@ public class AuthController {
     ) {
         TokenResponse tokenResponse = tokenRefresh.refresh(request.refreshToken());
         return ApiResponse.success(tokenResponse);
+    }
+
+    @Operation(
+            summary = "[구현완료] 이메일 중복 확인",
+            description = """
+            ## 이메일 중복 확인을 수행합니다.
+            """
+    )
+    @PostMapping("/email/availability")
+    public ApiResponse<?> checkEmailAvailability(@RequestBody @Valid EmailAvailabilityRequest email) {
+        auth.checkDuplicateEmail(email);
+        return ApiResponse.success("사용 가능한 이메일입니다.");
     }
 }
