@@ -82,10 +82,15 @@ public class CompanyModifyService implements CompanySaver {
 
     @Override
     public void updateCompanyInfo(Long companyId, CompanyUpdateRequest request) {
-        checkDuplicateEmail(new Email(request.email()));
-
         Company company = companyFinder.findCompany(companyId);
 
+        if (request.email() != null) {
+            Email newEmail = new Email(request.email().trim());
+
+            if (!newEmail.equals(company.getEmail())) {
+                checkDuplicateEmail(newEmail);
+            }
+        }
         company.update(request);
     }
 
