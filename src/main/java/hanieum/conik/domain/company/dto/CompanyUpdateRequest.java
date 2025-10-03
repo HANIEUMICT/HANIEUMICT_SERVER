@@ -2,7 +2,6 @@ package hanieum.conik.domain.company.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 
 public record CompanyUpdateRequest(
         @Schema(description = "기업 이름", example = "행복 제조업")
@@ -27,12 +26,12 @@ public record CompanyUpdateRequest(
         @Schema(description = "사업자등록 번호", example = "123-45-67890")
         String registrationNumber,
 
-        @NotNull(message = "사업자등록증 파일을 첨부해주세요.")
+        @Schema(description = "사업자등록 파일")
         String registrationCertificateUrl,
 
-        @NotNull(message = "통장 사본 파일을 첨부해주세요.")
+        @Schema(description = "통장 사본 파일")
         String bankbookCopy,
 
-        @NotNull(message = "회사 소개서 파일을 첨부해주세요.")
+        @Schema(description = "기업 정보 파일")
         String profileUrl
 ) {}
