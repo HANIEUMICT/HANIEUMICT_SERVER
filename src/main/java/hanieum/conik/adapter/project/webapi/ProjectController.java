@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -107,7 +108,7 @@ public class ProjectController {
     @GetMapping("/me/company")
     public ApiResponse<Page<ProjectDetailResponse>> getProjectsByCompanyId(
             @AuthenticationPrincipal AuthDetails authDetails,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 

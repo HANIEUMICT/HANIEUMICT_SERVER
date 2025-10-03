@@ -120,7 +120,7 @@ public class CompanyController {
             @RequestParam(required = false) Integer maxResponseMinutes,
             @RequestParam(required = false) Integer minTotalOrderCount,
             @RequestParam(required = false) Integer maxProductionHours,
-            @PageableDefault(size = 20, sort = "rating", direction = Sort.Direction.DESC) Pageable pageable
+            @ParameterObject @PageableDefault(size = 20, sort = "rating", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         var cond = new CompanyProfileSearchCondition(keyword, minRating, maxResponseMinutes, minTotalOrderCount, maxProductionHours);
         return ApiResponse.success(companyFinder.findAllCompanyWithFilter(cond, pageable));
