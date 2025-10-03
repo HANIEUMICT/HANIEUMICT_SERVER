@@ -40,7 +40,8 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/v1/auth/login",
                                         "/v1/email",
-                                        "/v1/email/certificate"
+                                        "/v1/email/certificate",
+                                        "/v1/auth/email/availability"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/swagger-ui.html",
