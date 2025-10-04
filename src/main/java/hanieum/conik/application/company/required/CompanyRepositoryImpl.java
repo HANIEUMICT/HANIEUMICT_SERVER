@@ -4,9 +4,12 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
+import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
+import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.company.entity.QCompany;
 import hanieum.conik.domain.company.entity.QCompanyDetail;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,4 +97,62 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom{
         }
         return list.toArray(OrderSpecifier[]::new);
     }
+
+    @Override
+    public Page<Company> search(CompanySummarySearchCondition cond, Pageable pageable) {
+        QCompany c = QCompany.company;
+        QCompanyDetail d = QCompanyDetail.companyDetail;
+
+        BooleanBuilder where = new BooleanBuilder();
+
+        if (cond != null) {
+            if (org.springframework.util.StringUtils.hasText(cond.name())) {
+                where.and(c.name.containsIgnoreCase(cond.name().trim()));
+            }
+            if (org.springframework.util.StringUtils.hasText(cond.region())) {
+                String kw = cond.region().trim();
+                where.and(
+                        c.address.streetAddress.containsIgnoreCase(kw)
+                                .or(c.address.detailAddress.containsIgnoreCase(kw))
+                );
+            }
+            if (org.springframework.util.StringUtils.hasText(cond.businessType())) {
+                where.and(c.businessType.containsIgnoreCase(cond.businessType().trim()));
+            }
+        }
+
+        JPAQuery<Company> contentQuery = qf
+                .selectFrom(c)
+                .leftJoin(c.companyDetail, d).fetchJoin()
+                .where(where)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        if (pageable.getSort().isEmpty()) {
+            contentQuery.orderBy(c.name.asc());
+        } else {
+            for (Sort.Order order : pageable.getSort()) {
+                String prop = order.getProperty();
+                boolean asc = order.isAscending();
+
+                if ("name".equalsIgnoreCase(prop)) {
+                    contentQuery.orderBy(asc ? c.name.asc() : c.name.desc());
+                } else if ("createdAt".equalsIgnoreCase(prop)) {
+                    contentQuery.orderBy(asc ? c.createdAt.asc() : c.createdAt.desc());
+                } else if ("businessType".equalsIgnoreCase(prop)) {
+                    contentQuery.orderBy(asc ? c.businessType.asc() : c.businessType.desc());
+                }
+            }
+        }
+
+        List<Company> content = contentQuery.fetch();
+
+        JPAQuery<Long> countQuery = qf
+                .select(c.count())
+                .from(c)
+                .where(where);
+
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+    }
+
 }

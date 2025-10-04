@@ -4,6 +4,7 @@ import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
+import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +19,8 @@ public interface CompanyFinder {
     Page<CompanySummaryResponse> findAllCompanySummaries(Pageable pageable);
 
     Company findCompany(Long companyId);
+
+    Page<CompanySummaryResponse> searchCompanySummaries(CompanySummarySearchCondition cond, Pageable pageable);
 
     CompanyDetailResponse findMyCompanyWithDetail(Long memberId);
 

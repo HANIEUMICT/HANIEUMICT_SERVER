@@ -8,6 +8,7 @@ import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.domain.company.dto.CompanyDetailCreateRequest;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
+import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.global.adapter.security.AuthDetails;
@@ -46,15 +47,17 @@ public class CompanyController {
         return ApiResponse.success(companySaver.register(request));
     }
 
-    @Operation(summary = "전체 기업 summary 조회", description = """
-    ## 기업 회원 가입 시 전체 기업 조회를 수행합니다.
-    - 등록되어있는 모든 기업을 조회할 수 있습니다.
-    - 기업명, 업종, 대표자, 사업자 등록번호, 주소 정보를 확인할 수 있습니다.
+    @Operation(summary = "기업 summary 조회(이름, 지역, 업종명)", description = """
+    ## 회원가입시 기업의 요약 정보를 조회합니다.
+    - 기업의 이름, 지역, 업종명 등의 요약 정보를 조회합니다.
+    - 페이징 처리가 적용되어 있습니다.
+    - 정렬은 생성일자 내림차순으로 고정되어 있습니다.
     """)
     @GetMapping("/summaries")
-    public ApiResponse<Page<CompanySummaryResponse>> findAllCompaniesSummary(
+    public ApiResponse<Page<CompanySummaryResponse>> findCompaniesSummary(
+            @ParameterObject CompanySummarySearchCondition cond,
             @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ApiResponse.success(companyFinder.findAllCompanySummaries(pageable));
+        return ApiResponse.success(companyFinder.searchCompanySummaries(cond, pageable));
     }
 
     @Operation(summary = "특정 기업 조회", description = """
