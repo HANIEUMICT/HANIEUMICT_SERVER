@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (token != null) {
                 Authentication auth = jwtTokenProviderPort.getAuthentication(token);
-                log.info("auth name={}, authorities={}", auth.getName(), auth.getAuthorities());
+                log.info("auth addressName={}, authorities={}", auth.getName(), auth.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
                 log.info("Authentication set in SecurityContext.");
             }

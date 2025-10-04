@@ -103,7 +103,7 @@ class MemberModifyServiceTest {
         Member member = mock(Member.class);
         given(memberFinder.findById(memberId)).willReturn(member);
 
-        AddressRegisterRequest addressRequest = new AddressRegisterRequest("12345", "행복로", "101호");
+        AddressRegisterRequest addressRequest = new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951","12345", "행복로", "101호", true);
         ArgumentCaptor<MemberAddress> addressCaptor = ArgumentCaptor.forClass(MemberAddress.class);
         //when
         memberModifyService.addAddress(memberId, addressRequest);

@@ -86,7 +86,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom{
         List<OrderSpecifier<?>> list = new ArrayList<>();
         for (Sort.Order o : sort) {
             ComparableExpressionBase<?> path = switch (o.getProperty()) {
-                case "name"                   -> c.name;
+                case "addressName"                   -> c.name;
                 case "rating"                 -> d.rating;
                 case "avgResponseMinutes"     -> d.avgResponseMinutes;
                 case "totalOrderCount"        -> d.totalOrderCount;
@@ -135,7 +135,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom{
                 String prop = order.getProperty();
                 boolean asc = order.isAscending();
 
-                if ("name".equalsIgnoreCase(prop)) {
+                if ("addressName".equalsIgnoreCase(prop)) {
                     contentQuery.orderBy(asc ? c.name.asc() : c.name.desc());
                 } else if ("createdAt".equalsIgnoreCase(prop)) {
                     contentQuery.orderBy(asc ? c.createdAt.asc() : c.createdAt.desc());

@@ -1,6 +1,5 @@
 package hanieum.conik.domain.favorite;
 
-import hanieum.conik.domain.favorite.dto.FavoriteRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

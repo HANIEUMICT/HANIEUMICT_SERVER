@@ -2,6 +2,8 @@ package hanieum.conik.domain.member;
 
 import hanieum.conik.domain.common.address.AddressBase;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.common.address.exception.AddressErrorType;
+import hanieum.conik.domain.common.address.exception.AddressException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -15,20 +17,41 @@ public class MemberAddress extends AddressBase {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    protected MemberAddress() { super(null,null,null); }
+    protected MemberAddress() { super(null,null,null,null,null,null); }
 
-    private MemberAddress(String postal, String street, String detail) {
-        super(postal, street, detail);
+    private MemberAddress(String postalCode, String streetAddress, String detailAddress, String addressName, String recipient, String phoneNumber) {
+        super(postalCode, streetAddress, detailAddress, addressName, recipient, phoneNumber);
     }
 
     /**
-     * 주소를 등록한다
+     * 주소 정보를 업데이트 한다.
      */
-    public static MemberAddress register(AddressRegisterRequest req) {
+    public static MemberAddress register(AddressRegisterRequest request) {
+        if (request.addressName() == null || request.addressName().isBlank()) {
+            throw new AddressException(AddressErrorType.INVALID_NAME);
+        }
+        if (request.recipient() == null || request.recipient().isBlank()) {
+            throw new AddressException(AddressErrorType.INVALID_RECIPIENT);
+        }
+        if (request.phoneNumber() == null || request.phoneNumber().isBlank()) {
+            throw new AddressException(AddressErrorType.INVALID_PHONE_NUMBER);
+        }
+        if (request.postalCode() == null || request.postalCode().isBlank()) {
+            throw new AddressException(AddressErrorType.INVALID_POSTAL_CODE);
+        }
+        if (request.streetAddress() == null || request.streetAddress().isBlank()) {
+            throw new AddressException(AddressErrorType.INVALID_STREET_ADDRESS);
+        }
+        if (request.detailAddress() == null || request.detailAddress().isBlank()) {
+            throw new AddressException(AddressErrorType.INVALID_DETAIL_ADDRESS);
+        }
         return new MemberAddress(
-                req.postalCode(),
-                req.streetAddress(),
-                req.detailAddress()
+                request.postalCode().trim(),
+                request.streetAddress().trim(),
+                request.detailAddress().trim(),
+                request.addressName().trim(),
+                request.recipient().trim(),
+                request.phoneNumber().trim()
         );
     }
 

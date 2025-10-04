@@ -54,7 +54,7 @@ public class MemberModifyService implements MemberSaver {
     public void addAddress(Long memberId, AddressRegisterRequest request) {
         Member member = memberFinder.findById(memberId);
         MemberAddress address = MemberAddress.register(request);
-        member.addAddress(address);
+        member.addAddress(address, request.isDefault());
     }
 
     @Override

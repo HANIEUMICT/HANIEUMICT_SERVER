@@ -1,11 +1,8 @@
 package hanieum.conik.application.member;
 
 import hanieum.conik.adapter.member.dto.MemberAddressResponse;
-import hanieum.conik.application.member.provided.MemberFinder;
-import hanieum.conik.application.member.required.MemberAddressRepository;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
-import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.MemberAddress;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
@@ -37,30 +34,37 @@ class MemberFinderServiceTest {
     @Test
     @DisplayName("멤버 주소 목록 조회 - 성공")
     void findAddresses_success() {
-
-        var baseAddr = new AddressRegisterRequest("00000", "기본로", "0호");
+        var baseAddr = new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951", "12345", "행복로", "101호", true);
         var signUpReq = new MemberSignUpRequest(
                 "홍길동", "hong@example.com", "raw-pw", "010-1234-5678",
                 true, baseAddr
         );
+
         Member member = Member.signUpIndividual(signUpReq);
 
         member.getAddresses().clear();
-        member.addAddress(MemberAddress.register(new AddressRegisterRequest("12345", "행복로", "101호")));
-        member.addAddress(MemberAddress.register(new AddressRegisterRequest("23456", "희망로", "202호")));
+        member.setDefaultAddress(null);
+
+        member.addAddress(MemberAddress.register(
+                new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951","12345", "행복로", "101호", false)));
+        member.addAddress(MemberAddress.register(
+                new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951","12345", "행복로", "102호", false)));
 
         memberRepository.saveAndFlush(member);
-        Long memberId = member.getId();
+
+        member.setDefaultAddress(member.getAddresses().get(0));
+        memberRepository.saveAndFlush(member);
 
         Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // when
-        Page<MemberAddressResponse> page = memberFinder.findAddresses(memberId, pageable);
+        Page<MemberAddressResponse> page = memberFinder.findAddresses(member.getId(), pageable);
 
         // then
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent()).hasSize(2);
     }
+
 
     @Test
     @DisplayName("멤버 주소 목록 조회 - 멤버 없음")

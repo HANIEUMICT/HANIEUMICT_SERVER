@@ -1,10 +1,8 @@
 package hanieum.conik.domain.common.address;
 
-import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
-import hanieum.conik.domain.common.address.exception.AddressErrorType;
-import hanieum.conik.domain.common.address.exception.AddressException;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +15,16 @@ public class AddressBase extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "address_name",nullable = false, length = 50)
+    private String addressName;
+
+    @Column(nullable = false, length = 50)
+    private String recipient;
+
+    @Column(nullable = false, length = 20)
+    @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "올바른 전화번호 형식이 아닙니다.")
+    private String phoneNumber;
+
     @Column(nullable = false)
     private String postalCode;
 
@@ -26,27 +34,12 @@ public class AddressBase extends BaseEntity {
     @Column(nullable = false)
     private String detailAddress;
 
-    protected AddressBase(String postalCode, String streetAddress, String detailAddress) {
+    protected AddressBase(String postalCode, String streetAddress, String detailAddress, String addressName, String recipient, String phoneNumber) {
         this.postalCode = postalCode;
         this.streetAddress = streetAddress;
         this.detailAddress = detailAddress;
-    }
-
-    /**
-     * 주소 정보를 업데이트 한다.
-     */
-    public void update(AddressRegisterRequest request) {
-        if (request.postalCode() == null || request.postalCode().isBlank()) {
-            throw new AddressException(AddressErrorType.INVALID_POSTAL_CODE);
-        }
-        if (request.streetAddress() == null || request.streetAddress().isBlank()) {
-            throw new AddressException(AddressErrorType.INVALID_STREET_ADDRESS);
-        }
-        if (request.detailAddress() == null || request.detailAddress().isBlank()) {
-            throw new AddressException(AddressErrorType.INVALID_DETAIL_ADDRESS);
-        }
-        this.postalCode = request.postalCode();
-        this.streetAddress = request.streetAddress();
-        this.detailAddress = request.detailAddress();
+        this.addressName = addressName;
+        this.recipient = recipient;
+        this.phoneNumber = phoneNumber;
     }
 }
