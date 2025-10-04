@@ -50,6 +50,7 @@ public class CompanyFinderService implements CompanyFinder {
 
     @Override
     public Page<CompanySummaryResponse> searchCompanySummaries(CompanySummarySearchCondition cond, Pageable pageable) {
+        validatePageable(pageable);
         Page<Company> search = companyRepository.search(cond, pageable);
         return search.map(CompanySummaryResponse::from);
     }
