@@ -9,6 +9,7 @@ import hanieum.conik.application.company.required.EquipmentRepository;
 import hanieum.conik.application.company.required.PortfolioRepository;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
+import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.company.entity.Equipment;
 import hanieum.conik.domain.company.entity.Portfolio;
@@ -26,7 +27,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class CompanyFinderService implements CompanyFinder {
     private final MemberFinder memberFinder;
     private final CompanyRepository companyRepository;
@@ -34,7 +35,6 @@ public class CompanyFinderService implements CompanyFinder {
     private final PortfolioRepository portfolioRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public Page<CompanySummaryResponse> findAllCompanySummaries(Pageable pageable) {
         validatePageable(pageable);
 
@@ -43,14 +43,19 @@ public class CompanyFinderService implements CompanyFinder {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Company findCompany(Long companyId) {
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
     }
 
     @Override
-    @Transactional(readOnly = true)
+    public Page<CompanySummaryResponse> searchCompanySummaries(CompanySummarySearchCondition cond, Pageable pageable) {
+        validatePageable(pageable);
+        Page<Company> search = companyRepository.search(cond, pageable);
+        return search.map(CompanySummaryResponse::from);
+    }
+
+    @Override
     public CompanyDetailResponse findMyCompanyWithDetail(Long memberId){
         Member member = memberFinder.findById(memberId);
 
@@ -72,7 +77,6 @@ public class CompanyFinderService implements CompanyFinder {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Company> findCompaniesByIds(Collection<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return List.of();
@@ -81,7 +85,6 @@ public class CompanyFinderService implements CompanyFinder {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CompanyDetailResponse findCompanyWithDetail(Long companyId) {
         Company company = companyRepository.findWithDetailById(companyId)
                 .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
@@ -101,7 +104,6 @@ public class CompanyFinderService implements CompanyFinder {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Page<CompanyProfileResponse> findAllCompanyWithFilter(CompanyProfileSearchCondition cond, Pageable pageable) {
         validatePageable(pageable);
 
