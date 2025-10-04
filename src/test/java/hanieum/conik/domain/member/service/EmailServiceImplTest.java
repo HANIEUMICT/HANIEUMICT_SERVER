@@ -1,6 +1,8 @@
 package hanieum.conik.domain.member.service;
 
+import hanieum.conik.application.member.provided.Auth;
 import hanieum.conik.application.member.required.EmailSender;
+import hanieum.conik.domain.member.dto.EmailAvailabilityRequest;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.global.application.required.MemoryMap;
 import hanieum.conik.adapter.member.email.dto.AuthCodeRequest;
@@ -16,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
@@ -24,6 +27,7 @@ import static org.mockito.Mockito.verify;
 class EmailServiceImplTest {
 
     @Mock private EmailSender emailClient;
+    @Mock private Auth auth;
     @Mock private MemoryMap memoryMap;
     @InjectMocks private EmailCertService emailService;
 
@@ -42,15 +46,16 @@ class EmailServiceImplTest {
     @Test
     @DisplayName("이메일 인증 코드 전송 성공")
     void sendEmail_Success() {
-        //given
+        // given
         given(emailClient.sendAuthMail(testEmail)).willReturn(testUserAuthNumber);
 
-        //when
+        // when
         emailService.sendEmail(authCodeRequest);
 
-        //then
+        // then
+        verify(auth).checkDuplicateEmail(eq(EmailAvailabilityRequest.from(testEmail)));
         verify(emailClient).sendAuthMail(testEmail);
-        verify(memoryMap).setValue(testEmail, String.valueOf(testUserAuthNumber), 5 * 60_000L);
+        verify(memoryMap).setValue(eq(testEmail), eq(String.valueOf(testUserAuthNumber)), eq(5 * 60_000L));
     }
 
     @Test

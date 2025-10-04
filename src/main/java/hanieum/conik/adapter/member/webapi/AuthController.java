@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @Tag(name = "AUTH", description = "회원가입/로그인 로직 API")
 public class AuthController {
-
     private final Auth auth;
     private final TokenRefresh tokenRefresh;
 

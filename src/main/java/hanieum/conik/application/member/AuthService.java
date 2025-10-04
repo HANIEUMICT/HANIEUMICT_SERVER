@@ -27,7 +27,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 @RequiredArgsConstructor
 public class AuthService implements Auth, TokenRefresh {
-
     private final MemberRepository memberRepository;
     private final CompanyFinder companyFinder;
     private final MemberFinder memberFinder;
@@ -37,7 +36,7 @@ public class AuthService implements Auth, TokenRefresh {
 
     @Override
     public MemberLoginResponse signUpIndividual(MemberSignUpRequest request) {
-        checkDuplicateEmail(request);
+        checkDuplicateEmail(EmailAvailabilityRequest.from(request.email()));
         Member member = Member.signUpIndividual(getHashedRequest(request));
         memberRepository.save(member);
 
@@ -48,7 +47,7 @@ public class AuthService implements Auth, TokenRefresh {
     public MemberLoginResponse signUpCompanyMember(MemberSignUpRequest request, Long companyId) {
         Company company = companyFinder.findCompany(companyId);
 
-        checkDuplicateEmail(request);
+        checkDuplicateEmail(EmailAvailabilityRequest.from(request.email()));
 
         Member member = Member.signUpCompanyMember(getHashedRequest(request), company.getId());
 
@@ -104,6 +103,13 @@ public class AuthService implements Auth, TokenRefresh {
         );
     }
 
+    @Override
+    public void checkDuplicateEmail(EmailAvailabilityRequest email){
+        if (memberRepository.findByEmail(Email.from(email.email())).isPresent()) {
+            throw new MemberException(MemberErrorType.EMAIL_DUPLICATE);
+        }
+    }
+
     private TokenInfo getTokenInfo(Member member) {
         String accessToken  = jwtTokenProviderPort.createAccessToken(member.getId());
         String refreshToken = jwtTokenProviderPort.createRefreshToken(member.getId());
@@ -111,12 +117,6 @@ public class AuthService implements Auth, TokenRefresh {
         memoryMap.setValue(redisKey, refreshToken, jwtTokenProviderPort.getRefreshTokenExpiration());
 
         return TokenInfo.of(accessToken, refreshToken);
-    }
-
-    private void checkDuplicateEmail(MemberSignUpRequest signUpRequest){
-        if (memberRepository.findByEmail(new Email(signUpRequest.email())).isPresent()) {
-            throw new MemberException(MemberErrorType.EMAIL_DUPLICATE);
-        }
     }
 
     private MemberSignUpRequest getHashedRequest(MemberSignUpRequest request) {

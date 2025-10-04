@@ -17,4 +17,8 @@ public record Email(String address) {
             throw new MemberException(MemberErrorType.INVALID_EMAIL);
         }
     }
+
+    public static Email from(String email) {
+        return new Email(email);
+    }
 }
