@@ -26,7 +26,7 @@ public class MemberFinderService implements MemberFinder {
 
     @Override
     public Member findById(Long memberId) {
-        return memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+        return memberRepository.findWithAddressesById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
     }
 
     @Override

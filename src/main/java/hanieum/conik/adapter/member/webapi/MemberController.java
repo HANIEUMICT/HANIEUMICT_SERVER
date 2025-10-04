@@ -1,9 +1,11 @@
 package hanieum.conik.adapter.member.webapi;
 
 import hanieum.conik.adapter.member.dto.MemberAddressResponse;
+import hanieum.conik.adapter.member.dto.MemberInfoResponse;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.provided.MemberSaver;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
+import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
 import hanieum.conik.domain.member.dto.PasswordChangeRequest;
 import hanieum.conik.global.adapter.security.AuthDetails;
@@ -44,15 +46,27 @@ public class MemberController {
         return ApiResponse.success("회원 정보 수정이 완료되었습니다.");
     }
 
+    @Operation(summary = "내 정보 조회", description = """
+            ## 내 정보를 조회합니다.
+            - 사용자의 기본 정보를 조회할 수 있습니다.
+            """)
+    @GetMapping("/me")
+    public ApiResponse<MemberInfoResponse> getMemberInfo(
+            @AuthenticationPrincipal AuthDetails authDetails
+    ) {
+        Member member = memberFinder.findById(authDetails.getMemberId());
+        return ApiResponse.success(MemberInfoResponse.from(member));
+    }
+
     @Operation(summary = "비밀번호 인증하기", description = """
-    ## 입력한 비밀번호가 현재 비밀번호와 일치하는지 확인합니다.
-    - 사용자가 현재 비밀번호를 인증할 수 있습니다.
-    """)
+            ## 입력한 비밀번호가 현재 비밀번호와 일치하는지 확인합니다.
+            - 사용자가 현재 비밀번호를 인증할 수 있습니다.
+            """)
     @PostMapping("/password")
     public ApiResponse<?> certificatePassword(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid PasswordChangeRequest request
-    ){
+    ) {
         memberSaver.validateCurrentPassword(authDetails.getMemberId(), request.currentPassword());
         return ApiResponse.success("비밀번호 인증이 완료되었습니다.");
     }
