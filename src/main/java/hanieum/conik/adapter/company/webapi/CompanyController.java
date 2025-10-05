@@ -63,7 +63,8 @@ public class CompanyController {
                 .map(AuthDetails::getMemberId)
                 .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
 
-        companySaver.update(memberId, request);
+        Member member = memberFinder.findById(memberId);
+        companySaver.update(member.getCompanyId(), request);
         return ApiResponse.success();
     }
 
