@@ -44,6 +44,13 @@ public class Member extends BaseEntity {
     @Column(name = "terms_of_service_agreed", nullable = false)
     private Boolean termsOfServiceAgreed;
 
+    // TODO : k8s 연결 후 RDS 기본 값 설정, 이후 nullable = false로 변경
+    @Column(name = "email_consent", nullable = true)
+    private Boolean emailConsent;
+
+    @Column(name = "sms_consent", nullable = true)
+    private Boolean smsConsent;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
     private MemberRole role;
@@ -69,6 +76,8 @@ public class Member extends BaseEntity {
         this.hashedPassword = hashedPassword;
         this.phoneNumber = phoneNumber;
         this.termsOfServiceAgreed = termsOfServiceAgreed;
+        this.emailConsent = true;
+        this.smsConsent = true;
         this.role = role;
         if (memberAddress != null) {
             addAddress(memberAddress);
