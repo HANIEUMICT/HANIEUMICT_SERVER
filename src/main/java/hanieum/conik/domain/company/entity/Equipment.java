@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -25,9 +27,9 @@ public class Equipment extends AbstractEntity {
     private Integer quantity;
 
     @Column(nullable = false, length = 512)
-    private String imageUrl;
+    private List<String> imageUrl;
 
-    private Equipment(String name, String description, Integer quantity, String imageUrl) {
+    private Equipment(String name, String description, Integer quantity, List<String> imageUrl) {
         this.name = name;
         this.description = description;
         this.quantity = (quantity == null ? 0 : Math.max(0, quantity));

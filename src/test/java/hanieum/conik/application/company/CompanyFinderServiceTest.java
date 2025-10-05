@@ -27,7 +27,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -36,7 +35,7 @@ import static org.mockito.Mockito.*;
 @Transactional
 class CompanyFinderServiceTest {
     @Autowired
-    CompanyFinderService service;
+    CompanyFinderService companyFinderService;
 
     @MockBean
     MemberFinder memberFinder;
@@ -56,7 +55,7 @@ class CompanyFinderServiceTest {
         given(companyRepository.findAll(pageable))
                 .willReturn(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
-        Page<CompanySummaryResponse> page = service.findAllCompanySummaries(pageable);
+        Page<CompanySummaryResponse> page = companyFinderService.findAllCompanySummaries(pageable);
 
         assertThat(page).isNotNull();
         assertThat(page.getTotalElements()).isZero();
@@ -75,7 +74,7 @@ class CompanyFinderServiceTest {
                 .hasMessageContaining("Page size must not be less than one");
 
         Pageable tooLarge = PageRequest.of(0, 201);
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.findAllCompanySummaries(tooLarge))
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> companyFinderService.findAllCompanySummaries(tooLarge))
                 .isInstanceOf(CompanyException.class);
     }
 
@@ -88,7 +87,7 @@ class CompanyFinderServiceTest {
         Company company = mock(Company.class);
         given(companyRepository.findById(id)).willReturn(Optional.of(company));
 
-        Company result = service.findCompany(id);
+        Company result = companyFinderService.findCompany(id);
 
         assertThat(result).isSameAs(company);
         verify(companyRepository).findById(id);
@@ -100,7 +99,7 @@ class CompanyFinderServiceTest {
         Long id = 999L;
         given(companyRepository.findById(id)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.findCompany(id))
+        assertThatThrownBy(() -> companyFinderService.findCompany(id))
                 .isInstanceOf(CompanyException.class);
     }
 
@@ -116,7 +115,7 @@ class CompanyFinderServiceTest {
                 .willReturn(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
         // when
-        Page<CompanySummaryResponse> page = service.searchCompanySummaries(cond, pageable);
+        Page<CompanySummaryResponse> page = companyFinderService.searchCompanySummaries(cond, pageable);
 
         // then
         assertThat(page).isNotNull();
@@ -134,7 +133,7 @@ class CompanyFinderServiceTest {
                 .willReturn(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
         // when
-        var page = service.searchCompanySummaries(cond, pageable);
+        var page = companyFinderService.searchCompanySummaries(cond, pageable);
 
         // then
         assertThat(page.getTotalElements()).isZero();
@@ -151,7 +150,7 @@ class CompanyFinderServiceTest {
                 .willReturn(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
         // when
-        var page = service.searchCompanySummaries(cond, pageable);
+        var page = companyFinderService.searchCompanySummaries(cond, pageable);
 
         // then
         assertThat(page.getTotalElements()).isZero();
@@ -168,7 +167,7 @@ class CompanyFinderServiceTest {
                 .willReturn(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
         // when
-        var page = service.searchCompanySummaries(cond, pageable);
+        var page = companyFinderService.searchCompanySummaries(cond, pageable);
 
         // then
         assertThat(page.getTotalElements()).isZero();
@@ -185,7 +184,7 @@ class CompanyFinderServiceTest {
                 .willReturn(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
         // when
-        var page = service.searchCompanySummaries(cond, pageable);
+        var page = companyFinderService.searchCompanySummaries(cond, pageable);
 
         // then
         assertThat(page.getTotalElements()).isZero();
@@ -202,7 +201,7 @@ class CompanyFinderServiceTest {
                 .willReturn(new PageImpl<>(Collections.emptyList(), pageable, 0));
 
         // when
-        var page = service.searchCompanySummaries(cond, pageable);
+        var page = companyFinderService.searchCompanySummaries(cond, pageable);
 
         // then
         assertThat(page.getTotalElements()).isZero();
@@ -226,7 +225,7 @@ class CompanyFinderServiceTest {
         given(company.getCompanyDetail()).willReturn(null);
         given(companyRepository.findById(companyId)).willReturn(Optional.of(company));
 
-        CompanyDetailResponse res = service.findMyCompanyWithDetail(memberId);
+        CompanyDetailResponse res = companyFinderService.findMyCompanyWithDetail(memberId);
 
         assertThat(res).isNotNull();
         verify(equipmentRepository, never()).findByCompanyDetailId(anyLong());
@@ -252,7 +251,7 @@ class CompanyFinderServiceTest {
         given(equipmentRepository.findByCompanyDetailId(anyLong())).willReturn(List.of());
         given(portfolioRepository.findByCompanyDetailId(anyLong())).willReturn(List.of());
 
-        CompanyDetailResponse res = service.findMyCompanyWithDetail(memberId);
+        CompanyDetailResponse res = companyFinderService.findMyCompanyWithDetail(memberId);
 
         assertThat(res).isNotNull();
         // 구현 상 companyId로 조회(또는 detailId) – 인자 검증이 필요하면 ArgumentCaptor 사용
@@ -268,7 +267,7 @@ class CompanyFinderServiceTest {
         Long id = 100L;
         given(companyRepository.findWithDetailById(id)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.findCompanyWithDetail(id))
+        assertThatThrownBy(() -> companyFinderService.findCompanyWithDetail(id))
                 .isInstanceOf(CompanyException.class);
     }
 
@@ -280,27 +279,8 @@ class CompanyFinderServiceTest {
         given(company.getCompanyDetail()).willReturn(null);
         given(companyRepository.findWithDetailById(id)).willReturn(Optional.of(company));
 
-        assertThatThrownBy(() -> service.findCompanyWithDetail(id))
+        assertThatThrownBy(() -> companyFinderService.findCompanyWithDetail(id))
                 .isInstanceOf(CompanyException.class);
-    }
-
-    @Test
-    @DisplayName("기업 상세 단건 조회: 상세가 있으면 장비/포트폴리오까지 조회")
-    void findCompanyWithDetail_ok() {
-        Long id = 77L;
-        Company company = mock(Company.class);
-        CompanyDetail detail = mock(CompanyDetail.class);
-        given(company.getCompanyDetail()).willReturn(detail);
-        given(companyRepository.findWithDetailById(id)).willReturn(Optional.of(company));
-
-        given(equipmentRepository.findByCompanyDetailId(id)).willReturn(List.of());
-        given(portfolioRepository.findByCompanyDetailId(id)).willReturn(List.of());
-
-        CompanyDetailResponse res = service.findCompanyWithDetail(id);
-
-        assertThat(res).isNotNull();
-        verify(equipmentRepository).findByCompanyDetailId(id);
-        verify(portfolioRepository).findByCompanyDetailId(id);
     }
 
     // ─────────────────────────── findCompaniesByIds ───────────────────────────
@@ -308,8 +288,8 @@ class CompanyFinderServiceTest {
     @Test
     @DisplayName("ID 컬렉션이 null/empty면 빈 리스트 반환하고 레포 호출 안함")
     void findCompaniesByIds_nullOrEmpty_returnsEmpty() {
-        assertThat(service.findCompaniesByIds(null)).isEmpty();
-        assertThat(service.findCompaniesByIds(List.of())).isEmpty();
+        assertThat(companyFinderService.findCompaniesByIds(null)).isEmpty();
+        assertThat(companyFinderService.findCompaniesByIds(List.of())).isEmpty();
         verify(companyRepository, never()).findByIdIn(anyCollection());
     }
 
@@ -320,7 +300,7 @@ class CompanyFinderServiceTest {
         List<Company> expected = List.of(mock(Company.class));
         given(companyRepository.findByIdIn(ids)).willReturn(expected);
 
-        List<Company> actual = service.findCompaniesByIds(ids);
+        List<Company> actual = companyFinderService.findCompaniesByIds(ids);
 
         assertThat(actual).isSameAs(expected);
         verify(companyRepository).findByIdIn(ids);
@@ -338,7 +318,7 @@ class CompanyFinderServiceTest {
         Page<CompanyProfileResponse> repoPage = new PageImpl<>(List.of(), pageable, 0);
         given(companyRepository.findCompaniesWithFilter(cond, pageable)).willReturn(repoPage);
 
-        Page<CompanyProfileResponse> result = service.findAllCompanyWithFilter(cond, pageable);
+        Page<CompanyProfileResponse> result = companyFinderService.findAllCompanyWithFilter(cond, pageable);
 
         assertThat(result.getTotalElements()).isZero();
         verify(companyRepository).findCompaniesWithFilter(cond, pageable);

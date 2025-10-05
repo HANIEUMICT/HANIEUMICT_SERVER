@@ -7,6 +7,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,11 +24,11 @@ public class Portfolio extends AbstractEntity {
     private String description;
 
     @Column(length = 1024)
-    private String imageUrl;
+    private List<String> imageUrl;
 
     private String category;
 
-    private Portfolio(Integer quantity, String description, String imageUrl, String category){
+    private Portfolio(Integer quantity, String description, List<String> imageUrl, String category){
         this.quantity = (quantity == null ? 0 : Math.max(0, quantity));
         this.description = description;
         this.imageUrl = imageUrl;
