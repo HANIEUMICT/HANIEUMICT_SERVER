@@ -86,7 +86,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom{
         List<OrderSpecifier<?>> list = new ArrayList<>();
         for (Sort.Order o : sort) {
             ComparableExpressionBase<?> path = switch (o.getProperty()) {
-                case "addressName"                   -> c.name;
+                case "name"                   -> c.name;
                 case "rating"                 -> d.rating;
                 case "avgResponseMinutes"     -> d.avgResponseMinutes;
                 case "totalOrderCount"        -> d.totalOrderCount;
