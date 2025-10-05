@@ -13,6 +13,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
         select distinct m
         from Member m
         left join fetch m.addresses
+        left join fetch m.defaultAddress d
         where m.id = :id
     """)
     Optional<Member> findWithAddressesById(@Param("id") Long id);

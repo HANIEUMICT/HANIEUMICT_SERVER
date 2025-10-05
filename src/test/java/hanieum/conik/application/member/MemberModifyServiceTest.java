@@ -98,24 +98,30 @@ class MemberModifyServiceTest {
     @Test
     @DisplayName("addAddress 성공")
     void addAddress_success() {
-        //given
+        // given
         long memberId = 1L;
         Member member = mock(Member.class);
         given(memberFinder.findById(memberId)).willReturn(member);
 
-        AddressRegisterRequest addressRequest = new AddressRegisterRequest("12345", "행복로", "101호");
+        AddressRegisterRequest addressRequest =
+                new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951","12345", "행복로", "101호", true);
+
         ArgumentCaptor<MemberAddress> addressCaptor = ArgumentCaptor.forClass(MemberAddress.class);
-        //when
+        ArgumentCaptor<Boolean> defaultFlagCaptor = ArgumentCaptor.forClass(Boolean.class);
+
+        // when
         memberModifyService.addAddress(memberId, addressRequest);
 
-        //then
-        then(member).should().addAddress(addressCaptor.capture());
-        MemberAddress capturedAddress = addressCaptor.getValue();
+        // then
+        then(member).should().addAddress(addressCaptor.capture(), defaultFlagCaptor.capture());
+        MemberAddress captured = addressCaptor.getValue();
 
-        assertEquals("12345", capturedAddress.getPostalCode());
-        assertEquals("행복로", capturedAddress.getStreetAddress());
-        assertEquals("101호", capturedAddress.getDetailAddress());
+        assertEquals("12345", captured.getPostalCode());
+        assertEquals("행복로", captured.getStreetAddress());
+        assertEquals("101호", captured.getDetailAddress());
+        assertTrue(defaultFlagCaptor.getValue());
     }
+
 
     @Test
     @DisplayName("deleteAddress 성공")

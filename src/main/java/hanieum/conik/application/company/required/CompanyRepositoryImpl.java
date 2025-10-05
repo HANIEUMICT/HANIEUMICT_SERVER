@@ -135,7 +135,7 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom{
                 String prop = order.getProperty();
                 boolean asc = order.isAscending();
 
-                if ("name".equalsIgnoreCase(prop)) {
+                if ("addressName".equalsIgnoreCase(prop)) {
                     contentQuery.orderBy(asc ? c.name.asc() : c.name.desc());
                 } else if ("createdAt".equalsIgnoreCase(prop)) {
                     contentQuery.orderBy(asc ? c.createdAt.asc() : c.createdAt.desc());

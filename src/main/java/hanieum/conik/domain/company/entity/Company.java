@@ -92,7 +92,7 @@ public class Company extends BaseEntity {
                 request.registrationCertificateUrl(),
                 request.profileUrl(),
                 request.bankbookCopy(),
-                CompanyAddress.from(request.addressRegisterRequest())
+                CompanyAddress.register(request.addressRegisterRequest())
         );
     }
 

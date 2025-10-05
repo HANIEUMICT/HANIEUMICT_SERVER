@@ -54,6 +54,12 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberAddress> addresses = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY) // 기본 배송지 FK
+    @JoinColumn(name = "default_member_address_id")
+    private MemberAddress defaultAddress;
+
+    /* ========= 생성/팩토리 ========= */
+
     private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, MemberAddress memberAddress) {
         if (!termsOfServiceAgreed) {
             throw new MemberException(MemberErrorType.TERMS_NOT_AGREED);
@@ -104,6 +110,8 @@ public class Member extends BaseEntity {
         return member;
     }
 
+    /* ========= 도메인 로직 ========= */
+
     /**
      * 비밀번호 검증
      * @param rawPassword
@@ -141,15 +149,39 @@ public class Member extends BaseEntity {
     public void addAddress(MemberAddress address) {
         addresses.add(address);
         address.setMember(this);
+
+        if (this.defaultAddress == null) {
+            this.defaultAddress = address;
+        }
+    }
+
+    /**
+     * 주소 추가 + 기본 배송지로 설정 여부까지 한 번에 처리 (체크박스용)
+     */
+    public MemberAddress addAddress(MemberAddress address, boolean setAsDefault) {
+        addAddress(address);
+        if (setAsDefault) {
+            setDefaultAddress(address);
+        }
+        return address;
     }
 
     /**
      * 회원 주소 삭제
      */
     public void deleteAddress(Long addressId) {
-        boolean removed = this.addresses.removeIf(address -> address.getId().equals(addressId));
-        if (!removed) {
-            throw new MemberException(MemberErrorType.ADDRESS_NOT_FOUND);
+        MemberAddress target = addresses.stream()
+                .filter(a -> a.getId().equals(addressId))
+                .findFirst()
+                .orElseThrow(() -> new MemberException(MemberErrorType.ADDRESS_NOT_FOUND));
+
+        boolean wasDefault = (defaultAddress != null && defaultAddress.equals(target));
+
+        addresses.remove(target);
+        target.setMember(null);
+
+        if (wasDefault) {
+            this.defaultAddress = addresses.isEmpty() ? null : addresses.get(0);
         }
     }
 
@@ -169,5 +201,20 @@ public class Member extends BaseEntity {
             throw new MemberException(MemberErrorType.INVALID_ROLE_FOR_COMPANY);
         }
         this.companyId = companyId;
+    }
+
+    /**
+     * 기본 배송지 변경(엔티티로)
+     * - 반드시 나의 주소여야 한다.
+     */
+    public void setDefaultAddress(MemberAddress address) {
+        if (address == null) {
+            this.defaultAddress = null;
+            return;
+        }
+        if (address.getMember() != this) {
+            throw new MemberException(MemberErrorType.ADDRESS_NOT_FOUND);
+        }
+        this.defaultAddress = address;
     }
 }
