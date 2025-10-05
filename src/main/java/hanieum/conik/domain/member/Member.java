@@ -76,8 +76,8 @@ public class Member extends BaseEntity {
         this.hashedPassword = hashedPassword;
         this.phoneNumber = phoneNumber;
         this.termsOfServiceAgreed = termsOfServiceAgreed;
-        this.emailConsent = true;
-        this.smsConsent = true;
+        this.emailConsent = false;
+        this.smsConsent = false;
         this.role = role;
         if (memberAddress != null) {
             addAddress(memberAddress);
