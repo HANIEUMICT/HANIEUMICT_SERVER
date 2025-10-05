@@ -1,5 +1,6 @@
 package hanieum.conik.domain.company.dto;
 
+import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 
@@ -33,5 +34,8 @@ public record CompanyUpdateRequest(
         String bankbookCopy,
 
         @Schema(description = "기업 정보 파일")
-        String profileUrl
+        String profileUrl,
+
+        @Schema(description = "주소는 필수 입력입니다.")
+        AddressRegisterRequest addressRegisterRequest
 ) {}

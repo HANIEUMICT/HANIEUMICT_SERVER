@@ -81,7 +81,7 @@ public class CompanyModifyService implements CompanySaver {
     }
 
     @Override
-    public void updateCompanyInfo(Long companyId, CompanyUpdateRequest request) {
+    public void update(Long companyId, CompanyUpdateRequest request) {
         Company company = companyFinder.findCompany(companyId);
 
         if (request.email() != null) {

@@ -6,11 +6,8 @@ import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
-import hanieum.conik.domain.company.dto.CompanyDetailCreateRequest;
-import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
-import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
+import hanieum.conik.domain.company.dto.*;
 import hanieum.conik.domain.company.entity.Company;
-import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import hanieum.conik.global.domain.exception.AuthErrorType;
@@ -45,6 +42,24 @@ public class CompanyController {
     @PostMapping()
     public ApiResponse<Long> registerCompany(@Valid @RequestBody CompanyRegisterRequest request) {
         return ApiResponse.success(companySaver.register(request));
+    }
+
+    @Operation(summary = "기업 정보 수정", description = """
+    ## 기업 정보를 수정합니다.
+    - 기업 회원이 자신의 기업 정보를 수정합니다.
+    - 인증된 회원만 접근할 수 있습니다.
+    """
+    )
+    @PatchMapping()
+    public ApiResponse<?> updateCompany(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @Valid @RequestBody CompanyUpdateRequest request) {
+        Long memberId = Optional.ofNullable(authDetails)
+                .map(AuthDetails::getMemberId)
+                .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
+
+        companySaver.update(memberId, request);
+        return ApiResponse.success();
     }
 
     @Operation(summary = "기업 summary 조회(이름, 지역, 업종명)", description = """

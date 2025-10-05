@@ -54,4 +54,13 @@ public class CompanyAddress{
     public static CompanyAddress from(AddressRegisterRequest dto) {
         return new CompanyAddress(dto.postalCode(), dto.streetAddress(), dto.detailAddress(), dto.addressName(), dto.recipient(), dto.phoneNumber());
     }
+
+    public void update(AddressRegisterRequest dto) {
+        if(dto.postalCode() != null) this.postalCode = dto.postalCode();
+        if (dto.streetAddress() != null) this.streetAddress = dto.streetAddress();
+        if (dto.detailAddress() != null) this.detailAddress = dto.detailAddress();
+        if (dto.addressName() != null) this.name = dto.addressName();
+        if (dto.recipient() != null) this.recipient = dto.recipient();
+        if (dto.phoneNumber() != null) this.phoneNumber = dto.phoneNumber();
+    }
 }

@@ -19,7 +19,7 @@ public record CompanyResponse(
         String bankbookCopy,
         String profileUrl,
         CompanyStatus status,
-        AddressDto address
+        CompanyAddressResponse address
 ) {
     public static CompanyResponse from(Company c) {
         return new CompanyResponse(
@@ -35,22 +35,7 @@ public record CompanyResponse(
                 c.getBankbookCopy(),
                 c.getProfileUrl(),
                 c.getStatus(),
-                AddressDto.from(c.getAddress())
+                CompanyAddressResponse.from(c.getAddress())
         );
-    }
-
-    public record AddressDto(
-            String zipCode,
-            String road,
-            String detail
-    ) {
-        public static AddressDto from(CompanyAddress a) {
-            if (a == null) return null;
-            return new AddressDto(
-                    a.getPostalCode(),
-                    a.getStreetAddress(),
-                    a.getDetailAddress()
-            );
-        }
     }
 }
