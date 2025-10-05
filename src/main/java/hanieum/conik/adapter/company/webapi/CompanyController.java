@@ -24,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -31,6 +32,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/v1/company")
 @Tag(name = "COMPANY", description = "기업 관련 API")
+@Validated
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyFinder companyFinder;
