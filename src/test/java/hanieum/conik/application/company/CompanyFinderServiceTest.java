@@ -10,6 +10,7 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.entity.CompanyAddress;
 import hanieum.conik.domain.company.entity.CompanyDetail;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
@@ -223,6 +224,16 @@ class CompanyFinderServiceTest {
         Company company = mock(Company.class);
         given(company.getId()).willReturn(companyId);
         given(company.getCompanyDetail()).willReturn(null);
+
+        // ✅ 주소 매핑에서 NPE 방지용 최소 스텁
+        CompanyAddress addr = mock(CompanyAddress.class);
+        given(company.getAddress()).willReturn(addr);
+        given(addr.getPostalCode()).willReturn("12345");
+        given(addr.getStreetAddress()).willReturn("Seoul-ro 1");
+        given(addr.getDetailAddress()).willReturn(null);
+        given(addr.getRecipient()).willReturn("홍길동");
+        given(addr.getPhoneNumber()).willReturn("010-0000-0000");
+
         given(companyRepository.findById(companyId)).willReturn(Optional.of(company));
 
         CompanyDetailResponse res = companyFinderService.findMyCompanyWithDetail(memberId);
@@ -246,6 +257,16 @@ class CompanyFinderServiceTest {
         Company company = mock(Company.class);
         given(company.getId()).willReturn(companyId);
         given(company.getCompanyDetail()).willReturn(detail);
+
+        // ✅ 주소 매핑에서 NPE 방지용 최소 스텁
+        CompanyAddress addr = mock(CompanyAddress.class);
+        given(company.getAddress()).willReturn(addr);
+        given(addr.getPostalCode()).willReturn("06789");
+        given(addr.getStreetAddress()).willReturn("Busan-ro 2");
+        given(addr.getDetailAddress()).willReturn("2F");
+        given(addr.getRecipient()).willReturn("이몽룡");
+        given(addr.getPhoneNumber()).willReturn("010-1111-2222");
+
         given(companyRepository.findById(companyId)).willReturn(Optional.of(company));
 
         given(equipmentRepository.findByCompanyDetailId(anyLong())).willReturn(List.of());
@@ -254,10 +275,10 @@ class CompanyFinderServiceTest {
         CompanyDetailResponse res = companyFinderService.findMyCompanyWithDetail(memberId);
 
         assertThat(res).isNotNull();
-        // 구현 상 companyId로 조회(또는 detailId) – 인자 검증이 필요하면 ArgumentCaptor 사용
         verify(equipmentRepository).findByCompanyDetailId(anyLong());
         verify(portfolioRepository).findByCompanyDetailId(anyLong());
     }
+
 
     // ─────────────────────────── findCompanyWithDetail ───────────────────────────
 
