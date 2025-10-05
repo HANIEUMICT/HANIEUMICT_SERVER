@@ -30,11 +30,13 @@ public class MemberModifyService implements MemberSaver {
     public void updateProfile(Long memberId, MemberProfileUpdateRequest request) {
         Member member = memberFinder.findById(memberId);
 
-        if (StringUtils.isNotBlank(request.currentPassword()) || StringUtils.isNotBlank(request.newPassword())) {
-            if (StringUtils.isBlank(request.currentPassword()) || StringUtils.isBlank(request.newPassword())) {
-                throw new MemberException(MemberErrorType.INVALID_PASSWORD_UPDATE_REQUEST);
-            }
+        boolean hasCurrentPassword = StringUtils.isNotBlank(request.currentPassword());
+        boolean hasNewPassword = StringUtils.isNotBlank(request.newPassword());
 
+        if (hasCurrentPassword != hasNewPassword) {
+            throw new MemberException(MemberErrorType.INVALID_PASSWORD_UPDATE_REQUEST);
+        }
+        if (hasNewPassword) {
             validateCurrentPassword(memberId, request.currentPassword());
             member.updatePassword(passwordEncoder.encode(request.newPassword()));
         }
