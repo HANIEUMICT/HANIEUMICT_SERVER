@@ -34,6 +34,9 @@ public class MemberAddress extends AddressBase {
             throw new AddressException(AddressErrorType.INVALID_RECIPIENT);
         }
         if (request.phoneNumber() == null || request.phoneNumber().isBlank()) {
+            if (!request.phoneNumber().matches("^010-\\d{4}-\\d{4}$")) {
+                throw new AddressException(AddressErrorType.INVALID_PHONE_NUMBER);
+            }
             throw new AddressException(AddressErrorType.INVALID_PHONE_NUMBER);
         }
         if (request.postalCode() == null || request.postalCode().isBlank()) {
