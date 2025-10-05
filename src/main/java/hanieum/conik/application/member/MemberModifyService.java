@@ -10,6 +10,7 @@ import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,12 @@ public class MemberModifyService implements MemberSaver {
     public void updateProfile(Long memberId, MemberProfileUpdateRequest request) {
         Member member = memberFinder.findById(memberId);
 
-        if(request.newPassword() != null && !request.newPassword().isBlank()) {
+        if (StringUtils.isNotBlank(request.currentPassword()) || StringUtils.isNotBlank(request.newPassword())) {
+            if (StringUtils.isBlank(request.currentPassword()) || StringUtils.isBlank(request.newPassword())) {
+                throw new MemberException(MemberErrorType.INVALID_PASSWORD_UPDATE_REQUEST);
+            }
+
+            validateCurrentPassword(memberId, request.currentPassword());
             member.updatePassword(passwordEncoder.encode(request.newPassword()));
         }
 
