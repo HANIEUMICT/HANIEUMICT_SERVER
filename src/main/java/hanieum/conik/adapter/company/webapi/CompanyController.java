@@ -6,8 +6,10 @@ import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
+import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.*;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import hanieum.conik.global.domain.exception.AuthErrorType;
@@ -33,6 +35,7 @@ import java.util.Optional;
 public class CompanyController {
     private final CompanyFinder companyFinder;
     private final CompanySaver companySaver;
+    private final MemberFinder memberFinder;
 
     @Operation(summary = "기업 등록", description = """
     ## 기업 등록을 수행합니다.
@@ -121,8 +124,9 @@ public class CompanyController {
         Long memberId = Optional.ofNullable(authDetails)
                 .map(AuthDetails::getMemberId)
                 .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
+        Member member = memberFinder.findById(memberId);
 
-        return ApiResponse.success(companyFinder.findMyCompanyWithDetail(memberId));
+        return ApiResponse.success(companyFinder.findMyCompanyWithDetail(member.getCompanyId()));
     }
 
     @Operation(summary = "기업 프로필 목록 조회(필터 적용)", description = """
