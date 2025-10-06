@@ -152,6 +152,20 @@ public class Member extends BaseEntity {
     }
 
     /**
+     * 이메일 마케팅 수신동의 여부 수정
+     */
+    public void updateEmailMarketingAgreed(boolean emailMarketingAgreed) {
+        this.emailMarketingAgreed = emailMarketingAgreed;
+    }
+
+    /**
+     * 전화번호 마케팅 수신동의 여부 수정
+     */
+    public void updateSmsMarketingAgreed(boolean smsMarketingAgreed) {
+        this.smsMarketingAgreed = smsMarketingAgreed;
+    }
+
+    /**
      * 회원 주소 추가
      */
     public void addAddress(MemberAddress address) {

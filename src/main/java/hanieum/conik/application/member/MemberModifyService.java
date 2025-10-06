@@ -5,7 +5,7 @@ import hanieum.conik.application.member.provided.MemberSaver;
 import hanieum.conik.domain.member.MemberAddress;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.Member;
-import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
+import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +47,44 @@ public class MemberModifyService implements MemberSaver {
         if (request.newPhoneNumber() != null && !request.newPhoneNumber().isBlank()) {
             member.updatePhoneNumber(request.newPhoneNumber().trim());
         }
+    }
+
+    @Override
+    public void updateName(Long memberId, MemberNameUpdateRequest request) {
+        Member member = memberFinder.findById(memberId);
+
+        member.updateName(request.name().trim());
+    }
+
+    @Override
+    public void updatePassword(Long memberId, MemberPasswordUpdateRequest request) {
+        Member member = memberFinder.findById(memberId);
+
+        validateCurrentPassword(memberId, request.currentPassword());
+        member.updatePassword(passwordEncoder.encode(request.newPassword()));
+    }
+
+    @Override
+    public void updatePhoneNumber(Long memberId, MemberPhoneNumberUpdateRequest request) {
+        Member member = memberFinder.findById(memberId);
+
+        // TODO : 전화번호 인증 로직 추가
+
+        member.updatePhoneNumber(request.newPhoneNumber().trim());
+    }
+
+    @Override
+    public void updateEmailMarketingConsent(Long memberId, MemberEmailMarketingConsentUpdateRequest request) {
+        Member member = memberFinder.findById(memberId);
+
+        member.updateEmailMarketingAgreed(request.isEmailMarketingAgreed());
+    }
+
+    @Override
+    public void updateSmsMarketingConsent(Long memberId, MemberSmsMarketingConsentUpdateRequest request) {
+        Member member = memberFinder.findById(memberId);
+
+        member.updateSmsMarketingAgreed(request.isSmsMarketingAgreed());
     }
 
     @Override
