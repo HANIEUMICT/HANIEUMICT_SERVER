@@ -167,6 +167,27 @@ public class Member extends BaseEntity {
     }
 
     /**
+     * 회원 주소 수정
+     */
+    public void updateAddress(Long addressId, MemberAddress updatedAddress, boolean setAsDefault) {
+        MemberAddress target = addresses.stream()
+                .filter(a -> a.getId().equals(addressId))
+                .findFirst()
+                .orElseThrow(() -> new MemberException(MemberErrorType.ADDRESS_NOT_FOUND));
+
+        target.update(updatedAddress);
+
+        boolean wasDefault = (defaultAddress != null && defaultAddress.equals(target));
+        if (wasDefault && !setAsDefault) {
+            throw new MemberException(MemberErrorType.CANNOT_UNSET_DEFAULT_ADDRESS);
+        }
+
+        if (setAsDefault) {
+            setDefaultAddress(target);
+        }
+    }
+
+    /**
      * 회원 주소 삭제
      */
     public void deleteAddress(Long addressId) {

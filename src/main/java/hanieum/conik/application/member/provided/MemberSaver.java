@@ -26,6 +26,15 @@ public interface MemberSaver {
     void addAddress(Long memberId, AddressRegisterRequest addressRegister);
 
     /**
+     * 회원 주소를 수정합니다.
+     *
+     * @param memberId    수정할 멤버의 id
+     * @param addressId    수정할 주소의 id
+     * @param addressRegister   새로운 주소 정보를 담은 DTO
+     */
+    void updateAddress(Long memberId, Long addressId, AddressRegisterRequest addressRegister);
+
+    /**
      * 회원의 주소를 삭제합니다.
      *
      * @param memberId    수정할 멤버의 id

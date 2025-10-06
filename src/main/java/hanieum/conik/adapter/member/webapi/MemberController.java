@@ -87,13 +87,27 @@ public class MemberController {
     ## 주소 추가를 수행합니다.
     - 사용자가 주소를 추가할 수 있습니다.
     """)
-    @PatchMapping("/addresses")
+    @PatchMapping("/addresses") // TODO: address 추가인데 왜 Post말고 Patch로 썼는지 궁금합니당 주소 수정 안되는 거 같던데..!
     public ApiResponse<?> addAddress(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid AddressRegisterRequest request
     ) {
         memberSaver.addAddress(authDetails.getMemberId(), request);
         return ApiResponse.success("주소 추가가 완료되었습니다.");
+    }
+
+    @Operation(summary = "주소 수정", description = """
+    ## 주소를 업데이트합니다.
+    - 사용자가 입력한 주소를 수정할 수 있습니다.
+    """)
+    @PutMapping("/addresses/{addressId}")
+    public ApiResponse<?> addAddress(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long addressId,
+            @RequestBody @Valid AddressRegisterRequest request
+    ) {
+        memberSaver.updateAddress(authDetails.getMemberId(), addressId, request);
+        return ApiResponse.success("주소 수정이 완료되었습니다.");
     }
 
     @Operation(summary = "주소 삭제", description = """
