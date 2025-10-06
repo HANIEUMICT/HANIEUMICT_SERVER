@@ -83,6 +83,18 @@ public class MemberController {
         return ApiResponse.success(memberFinder.findAddresses(authDetails.getMemberId(), pageable));
     }
 
+    @Operation(summary = "마이페이지 특정 주소 조회", description = """
+    ## 특정 주소 조회를 수행합니다.
+    - 사용자가 등록한 주소 중, 특정 주소를 조회할 수 있습니다.
+    """)
+    @GetMapping("/me/addresses/{addressId}")
+    public ApiResponse<MemberAddressResponse> getMyAddresses(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long addressId
+    ) {
+        return ApiResponse.success(memberFinder.findAddress(authDetails.getMemberId(), addressId));
+    }
+
     @Operation(summary = "주소 추가", description = """
     ## 주소 추가를 수행합니다.
     - 사용자가 주소를 추가할 수 있습니다.

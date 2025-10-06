@@ -54,4 +54,12 @@ public class MemberFinderService implements MemberFinder {
 
         return member.getCompanyId();
     }
+
+    @Override
+    public MemberAddressResponse findAddress(Long memberId, Long addressId) {
+        MemberAddress memberAddress = memberAddressRepository.findByIdAndMemberId(addressId, memberId)
+                .orElseThrow(() -> new MemberException(MemberErrorType.ADDRESS_NOT_FOUND));
+
+        return MemberAddressResponse.from(memberAddress, memberAddress.getMember());
+    }
 }
