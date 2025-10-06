@@ -38,6 +38,8 @@ public class ApiControllerAdvice {
 
             if (fieldError.getDefaultMessage() != null) {
                 message = fieldError.getDefaultMessage();
+            } else {
+                message = type.getMessage();
             }
         }
 
