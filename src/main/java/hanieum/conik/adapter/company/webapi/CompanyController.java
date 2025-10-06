@@ -126,15 +126,11 @@ public class CompanyController {
             """)
     @GetMapping("/detail/me")
     public ApiResponse<CompanyDetailResponse> findMyCompanyWithDetail(@AuthenticationPrincipal AuthDetails authDetails){
-        Long memberId = Optional.ofNullable(authDetails)
-                .map(AuthDetails::getMemberId)
-                .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
-        Member member = memberFinder.findById(memberId);
+        Member member = memberFinder.findById(authDetails.getMemberId());
         if (member.getCompanyId() == null) {
             throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
         }
-
-        return ApiResponse.success(companyFinder.findMyCompanyWithDetail(member.getCompanyId()));
+        return ApiResponse.success(companyFinder.findMyCompanyWithDetail(member.getId()));
     }
 
     @Operation(summary = "기업 프로필 목록 조회(필터 적용)", description = """
