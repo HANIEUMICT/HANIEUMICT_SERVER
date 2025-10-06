@@ -7,13 +7,22 @@ public record CompanyAddressResponse(
 
         String street,
 
-        String detail
+        String detail,
+
+        String addressName,
+
+        String recipient,
+
+        String phoneNumber
 ) {
     public static CompanyAddressResponse from(CompanyAddress address) {
         return new CompanyAddressResponse(
                 address.getPostalCode(),
                 address.getStreetAddress(),
-                address.getDetailAddress()
+                address.getDetailAddress(),
+                address.getName(),
+                address.getRecipient(),
+                address.getPhoneNumber()
         );
     }
 }
