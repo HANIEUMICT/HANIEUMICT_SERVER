@@ -88,7 +88,7 @@ public class MemberController {
     - 사용자가 등록한 주소 중, 특정 주소를 조회할 수 있습니다.
     """)
     @GetMapping("/me/addresses/{addressId}")
-    public ApiResponse<MemberAddressResponse> getMyAddresses(
+    public ApiResponse<MemberAddressResponse> getMyAddress(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long addressId
     ) {
@@ -113,7 +113,7 @@ public class MemberController {
     - 사용자가 입력한 주소를 수정할 수 있습니다.
     """)
     @PutMapping("/addresses/{addressId}")
-    public ApiResponse<?> addAddress(
+    public ApiResponse<?> updateAddress(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long addressId,
             @RequestBody @Valid AddressRegisterRequest request
