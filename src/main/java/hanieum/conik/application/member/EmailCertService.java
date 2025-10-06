@@ -23,7 +23,7 @@ public class EmailCertService{
     private static final long OTP_TIMEOUT = 5 * 60_000L; // 5분
 
     public void sendEmail(AuthCodeRequest authCodeRequest) {
-        auth.checkDuplicateEmail(EmailAvailabilityRequest.from(authCodeRequest.email()));
+        auth.checkDuplicateEmail(EmailAvailabilityRequest.from(authCodeRequest.email())); // TODO: 여기서 checkDuplicateEmail을 하는 이유가 뭔가요? 이미 존재하는 사용자는 이메일 인증을 할 수 없는 이유는..?
 
         int authNumber = emailSender.sendAuthMail(authCodeRequest.email());
         memoryMap.setValue(authCodeRequest.email(), String.valueOf(authNumber), OTP_TIMEOUT);
