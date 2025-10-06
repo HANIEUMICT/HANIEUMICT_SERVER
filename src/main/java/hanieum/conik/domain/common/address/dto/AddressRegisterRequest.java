@@ -31,7 +31,7 @@ public record AddressRegisterRequest(
         String detailAddress,
 
         @Schema(description = "기본 배송지 여부", example = "false")
-        @JsonProperty("default")
+        @JsonProperty("default") // TODO: JSON 필드명 default로 고정한 이유가 궁금합니당
         @NotNull
         boolean isDefault
 ) {}

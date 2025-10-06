@@ -36,11 +36,12 @@ public class MemberFinderService implements MemberFinder {
 
     @Override
     public Page<MemberAddressResponse> findAddresses(Long memberId, Pageable pageable) {
-       memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+       Member member = memberRepository.findById(memberId)
+               .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
 
        Page<MemberAddress> memberAddresses = memberAddressRepository.findAllByMemberId(memberId, pageable);
 
-       return memberAddresses.map(MemberAddressResponse::from);
+       return memberAddresses.map(address -> MemberAddressResponse.from(address, member));
     }
 
     @Override
