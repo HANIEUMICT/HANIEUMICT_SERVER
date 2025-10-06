@@ -9,7 +9,7 @@ public record PortfolioResponse(
         String category,
         Integer quantity,
         String description,
-        List<String> imageUrl
+        List<String> imageUrls
 ) {
     public static PortfolioResponse from(Portfolio p) {
         return new PortfolioResponse(

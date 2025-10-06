@@ -9,7 +9,7 @@ public record EquipmentResponse(
         String name,
         Integer quantity,
         String description,
-        List<String> imageUrl
+        List<String> imageUrls
 ) {
     public static EquipmentResponse from(Equipment e) {
         return new EquipmentResponse(
