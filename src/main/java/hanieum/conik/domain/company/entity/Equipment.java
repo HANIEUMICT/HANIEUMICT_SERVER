@@ -27,17 +27,17 @@ public class Equipment extends AbstractEntity {
     private Integer quantity;
 
     @Column(nullable = false, length = 512)
-    private List<String> imageUrl;
+    private List<String> imageUrls;
 
-    private Equipment(String name, String description, Integer quantity, List<String> imageUrl) {
+    private Equipment(String name, String description, Integer quantity, List<String> imageUrls) {
         this.name = name;
         this.description = description;
         this.quantity = (quantity == null ? 0 : Math.max(0, quantity));
-        this.imageUrl = imageUrl;
+        this.imageUrls = imageUrls;
     }
 
     public static Equipment create(EquipmentRequest request) {
-        return new Equipment(request.name(), request.description(), request.quantity(), request.imageUrl());
+        return new Equipment(request.name(), request.description(), request.quantity(), request.imageUrls());
     }
 
     void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail; }
@@ -46,7 +46,7 @@ public class Equipment extends AbstractEntity {
         if (request.name() != null && !request.name().isBlank()) this.name = request.name().trim();
         this.description = request.description();
         if (request.quantity() != null) this.quantity = Math.max(0, request.quantity());
-        this.imageUrl = request.imageUrl();
+        this.imageUrls = request.imageUrls();
     }
 
     public void remove() {

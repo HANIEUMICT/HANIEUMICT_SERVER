@@ -9,6 +9,8 @@ import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.*;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.exception.CompanyErrorType;
+import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -64,6 +66,9 @@ public class CompanyController {
                 .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
 
         Member member = memberFinder.findById(memberId);
+        if (member.getCompanyId() == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
+        }
         companySaver.update(member.getCompanyId(), request);
         return ApiResponse.success();
     }
@@ -100,12 +105,9 @@ public class CompanyController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @Valid @RequestBody CompanyDetailCreateRequest request
     ) {
-        Long memberId = Optional.ofNullable(authDetails)
-                .map(AuthDetails::getMemberId)
-                .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
+        Member member = memberFinder.findById(authDetails.getMemberId());
 
-        return ApiResponse.success(companySaver.registerCompanyDetail(memberId, request)
-        );
+        return ApiResponse.success(companySaver.registerCompanyDetail(member.getId(), request));
     }
 
     @Operation(summary = "기업 상세 페이지 단건 조회", description = """
@@ -128,6 +130,9 @@ public class CompanyController {
                 .map(AuthDetails::getMemberId)
                 .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
         Member member = memberFinder.findById(memberId);
+        if (member.getCompanyId() == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
+        }
 
         return ApiResponse.success(companyFinder.findMyCompanyWithDetail(member.getCompanyId()));
     }

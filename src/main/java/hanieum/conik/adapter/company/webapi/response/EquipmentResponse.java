@@ -17,7 +17,7 @@ public record EquipmentResponse(
                 e.getName(),
                 e.getQuantity(),
                 e.getDescription(),
-                e.getImageUrl()
+                e.getImageUrls()
         );
     }
 }

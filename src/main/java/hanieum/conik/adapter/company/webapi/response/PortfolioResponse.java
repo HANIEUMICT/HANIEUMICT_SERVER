@@ -17,7 +17,7 @@ public record PortfolioResponse(
                 p.getCategory(),
                 p.getQuantity(),
                 p.getDescription(),
-                p.getImageUrl()
+                p.getImageUrls()
         );
     }
 }

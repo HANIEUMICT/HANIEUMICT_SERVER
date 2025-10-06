@@ -22,13 +22,12 @@ public record PortfolioRequest(
                 arraySchema = @Schema(
                         description = "포트폴리오 이미지 URL 목록",
                         example = "[\"https://cdn.example.com/portfolio/cnc-1.jpg\", \"https://cdn.example.com/portfolio/cnc-2.jpg\"]"
-                ),
-                schema = @Schema(type = "string", format = "uri", maxLength = 1024, description = "이미지 URL")
+                )
         )
         List<@NotBlank(message = "이미지 URL은 비어 있을 수 없습니다.")
             @Size(max = 1024, message = "이미지 URL은 1024자 이하여야 합니다.")
             String
-            > imageUrl,
+            > imageUrls,
 
         @Schema(description = "포트폴리오 카테고리", example = "기계가공")
         @NotBlank

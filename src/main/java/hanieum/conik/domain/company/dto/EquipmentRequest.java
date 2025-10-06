@@ -28,11 +28,10 @@ public record EquipmentRequest(
                 arraySchema = @Schema(
                         description = "장비 이미지 URL 목록",
                         example = "[\"https://cdn.example.com/equip/cnc-123.jpg\",\"https://cdn.example.com/equip/cnc-124.jpg\"]"
-                ),
-                schema = @Schema(type = "string", format = "uri", maxLength = 512, description = "이미지 URL")
+                )
         )
         List<@NotBlank(message = "이미지 URL은 비어 있을 수 없습니다.")
             @Size(max = 512, message = "이미지 URL은 512자 이하여야 합니다.")
             String
-            >imageUrl
+            > imageUrls
 ) {}

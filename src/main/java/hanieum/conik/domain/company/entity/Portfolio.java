@@ -24,14 +24,14 @@ public class Portfolio extends AbstractEntity {
     private String description;
 
     @Column(length = 1024)
-    private List<String> imageUrl;
+    private List<String> imageUrls;
 
     private String category;
 
-    private Portfolio(Integer quantity, String description, List<String> imageUrl, String category){
+    private Portfolio(Integer quantity, String description, List<String> imageUrls, String category){
         this.quantity = (quantity == null ? 0 : Math.max(0, quantity));
         this.description = description;
-        this.imageUrl = imageUrl;
+        this.imageUrls = imageUrls;
         this.category = category;
     }
 
@@ -40,7 +40,7 @@ public class Portfolio extends AbstractEntity {
         return new Portfolio(
                 (quantity == null ? 0 : Math.max(0, quantity)),
                 request.description(),
-                request.imageUrl(),
+                request.imageUrls(),
                 request.category()
         );
     }
@@ -50,7 +50,7 @@ public class Portfolio extends AbstractEntity {
     public void update(PortfolioRequest request) {
         if (request.quantity() != null) this.quantity = Math.max(0, request.quantity());
         this.description = request.description();
-        this.imageUrl = request.imageUrl();
+        this.imageUrls = request.imageUrls();
         this.category = request.category();
     }
 
