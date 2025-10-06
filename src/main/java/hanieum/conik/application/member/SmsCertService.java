@@ -24,13 +24,22 @@ public class SmsCertService {
         memoryMap.setValue(authCodeRequest.phoneNumber(), String.valueOf(authNumber), OTP_TIMEOUT);
     }
 
+    // TODO : 논의 후 Sms,EmailCertService에서 MemoryMap 직접 접근 -> VerificationStore 포트로 추상화 (현재 PhoneVerificationStore만 존재)
     public Boolean certificatePhoneNumber(SmsCertificateRequest certificateRequest) {
-        if (memoryMap.getValue(certificateRequest.phoneNumber()).equals(certificateRequest.authCode())) {
-            memoryMap.deleteValue(certificateRequest.phoneNumber());
-            return true;
+        String phoneNumber = certificateRequest.phoneNumber();
+        String inputCode = certificateRequest.authCode();
+
+        String storedCode = memoryMap.getValue(phoneNumber);
+        if (storedCode == null) {
+            throw new MemberException(MemberErrorType.EXPIRED_VERIFICATION_CODE);
         }
-        else{
+        if (!storedCode.equals(inputCode)) {
             throw new MemberException(MemberErrorType.INVALID_AUTHORIZATION_CODE);
         }
+
+        memoryMap.setValue("verified:" + phoneNumber, "true", OTP_TIMEOUT);
+        memoryMap.deleteValue(phoneNumber);
+
+        return true;
     }
 }

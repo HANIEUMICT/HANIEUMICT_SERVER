@@ -2,6 +2,7 @@ package hanieum.conik.application.member;
 
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.provided.MemberSaver;
+import hanieum.conik.application.member.required.PhoneVerificationStore;
 import hanieum.conik.domain.member.MemberAddress;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.Member;
@@ -25,6 +26,7 @@ public class MemberModifyService implements MemberSaver {
 
     private final MemberFinder memberFinder;
     private final PasswordEncoder passwordEncoder;
+    private final PhoneVerificationStore phoneVerificationStore;
 
     @Override
     public void updateProfile(Long memberId, MemberProfileUpdateRequest request) {
@@ -67,10 +69,15 @@ public class MemberModifyService implements MemberSaver {
     @Override
     public void updatePhoneNumber(Long memberId, MemberPhoneNumberUpdateRequest request) {
         Member member = memberFinder.findById(memberId);
+        String newPhoneNumber = request.newPhoneNumber().trim();
 
-        // TODO : 전화번호 인증 로직 추가
+        if (!phoneVerificationStore.isVerified(newPhoneNumber)) {
+            throw new MemberException(MemberErrorType.INVALID_PHONE_NUMBER);
+        }
 
-        member.updatePhoneNumber(request.newPhoneNumber().trim());
+        member.updatePhoneNumber(newPhoneNumber);
+
+        phoneVerificationStore.removeVerifiedFlag(newPhoneNumber);
     }
 
     @Override
