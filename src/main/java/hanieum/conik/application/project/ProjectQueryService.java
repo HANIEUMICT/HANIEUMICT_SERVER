@@ -9,13 +9,17 @@ import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.ProgressStatus;
+import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
+import jakarta.persistence.criteria.Expression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,16 +44,55 @@ public class ProjectQueryService implements ProjectFinder {
                 .orElseThrow(() -> new ProjectException(ProjectErrorType.PROJECT_NOT_FOUND));
     }
 
+    // TODO : Pagable 응답 커스텀하여 전체적으로 필요한 필드만 반환하도록 수정
     @Override
-    public Page<ProjectDetailResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
-        Page<Project> projects;
+    public Page<ProjectDetailResponse> getMemberProjects(
+            Long memberId, SubmitStatus submitStatus, ProgressStatus progressStatus, Pageable pageable
+    ) {
+        Specification<Project> spec = Specification.where(null);
 
         if (memberId != null) {
-            projects = findProjectsWithStatus(submitStatus, memberId, pageable);
-        } else {
-            projects = findAllProjectsWithStatus(submitStatus, pageable);
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("memberId"), memberId));
         }
 
+        if (submitStatus == null) {
+            spec = spec.and((root, query, cb) ->
+                    root.get("submitStatus").in(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT)));
+        } else {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("submitStatus"), submitStatus));
+        }
+
+        if (progressStatus != null) {
+            spec = spec.and((root, query, cb) -> {
+                Expression<ProjectProgressStep> stepExpr = root.get("currentStep");
+
+                // TODO : ENUM → DB 저장 시 step 필드로 변환하는 Converter 추가하여 매핑 일관성 유지 고려중
+                return switch (progressStatus) {
+                    case BEFORE -> cb.or(
+                            cb.isNull(stepExpr),
+                            stepExpr.in(ProjectProgressStep.OPEN, ProjectProgressStep.REQUESTED)
+                    );
+                    case IN_PROGRESS -> stepExpr.in(
+                            ProjectProgressStep.CONTRACT_CONFIRMED,
+                            ProjectProgressStep.COMPANY_INSPECTION_COMPLETED,
+                            ProjectProgressStep.SAMPLE_PRODUCTION,
+                            ProjectProgressStep.SAMPLE_PRODUCTION_COMPLETED,
+                            ProjectProgressStep.SAMPLE_DELIVERY,
+                            ProjectProgressStep.SAMPLE_DELIVERED,
+                            ProjectProgressStep.SAMPLE_APPROVED,
+                            ProjectProgressStep.SAMPLE_REJECTED,
+                            ProjectProgressStep.MASS_PRODUCTION,
+                            ProjectProgressStep.MASS_PRODUCTION_COMPLETED,
+                            ProjectProgressStep.PRODUCT_DELIVERY
+                    );
+                    case COMPLETED -> stepExpr.in(ProjectProgressStep.CLOSED);
+                };
+            });
+        }
+
+        Page<Project> projects = projectRepository.findAll(spec, pageable);
         return projects.map(ProjectDetailResponse::from);
     }
 
@@ -57,18 +100,6 @@ public class ProjectQueryService implements ProjectFinder {
     public Page<ProjectDetailResponse> findProjectsByCompanyId(Long companyId, Pageable pageable) {
         Page<Project> projects = projectRepository.findByCompanyId(companyId, pageable);
         return projects.map(ProjectDetailResponse::from);
-    }
-
-    private Page<Project> findProjectsWithStatus(SubmitStatus submitStatus, Long memberId, Pageable pageable) {
-        return (submitStatus == null)
-                ? projectRepository.findByMemberIdAndSubmitStatusIn(memberId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
-                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus, pageable);
-    }
-
-    private Page<Project> findAllProjectsWithStatus(SubmitStatus submitStatus, Pageable pageable) {
-        return (submitStatus == null)
-                ? projectRepository.findBySubmitStatusIn(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
-                : projectRepository.findBySubmitStatus(submitStatus, pageable);
     }
 
     @Override

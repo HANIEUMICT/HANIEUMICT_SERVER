@@ -10,6 +10,7 @@ import hanieum.conik.application.project.provided.ProjectDrawingSaver;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.ProgressStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.adapter.security.AuthSourceType;
@@ -92,10 +93,11 @@ public class ProjectController {
     public ApiResponse<Page<ProjectDetailResponse>> getMemberProjects(
             @RequestParam(value = "status", required = false) SubmitStatus submitStatus,
             @RequestParam(value = "memberId", required = false) Long memberId,
+            @RequestParam(value = "progressStatus", required = false) ProgressStatus progressStatus,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
 
-        return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus, pageable));
+        return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus, progressStatus, pageable));
     }
 
     @Operation(summary = "특정 프로젝트(공고) 조회 API", description = "프로젝트 ID로 특정 프로젝트를 조회합니다.")

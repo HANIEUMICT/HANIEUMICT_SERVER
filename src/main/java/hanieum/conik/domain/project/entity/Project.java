@@ -3,12 +3,11 @@ package hanieum.conik.domain.project.entity;
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
+import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.domain.AbstractEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,7 +57,10 @@ public class Project extends AbstractEntity {
 
     private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
 
-    @BatchSize( size = 250)
+    @Enumerated(EnumType.STRING)
+    private ProjectProgressStep currentStep = ProjectProgressStep.OPEN;
+
+    @BatchSize(size = 250)
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectDrawingFile> drawingFiles = new ArrayList<>();
 
@@ -133,4 +135,9 @@ public class Project extends AbstractEntity {
     }
 
     public void finalizeDrawingFiles() { this.drawingFiles.forEach(ProjectDrawingFile::finalizeFile); }
+
+    // TODO : Progress 변경 시 currentStep도 함께 갱신되도록 수정 (데이터 일관성 유지)
+    public void updateCurrentStep(ProjectProgressStep step) {
+        this.currentStep = step;
+    }
 }
