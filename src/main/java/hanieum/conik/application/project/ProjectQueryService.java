@@ -67,9 +67,7 @@ public class ProjectQueryService implements ProjectFinder {
         Specification<Project> spec = buildProjectSpec(memberId, submitStatus, progressStatus);
         Page<Project> projects = projectRepository.findAll(spec, pageable);
 
-        ProjectStatusSummary summary = progressStatus != null
-                ? buildProjectStatusSummary(memberId, submitStatus)
-                : null ;
+        ProjectStatusSummary summary = buildProjectStatusSummary(memberId, submitStatus);
         Page<ProjectDetailResponse> projectResponses = projects.map(project -> buildProjectResponse(project, currentMember));
 
         return ProjectListResponse.from(summary, projectResponses);
