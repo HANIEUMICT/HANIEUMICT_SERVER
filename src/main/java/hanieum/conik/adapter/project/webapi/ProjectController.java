@@ -103,6 +103,20 @@ public class ProjectController {
         return ApiResponse.success(projectFinder.getMemberProjects(authDetails, memberId, submitStatus, progressStatus, pageable));
     }
 
+    @Operation(summary = "특정 프로젝트(공고) 삭제 API", description = """
+    ## 특정 프로젝트(공고)를 삭제합니다.
+    - 특정 프로젝트를 삭제합니다.
+    - 거래 진행 중인 프로젝트(공고/견적서)의 경우 삭제가 불가합니다.
+    """)
+    @DeleteMapping("/{projectId}")
+    public ApiResponse<String> deleteProject(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable("projectId") Long projectId
+    ) {
+        projectFinder.deleteProject(authDetails.getMemberId(), projectId);
+        return ApiResponse.success("견적서가 삭제되었습니다.");
+    }
+
     @Operation(summary = "특정 프로젝트(공고) 조회 API", description = "프로젝트 ID로 특정 프로젝트를 조회합니다.")
     @GetMapping("/{projectId}/detail")
     public ApiResponse<ProjectWithProposalsResponse> getProject(

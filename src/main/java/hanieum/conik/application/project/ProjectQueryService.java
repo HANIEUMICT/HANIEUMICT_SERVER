@@ -80,6 +80,20 @@ public class ProjectQueryService implements ProjectFinder {
     }
 
     @Override
+    public void deleteProject(Long currentMemberId, Long projectId) {
+        Project project = findProject(projectId);
+
+        if (!project.getMemberId().equals(currentMemberId)) {
+            throw new ProjectException(ProjectErrorType.UNAUTHORIZED);
+        }
+        if (project.getCurrentStep() != null && project.getCurrentStep().getStep() > 0) {
+            throw new ProjectException(ProjectErrorType.PROJECT_ALREADY_IN_PROGRESS);
+        }
+
+        projectRepository.delete(project);
+    }
+
+    @Override
     public Project validateProjectOpenStatus(Long projectId){
         Project project = findProject(projectId);
         if (project.getPublicUntil().isBefore(LocalDate.now())) {

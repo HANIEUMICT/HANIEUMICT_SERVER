@@ -20,4 +20,6 @@ public interface ProjectFinder {
     ProjectListResponse getMemberProjects(AuthDetails authDetails, Long memberId, SubmitStatus submitStatus, ProgressStatus progressStatus, Pageable pageable);
 
     Page<ProjectDetailResponse> findProjectsByCompanyId(Long companyId, Pageable pageable);
+
+    void deleteProject(Long currentMemberId, Long projectId);
 }
