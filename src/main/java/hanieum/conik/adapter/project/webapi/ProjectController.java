@@ -88,6 +88,7 @@ public class ProjectController {
     ## 프로젝트(공고) 목록을 조회합니다.
     - status는 입력하지 않을 시, 임시저장 / 최종 저장된 견적서 목록이 조회됩니다.
     - memberId는 입력하지 않을 시, 전체 사용자의 견적서 대상으로 검색합니다.
+    - progressStatus는 입력하지 않을 시, 전체 견적서 대상으로 검색합니다.
     """)
     @GetMapping
     public ApiResponse<Page<ProjectDetailResponse>> getMemberProjects(
