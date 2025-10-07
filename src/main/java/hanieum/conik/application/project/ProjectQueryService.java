@@ -4,10 +4,15 @@ import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.adapter.proposal.dto.response.ProposalThumbnailResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
+import hanieum.conik.application.favorite.required.FavoriteRepository;
+import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.exception.MemberErrorType;
+import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.ProgressStatus;
 import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
@@ -15,6 +20,7 @@ import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
+import hanieum.conik.global.adapter.security.AuthDetails;
 import jakarta.persistence.criteria.Expression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +41,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ProjectQueryService implements ProjectFinder {
     private final ProjectRepository projectRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final MemberRepository memberRepository;
     private final ProposalFinder proposalFinder;
     private final CompanyFinder companyFinder;
 
@@ -47,53 +55,17 @@ public class ProjectQueryService implements ProjectFinder {
     // TODO : Pagable 응답 커스텀하여 전체적으로 필요한 필드만 반환하도록 수정
     @Override
     public Page<ProjectDetailResponse> getMemberProjects(
-            Long memberId, SubmitStatus submitStatus, ProgressStatus progressStatus, Pageable pageable
+            AuthDetails authDetails, Long memberId, SubmitStatus submitStatus, ProgressStatus progressStatus, Pageable pageable
     ) {
-        Specification<Project> spec = Specification.where(null);
+        Member currentMember = (authDetails != null)
+                ? memberRepository.findById(authDetails.getMemberId())
+                    .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND))
+                : null;
 
-        if (memberId != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("memberId"), memberId));
-        }
-
-        if (submitStatus == null) {
-            spec = spec.and((root, query, cb) ->
-                    root.get("submitStatus").in(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT)));
-        } else {
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("submitStatus"), submitStatus));
-        }
-
-        if (progressStatus != null) {
-            spec = spec.and((root, query, cb) -> {
-                Expression<ProjectProgressStep> stepExpr = root.get("currentStep");
-
-                // TODO : ENUM → DB 저장 시 step 필드로 변환하는 Converter 추가하여 매핑 일관성 유지 고려중
-                return switch (progressStatus) {
-                    case BEFORE -> cb.or(
-                            cb.isNull(stepExpr),
-                            stepExpr.in(ProjectProgressStep.OPEN, ProjectProgressStep.REQUESTED)
-                    );
-                    case IN_PROGRESS -> stepExpr.in(
-                            ProjectProgressStep.CONTRACT_CONFIRMED,
-                            ProjectProgressStep.COMPANY_INSPECTION_COMPLETED,
-                            ProjectProgressStep.SAMPLE_PRODUCTION,
-                            ProjectProgressStep.SAMPLE_PRODUCTION_COMPLETED,
-                            ProjectProgressStep.SAMPLE_DELIVERY,
-                            ProjectProgressStep.SAMPLE_DELIVERED,
-                            ProjectProgressStep.SAMPLE_APPROVED,
-                            ProjectProgressStep.SAMPLE_REJECTED,
-                            ProjectProgressStep.MASS_PRODUCTION,
-                            ProjectProgressStep.MASS_PRODUCTION_COMPLETED,
-                            ProjectProgressStep.PRODUCT_DELIVERY
-                    );
-                    case COMPLETED -> stepExpr.in(ProjectProgressStep.CLOSED);
-                };
-            });
-        }
-
+        Specification<Project> spec = buildProjectSpec(memberId, submitStatus, progressStatus);
         Page<Project> projects = projectRepository.findAll(spec, pageable);
-        return projects.map(ProjectDetailResponse::from);
+
+        return projects.map(project -> buildProjectResponse(project, currentMember));
     }
 
     @Override
@@ -144,5 +116,64 @@ public class ProjectQueryService implements ProjectFinder {
         Company companyWithDetail = companyFinder.findCompany(proposal.getCompanyId());
 
         return ProposalThumbnailResponse.from(proposal, companyWithDetail);
+    }
+
+    private Specification<Project> buildProjectSpec(
+            Long memberId,
+            SubmitStatus submitStatus,
+            ProgressStatus progressStatus
+    ) {
+        Specification<Project> spec = Specification.where(null);
+
+        if (memberId != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("memberId"), memberId));
+        }
+
+        if (submitStatus == null) {
+            spec = spec.and((root, query, cb) ->
+                    root.get("submitStatus").in(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT)));
+        } else {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("submitStatus"), submitStatus));
+        }
+
+        if (progressStatus != null) {
+            spec = spec.and((root, query, cb) -> {
+                Expression<ProjectProgressStep> stepExpr = root.get("currentStep");
+
+                // TODO : ENUM → DB 저장 시 step 필드로 변환하는 Converter 추가하여 매핑 일관성 유지 고려중
+                return switch (progressStatus) {
+                    case BEFORE -> cb.or(
+                            cb.isNull(stepExpr),
+                            stepExpr.in(ProjectProgressStep.OPEN, ProjectProgressStep.REQUESTED)
+                    );
+                    case IN_PROGRESS -> stepExpr.in(
+                            ProjectProgressStep.CONTRACT_CONFIRMED,
+                            ProjectProgressStep.COMPANY_INSPECTION_COMPLETED,
+                            ProjectProgressStep.SAMPLE_PRODUCTION,
+                            ProjectProgressStep.SAMPLE_PRODUCTION_COMPLETED,
+                            ProjectProgressStep.SAMPLE_DELIVERY,
+                            ProjectProgressStep.SAMPLE_DELIVERED,
+                            ProjectProgressStep.SAMPLE_APPROVED,
+                            ProjectProgressStep.SAMPLE_REJECTED,
+                            ProjectProgressStep.MASS_PRODUCTION,
+                            ProjectProgressStep.MASS_PRODUCTION_COMPLETED,
+                            ProjectProgressStep.PRODUCT_DELIVERY
+                    );
+                    case COMPLETED -> stepExpr.in(ProjectProgressStep.CLOSED);
+                };
+            });
+        }
+
+        return spec;
+    }
+
+    private ProjectDetailResponse buildProjectResponse(Project project, Member currentMember) {
+        long favoriteCount = favoriteRepository.countByProjectId(project.getId());
+        boolean isFavorite = (currentMember != null)
+                && favoriteRepository.existsByCompanyIdAndProjectId(currentMember.getCompanyId(), project.getId());
+
+        return ProjectDetailResponse.from(project, favoriteCount, isFavorite);
     }
 }

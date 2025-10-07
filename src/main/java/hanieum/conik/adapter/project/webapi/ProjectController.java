@@ -92,13 +92,14 @@ public class ProjectController {
     """)
     @GetMapping
     public ApiResponse<Page<ProjectDetailResponse>> getMemberProjects(
+            @AuthenticationPrincipal AuthDetails authDetails,
             @RequestParam(value = "status", required = false) SubmitStatus submitStatus,
             @RequestParam(value = "memberId", required = false) Long memberId,
             @RequestParam(value = "progressStatus", required = false) ProgressStatus progressStatus,
             @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
 
-        return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus, progressStatus, pageable));
+        return ApiResponse.success(projectFinder.getMemberProjects(authDetails, memberId, submitStatus, progressStatus, pageable));
     }
 
     @Operation(summary = "특정 프로젝트(공고) 조회 API", description = "프로젝트 ID로 특정 프로젝트를 조회합니다.")
