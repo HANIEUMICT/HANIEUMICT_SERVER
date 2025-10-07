@@ -2,6 +2,7 @@ package hanieum.conik.adapter.project.webapi;
 
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectDrawingUploadRequest;
+import hanieum.conik.adapter.project.dto.request.ProjectListResponse;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
@@ -91,7 +92,7 @@ public class ProjectController {
     - progressStatus는 입력하지 않을 시, 전체 견적서 대상으로 검색합니다.
     """)
     @GetMapping
-    public ApiResponse<Page<ProjectDetailResponse>> getMemberProjects(
+    public ApiResponse<ProjectListResponse> getMemberProjects(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestParam(value = "status", required = false) SubmitStatus submitStatus,
             @RequestParam(value = "memberId", required = false) Long memberId,

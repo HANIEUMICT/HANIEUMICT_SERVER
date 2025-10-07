@@ -1,5 +1,7 @@
 package hanieum.conik.application.project;
 
+import hanieum.conik.adapter.project.dto.request.ProjectListResponse;
+import hanieum.conik.adapter.project.dto.request.ProjectStatusSummary;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.adapter.proposal.dto.response.ProposalThumbnailResponse;
@@ -54,7 +56,7 @@ public class ProjectQueryService implements ProjectFinder {
 
     // TODO : Pagable 응답 커스텀하여 전체적으로 필요한 필드만 반환하도록 수정
     @Override
-    public Page<ProjectDetailResponse> getMemberProjects(
+    public ProjectListResponse getMemberProjects(
             AuthDetails authDetails, Long memberId, SubmitStatus submitStatus, ProgressStatus progressStatus, Pageable pageable
     ) {
         Member currentMember = (authDetails != null)
@@ -65,7 +67,12 @@ public class ProjectQueryService implements ProjectFinder {
         Specification<Project> spec = buildProjectSpec(memberId, submitStatus, progressStatus);
         Page<Project> projects = projectRepository.findAll(spec, pageable);
 
-        return projects.map(project -> buildProjectResponse(project, currentMember));
+        ProjectStatusSummary summary = progressStatus != null
+                ? buildProjectStatusSummary(memberId, submitStatus)
+                : null ;
+        Page<ProjectDetailResponse> projectResponses = projects.map(project -> buildProjectResponse(project, currentMember));
+
+        return ProjectListResponse.from(summary, projectResponses);
     }
 
     @Override
@@ -175,5 +182,13 @@ public class ProjectQueryService implements ProjectFinder {
                 && favoriteRepository.existsByCompanyIdAndProjectId(currentMember.getCompanyId(), project.getId());
 
         return ProjectDetailResponse.from(project, favoriteCount, isFavorite);
+    }
+
+    private ProjectStatusSummary buildProjectStatusSummary(Long memberId, SubmitStatus submitStatus) {
+        long beforeCount = projectRepository.count(buildProjectSpec(memberId, submitStatus, ProgressStatus.BEFORE));
+        long inProgressCount = projectRepository.count(buildProjectSpec(memberId, submitStatus, ProgressStatus.IN_PROGRESS));
+        long completedCount = projectRepository.count(buildProjectSpec(memberId, submitStatus, ProgressStatus.COMPLETED));
+
+        return ProjectStatusSummary.from(beforeCount, inProgressCount, completedCount);
     }
 }
