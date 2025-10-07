@@ -40,8 +40,10 @@ public class ProjectController {
     @Operation(summary = "프로젝트(공고) 도면 파일 업로드 API", description = "프로젝트(공고) 생성 중 도면 파일을 업로드합니다.")
     @PostMapping("{memberId}/image")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
-    public ApiResponse<?> uploadImage(@PathVariable("memberId") Long memberId,
-                                      @RequestBody @Valid ProjectDrawingUploadRequest projectDrawingUploadRequest) {
+    public ApiResponse<?> uploadImage(
+            @PathVariable("memberId") Long memberId,
+          @RequestBody @Valid ProjectDrawingUploadRequest projectDrawingUploadRequest
+    ) {
         projectDrawingSaver.saveDrawingFileTemp(projectDrawingUploadRequest);
         return ApiResponse.success("도면 파일 업로드 성공");
     }
@@ -49,7 +51,9 @@ public class ProjectController {
     @Operation(summary = "초기 프로젝트(공고) 생성 API", description = "초기에 프로젝트(공고) 페이지를 생성합니다.")
     @PostMapping("{memberId}/init")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
-    public ApiResponse<ProjectDetailResponse> initProject(@PathVariable("memberId") Long memberId) {
+    public ApiResponse<ProjectDetailResponse> initProject(
+            @PathVariable("memberId") Long memberId
+    ) {
         Project project = projectSaver.initiate(memberId);
 
         return ApiResponse.success(ProjectDetailResponse.from(project));
@@ -58,8 +62,10 @@ public class ProjectController {
     @Operation(summary = "프로젝트(공고) 수정 및 임시저장 API", description = "임시 저장 시, 발급된 프로젝트(공고)에 대해 정보를 수정합니다.")
     @PostMapping("{projectId}/draft")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
-    public ApiResponse<ProjectDetailResponse> saveProjectTemp(@PathVariable("projectId") Long projectId,
-                                                              @RequestBody ProjectRegisterRequest projectRegisterRequest) {
+    public ApiResponse<ProjectDetailResponse> saveProjectTemp(
+            @PathVariable("projectId") Long projectId,
+            @RequestBody ProjectRegisterRequest projectRegisterRequest
+    ) {
         Project project = projectSaver.saveProjectDraft(projectId, projectRegisterRequest);
 
         return ApiResponse.success(ProjectDetailResponse.from(project));
@@ -68,8 +74,10 @@ public class ProjectController {
     @Operation(summary = "프로젝트(공고) 수정 및 저장 API", description = "작성 완료 된 프로젝트(공고)를 최종 저장합니다.")
     @PostMapping("{projectId}/final")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
-    public ApiResponse<ProjectDetailResponse> saveProjectFinal(@PathVariable("projectId") Long projectId,
-                                                               @RequestBody @Valid ProjectRegisterRequest projectRegisterRequest) {
+    public ApiResponse<ProjectDetailResponse> saveProjectFinal(
+            @PathVariable("projectId") Long projectId,
+            @RequestBody @Valid ProjectRegisterRequest projectRegisterRequest
+    ) {
         Project project = projectSaver.saveProjectFinal(projectId, projectRegisterRequest);
 
         return ApiResponse.success(ProjectDetailResponse.from(project));
@@ -77,16 +85,20 @@ public class ProjectController {
 
     @Operation(summary = "사용자 프로젝트(공고) 조회 API", description = "사용자의 프로젝트(공고) 목록을 조회합니다.")
     @GetMapping
-    public ApiResponse<Page<ProjectDetailResponse>> getMemberProjects(@RequestParam(value = "status", required = false) SubmitStatus submitStatus,
-                                                                      @RequestParam(value = "memberId", required = false) Long memberId,
-                                                                      @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ApiResponse<Page<ProjectDetailResponse>> getMemberProjects(
+            @RequestParam(value = "status", required = false) SubmitStatus submitStatus,
+            @RequestParam(value = "memberId", required = false) Long memberId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
 
         return ApiResponse.success(projectFinder.getMemberProjects(memberId, submitStatus, pageable));
     }
 
     @Operation(summary = "특정 프로젝트(공고) 조회 API", description = "프로젝트 ID로 특정 프로젝트를 조회합니다.")
     @GetMapping("/{projectId}/detail")
-    public ApiResponse<ProjectWithProposalsResponse> getProject(@PathVariable("projectId") Long projectId) {
+    public ApiResponse<ProjectWithProposalsResponse> getProject(
+            @PathVariable("projectId") Long projectId
+    ) {
 
         return ApiResponse.success(projectFinder.getProjectDetailWithProposals(projectId));
     }
@@ -94,8 +106,10 @@ public class ProjectController {
     @Operation(summary = "프로젝트(공고) 입찰 상태 변경 API", description = "프로젝트(공고)의 입찰 상태를 변경합니다.")
     @PatchMapping("/{projectId}/status")
     @AuthorizeUser(sourceType = AuthSourceType.REQUEST_BODY, fieldName = "memberId")
-    public ApiResponse<ProjectDetailResponse> changeProjectStatus(@PathVariable("projectId") Long projectId,
-                                                                  @RequestBody @Valid  BidStatusUpdateRequest bidStatusUpdateRequest) {
+    public ApiResponse<ProjectDetailResponse> changeProjectStatus(
+            @PathVariable("projectId") Long projectId,
+            @RequestBody @Valid  BidStatusUpdateRequest bidStatusUpdateRequest
+    ) {
         Project project = projectSaver.updateProjectBidStatus(projectId, bidStatusUpdateRequest);
 
         return ApiResponse.success(ProjectDetailResponse.from(project));
@@ -108,7 +122,8 @@ public class ProjectController {
     @GetMapping("/me/company")
     public ApiResponse<Page<ProjectDetailResponse>> getProjectsByCompanyId(
             @AuthenticationPrincipal AuthDetails authDetails,
-            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
 
         Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 
