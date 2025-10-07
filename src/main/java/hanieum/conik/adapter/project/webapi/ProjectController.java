@@ -83,7 +83,11 @@ public class ProjectController {
         return ApiResponse.success(ProjectDetailResponse.from(project));
     }
 
-    @Operation(summary = "사용자 프로젝트(공고) 조회 API", description = "사용자의 프로젝트(공고) 목록을 조회합니다.")
+    @Operation(summary = "프로젝트(공고) 목록 조회 API", description = """
+    ## 프로젝트(공고) 목록을 조회합니다.
+    - status는 입력하지 않을 시, 임시저장 / 최종 저장된 견적서 목록이 조회됩니다.
+    - memberId는 입력하지 않을 시, 전체 사용자의 견적서 대상으로 검색합니다.
+    """)
     @GetMapping
     public ApiResponse<Page<ProjectDetailResponse>> getMemberProjects(
             @RequestParam(value = "status", required = false) SubmitStatus submitStatus,
@@ -116,9 +120,9 @@ public class ProjectController {
     }
 
     @Operation(summary = "기업 마이페이지 - 나에게 온 견적서 목록 조회", description = """
-            ## 기업 회원이 자신의 기업에 전송된 프로젝트(공고) 목록을 조회합니다.
-            - 자신의 기업에 전송된 프로젝트(공고) 목록을 조회합니다.
-            """)
+    ## 기업 회원이 자신의 기업에 전송된 프로젝트(공고) 목록을 조회합니다.
+    - 자신의 기업에 전송된 프로젝트(공고) 목록을 조회합니다.
+    """)
     @GetMapping("/me/company")
     public ApiResponse<Page<ProjectDetailResponse>> getProjectsByCompanyId(
             @AuthenticationPrincipal AuthDetails authDetails,
