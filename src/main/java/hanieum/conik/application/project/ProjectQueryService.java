@@ -1,5 +1,6 @@
 package hanieum.conik.application.project;
 
+import hanieum.conik.adapter.member.dto.MemberAddressResponse;
 import hanieum.conik.adapter.project.dto.request.ProjectListResponse;
 import hanieum.conik.adapter.project.dto.request.ProjectStatusSummary;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
@@ -7,12 +8,14 @@ import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.adapter.proposal.dto.response.ProposalThumbnailResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.favorite.required.FavoriteRepository;
+import hanieum.conik.application.member.required.MemberAddressRepository;
 import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.MemberAddress;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.project.entity.Project;
@@ -47,6 +50,7 @@ public class ProjectQueryService implements ProjectFinder {
     private final MemberRepository memberRepository;
     private final ProposalFinder proposalFinder;
     private final CompanyFinder companyFinder;
+    private final MemberAddressRepository memberAddressRepository;
 
     @Override
     public Project findProject(Long projectId) {
@@ -124,10 +128,19 @@ public class ProjectQueryService implements ProjectFinder {
                 .map(p -> ProposalThumbnailResponse.from(p, companyMap.get(p.getCompanyId())))
                 .toList();
 
+        Long addressId = project.getAddressId();
+        if (addressId == null) {
+            throw new ProjectException(ProjectErrorType.PROJECT_ADDRESS_NOT_FOUND);
+        }
+
+        MemberAddress address = memberAddressRepository.findById(addressId)
+                .orElseThrow(() -> new ProjectException(ProjectErrorType.PROJECT_ADDRESS_NOT_FOUND));
+
         // 4. 최종 응답 조합
         return new ProjectWithProposalsResponse(
                 ProjectDetailResponse.from(project),
-                proposalThumbnails
+                proposalThumbnails,
+                MemberAddressResponse.from(address)
         );
     }
 
