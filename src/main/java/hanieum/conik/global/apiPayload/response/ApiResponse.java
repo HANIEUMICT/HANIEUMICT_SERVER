@@ -17,4 +17,7 @@ public record ApiResponse<T>(ResultType result, T data, ErrorMessage error) {
         return new ApiResponse<>(ResultType.ERROR, null, new ErrorMessage(error));
     }
 
+    public static ApiResponse<?> error(ErrorType type, String customMessage) {
+        return new ApiResponse<>(ResultType.ERROR, null, new ErrorMessage(type, customMessage));
+    }
 }

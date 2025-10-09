@@ -30,13 +30,20 @@ public class ApiControllerAdvice {
                 .orElse(null);
 
         GlobalErrorType type = GlobalErrorType.FAILED_REQUEST_VALIDATION;
+        String message = type.getMessage();
 
         if (fieldError != null) {
             String key = fieldError.getField() + ":" + fieldError.getCode();
             type = VALIDATION_MAP.getOrDefault(key, GlobalErrorType.FAILED_REQUEST_VALIDATION);
+
+            if (fieldError.getDefaultMessage() != null) {
+                message = fieldError.getDefaultMessage();
+            } else {
+                message = type.getMessage();
+            }
         }
 
-        return new ResponseEntity<>(ApiResponse.error(type), type.getStatus());
+        return new ResponseEntity<>(ApiResponse.error(type, message), type.getStatus());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

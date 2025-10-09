@@ -43,3 +43,6 @@ out/
 /src/main/resources/application-test.yml
 /src/test/resources/application.yml
 /도메인모델.md
+
+### Mac OS
+.DS_Store
