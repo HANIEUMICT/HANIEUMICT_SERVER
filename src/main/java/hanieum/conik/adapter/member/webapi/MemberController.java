@@ -147,17 +147,43 @@ public class MemberController {
         return ApiResponse.success(memberFinder.findAddresses(authDetails.getMemberId(), pageable));
     }
 
+    @Operation(summary = "마이페이지 특정 주소 조회", description = """
+    ## 특정 주소 조회를 수행합니다.
+    - 사용자가 등록한 주소 중, 특정 주소를 조회할 수 있습니다.
+    """)
+    @GetMapping("/me/addresses/{addressId}")
+    public ApiResponse<MemberAddressResponse> getMyAddress(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long addressId
+    ) {
+        return ApiResponse.success(memberFinder.findAddress(authDetails.getMemberId(), addressId));
+    }
+
     @Operation(summary = "주소 추가", description = """
     ## 주소 추가를 수행합니다.
     - 사용자가 주소를 추가할 수 있습니다.
     """)
-    @PatchMapping("/addresses")
+    @PostMapping("/addresses")
     public ApiResponse<?> addAddress(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid AddressRegisterRequest request
     ) {
         memberSaver.addAddress(authDetails.getMemberId(), request);
         return ApiResponse.success("주소 추가가 완료되었습니다.");
+    }
+
+    @Operation(summary = "주소 수정", description = """
+    ## 주소를 업데이트합니다.
+    - 사용자가 입력한 주소를 수정할 수 있습니다.
+    """)
+    @PutMapping("/addresses/{addressId}")
+    public ApiResponse<?> updateAddress(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long addressId,
+            @RequestBody @Valid AddressRegisterRequest request
+    ) {
+        memberSaver.updateAddress(authDetails.getMemberId(), addressId, request);
+        return ApiResponse.success("주소 수정이 완료되었습니다.");
     }
 
     @Operation(summary = "주소 삭제", description = """

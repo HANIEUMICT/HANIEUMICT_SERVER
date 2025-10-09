@@ -14,4 +14,5 @@ public interface MemberFinder {
     Member findByEmail(Email email);
     Page<MemberAddressResponse> findAddresses(Long memberId, Pageable pageable);
     Long findCompanyIdByMemberId(Long memberId);
+    MemberAddressResponse findAddress(Long memberId, Long addressId);
 }
