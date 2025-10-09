@@ -1,6 +1,7 @@
 package hanieum.conik.application.member;
 
 import hanieum.conik.adapter.member.dto.MemberAddressResponse;
+import hanieum.conik.adapter.member.dto.MemberInfoResponse;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.required.MemberAddressRepository;
 import hanieum.conik.application.member.required.MemberRepository;
@@ -36,12 +37,11 @@ public class MemberFinderService implements MemberFinder {
 
     @Override
     public Page<MemberAddressResponse> findAddresses(Long memberId, Pageable pageable) {
-       Member member = memberRepository.findById(memberId)
-               .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+       memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
 
        Page<MemberAddress> memberAddresses = memberAddressRepository.findAllByMemberId(memberId, pageable);
 
-       return memberAddresses.map(address -> MemberAddressResponse.from(address, member));
+       return memberAddresses.map(MemberAddressResponse::from);
     }
 
     @Override
@@ -61,5 +61,13 @@ public class MemberFinderService implements MemberFinder {
                 .orElseThrow(() -> new MemberException(MemberErrorType.ADDRESS_NOT_FOUND));
 
         return MemberAddressResponse.from(memberAddress, memberAddress.getMember());
+    }
+
+    @Override
+    public MemberInfoResponse getMemberInfo(Long memberId) {
+        Member member = memberRepository.findWithAddressesById(memberId)
+                .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+
+        return MemberInfoResponse.from(member);
     }
 }

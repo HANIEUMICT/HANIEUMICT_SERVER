@@ -15,8 +15,7 @@ public record MemberInfoResponse(
         boolean emailMarketingAgreed,
         boolean smsMarketingAgreed,
         MemberRole memberType,
-        List<MemberAddressResponse> addresses,
-        MemberAddressResponse defaultAddress
+        List<MemberAddressResponse> addresses
 ) {
     public static MemberInfoResponse from(Member member) {
         return new MemberInfoResponse(
@@ -28,10 +27,9 @@ public record MemberInfoResponse(
                 member.getEmailMarketingAgreed(),
                 member.getSmsMarketingAgreed(),
                 member.getRole(),
-                member.getAddresses().stream()
-                        .map(MemberAddressResponse::from)
-                        .toList(),
-                MemberAddressResponse.from(member.getDefaultAddress())
+                member.getSortedAddresses().stream()
+                        .map(address -> MemberAddressResponse.from(address, member))
+                        .toList()
         );
     }
 }
