@@ -48,6 +48,7 @@ public class MemberController {
     @Operation(summary = "내 정보 조회", description = """
     ## 내 정보를 조회합니다.
     - 사용자의 기본 정보를 조회할 수 있습니다.
+    - 주소 목록 중 기본 배송지는 먼저 조회됩니다.
     """)
     @GetMapping("/me")
     public ApiResponse<MemberInfoResponse> getMemberInfo(

@@ -166,6 +166,19 @@ public class Member extends BaseEntity {
     }
 
     /**
+     * 회원 주소 정렬 조회 (기본 배송지 먼저)
+     */
+    public List<MemberAddress> getSortedAddresses() {
+        return addresses.stream()
+                .sorted((a, b) -> {
+                    boolean aDefault = defaultAddress != null && defaultAddress.equals(a);
+                    boolean bDefault = defaultAddress != null && defaultAddress.equals(b);
+                    return Boolean.compare(bDefault, aDefault);
+                })
+                .toList();
+    }
+
+    /**
      * 회원 주소 추가
      */
     public void addAddress(MemberAddress address) {

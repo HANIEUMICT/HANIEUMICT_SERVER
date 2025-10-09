@@ -27,7 +27,7 @@ public record MemberInfoResponse(
                 member.getEmailMarketingAgreed(),
                 member.getSmsMarketingAgreed(),
                 member.getRole(),
-                member.getAddresses().stream()
+                member.getSortedAddresses().stream()
                         .map(address -> MemberAddressResponse.from(address, member))
                         .toList()
         );
