@@ -56,6 +56,14 @@ public class MemberFinderService implements MemberFinder {
     }
 
     @Override
+    public MemberAddressResponse findAddress(Long memberId, Long addressId) {
+        MemberAddress memberAddress = memberAddressRepository.findByIdAndMemberId(addressId, memberId)
+                .orElseThrow(() -> new MemberException(MemberErrorType.ADDRESS_NOT_FOUND));
+
+        return MemberAddressResponse.from(memberAddress, memberAddress.getMember());
+    }
+
+    @Override
     public MemberInfoResponse getMemberInfo(Long memberId) {
         Member member = memberRepository.findWithAddressesById(memberId)
                 .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));

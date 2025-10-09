@@ -111,6 +111,13 @@ public class MemberModifyService implements MemberSaver {
     }
 
     @Override
+    public void updateAddress(Long memberId, Long addressId, AddressRegisterRequest request) {
+        Member member = memberFinder.findById(memberId);
+        MemberAddress address = MemberAddress.register(request);
+        member.updateAddress(addressId, address, request.isDefault());
+    }
+
+    @Override
     public void deleteAddress(Long memberId, Long addressId) {
         Member member = memberFinder.findById(memberId);
 
