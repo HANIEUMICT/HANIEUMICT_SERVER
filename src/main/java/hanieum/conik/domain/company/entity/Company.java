@@ -110,6 +110,13 @@ public class Company extends BaseEntity {
         if (request.registrationCertificateUrl() != null) this.registrationCertificateUrl = request.registrationCertificateUrl();
         if (request.profileUrl() != null) this.profileUrl = request.profileUrl();
         if (request.bankbookCopy() != null) this.bankbookCopy = request.bankbookCopy();
+        if( request.addressRegisterRequest() != null) {
+            if (this.address == null) {
+                this.address = CompanyAddress.register(request.addressRegisterRequest());
+            } else {
+                this.address.update(request.addressRegisterRequest());
+            }
+        }
     }
 
     /**

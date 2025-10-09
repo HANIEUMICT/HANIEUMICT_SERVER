@@ -86,7 +86,7 @@ public class CompanyFinderService implements CompanyFinder {
 
     @Override
     public CompanyDetailResponse findCompanyWithDetail(Long companyId) {
-        Company company = companyRepository.findWithDetailById(companyId)
+        Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
 
         if (company.getCompanyDetail() == null) {

@@ -1,9 +1,13 @@
 package hanieum.conik.domain.company.dto;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 public record EquipmentRequest(
         @NotBlank
@@ -19,8 +23,15 @@ public record EquipmentRequest(
         @Schema(description = "장비 수량(0 이상)", example = "3", minimum = "0", defaultValue = "0")
         Integer quantity,
 
-        @NotBlank
-        @Size(max=512)
-        @Schema(description = "장비 이미지 URL", example = "https://cdn.example.com/equip/cnc-123.jpg", maxLength = 512, format = "uri")
-        String imageUrl
+        @NotEmpty(message = "이미지 URL은 최소 1개 이상이어야 합니다.")
+        @ArraySchema(
+                arraySchema = @Schema(
+                        description = "장비 이미지 URL 목록",
+                        example = "[\"https://cdn.example.com/equip/cnc-123.jpg\",\"https://cdn.example.com/equip/cnc-124.jpg\"]"
+                )
+        )
+        List<@NotBlank(message = "이미지 URL은 비어 있을 수 없습니다.")
+            @Size(max = 512, message = "이미지 URL은 512자 이하여야 합니다.")
+            String
+            > imageUrls
 ) {}

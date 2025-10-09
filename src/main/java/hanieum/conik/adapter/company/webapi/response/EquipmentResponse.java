@@ -2,12 +2,14 @@ package hanieum.conik.adapter.company.webapi.response;
 
 import hanieum.conik.domain.company.entity.Equipment;
 
+import java.util.List;
+
 public record EquipmentResponse(
         Long id,
         String name,
         Integer quantity,
         String description,
-        String imageUrl
+        List<String> imageUrls
 ) {
     public static EquipmentResponse from(Equipment e) {
         return new EquipmentResponse(
@@ -15,7 +17,7 @@ public record EquipmentResponse(
                 e.getName(),
                 e.getQuantity(),
                 e.getDescription(),
-                e.getImageUrl()
+                e.getImageUrls()
         );
     }
 }

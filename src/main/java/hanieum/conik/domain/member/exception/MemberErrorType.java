@@ -20,8 +20,9 @@ public enum MemberErrorType implements ErrorType {
     INVALID_PHONE_NUMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 전화번호입니다."),
     INVALID_NAME(HttpStatus.BAD_REQUEST, "유효하지 않은 이름입니다."),
     COMPANY_ID_MISSING(HttpStatus.UNPROCESSABLE_ENTITY, "기업 회원의 companyId가 누락되었습니다."),
-    INVALID_VERIFICATION_CODE(HttpStatus.UNAUTHORIZED,   "유효하지 않은 이메일 인증 코드입니다."),
-    EXPIRED_VERIFICATION_CODE(HttpStatus.UNAUTHORIZED,   "이메일 인증 코드가 만료되었습니다."),
+    INVALID_VERIFICATION_CODE(HttpStatus.UNAUTHORIZED,   "유효하지 않은 인증 코드입니다."),
+    EXPIRED_VERIFICATION_CODE(HttpStatus.UNAUTHORIZED,   "인증 코드가 만료되었습니다."),
+    INVALID_PASSWORD_UPDATE_REQUEST(HttpStatus.BAD_REQUEST, "올바르지 않은 비밀번호 수정 요청입니다."),
     CANNOT_UNSET_DEFAULT_ADDRESS(HttpStatus.BAD_REQUEST, "기본 배송지는 해제할 수 없습니다.")
     ;
 

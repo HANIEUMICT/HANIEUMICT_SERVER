@@ -2,9 +2,11 @@ package hanieum.conik.domain.company.dto;
 
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public record CompanyRegisterRequest(
     @Schema(description = "기업 이름", example = "행복 제조업")
@@ -21,6 +23,7 @@ public record CompanyRegisterRequest(
     String email,
 
     @Schema(description = "기업 전화번호", example = "010-1234-5678")
+    @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "올바른 전화번호 형식이 아닙니다.")
     @NotBlank(message = "기업 전화번호는 필수 입력입니다.")
     String phoneNumber,
 
@@ -46,5 +49,6 @@ public record CompanyRegisterRequest(
     String profileUrl,
 
     @NotNull(message = "주소는 필수 입력입니다.")
+    @Valid
     AddressRegisterRequest addressRegisterRequest
 ) {}

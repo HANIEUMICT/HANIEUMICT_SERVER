@@ -6,11 +6,12 @@ import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
-import hanieum.conik.domain.company.dto.CompanyDetailCreateRequest;
-import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
-import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
+import hanieum.conik.application.member.provided.MemberFinder;
+import hanieum.conik.domain.company.dto.*;
 import hanieum.conik.domain.company.entity.Company;
-import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
+import hanieum.conik.domain.company.exception.CompanyErrorType;
+import hanieum.conik.domain.company.exception.CompanyException;
+import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import hanieum.conik.global.domain.exception.AuthErrorType;
@@ -25,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -32,10 +34,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/v1/company")
 @Tag(name = "COMPANY", description = "기업 관련 API")
+@Validated
 @RequiredArgsConstructor
 public class CompanyController {
     private final CompanyFinder companyFinder;
     private final CompanySaver companySaver;
+    private final MemberFinder memberFinder;
 
     @Operation(summary = "기업 등록", description = """
     ## 기업 등록을 수행합니다.
@@ -45,6 +49,28 @@ public class CompanyController {
     @PostMapping()
     public ApiResponse<Long> registerCompany(@Valid @RequestBody CompanyRegisterRequest request) {
         return ApiResponse.success(companySaver.register(request));
+    }
+
+    @Operation(summary = "기업 정보 수정", description = """
+    ## 기업 정보를 수정합니다.
+    - 기업 회원이 자신의 기업 정보를 수정합니다.
+    - 인증된 회원만 접근할 수 있습니다.
+    """
+    )
+    @PatchMapping()
+    public ApiResponse<?> updateCompany(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @Valid @RequestBody CompanyUpdateRequest request) {
+        Long memberId = Optional.ofNullable(authDetails)
+                .map(AuthDetails::getMemberId)
+                .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
+
+        Member member = memberFinder.findById(memberId);
+        if (member.getCompanyId() == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
+        }
+        companySaver.update(member.getCompanyId(), request);
+        return ApiResponse.success();
     }
 
     @Operation(summary = "기업 summary 조회(이름, 지역, 업종명)", description = """
@@ -79,12 +105,9 @@ public class CompanyController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @Valid @RequestBody CompanyDetailCreateRequest request
     ) {
-        Long memberId = Optional.ofNullable(authDetails)
-                .map(AuthDetails::getMemberId)
-                .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
+        Member member = memberFinder.findById(authDetails.getMemberId());
 
-        return ApiResponse.success(companySaver.registerCompanyDetail(memberId, request)
-        );
+        return ApiResponse.success(companySaver.registerCompanyDetail(member.getId(), request));
     }
 
     @Operation(summary = "기업 상세 페이지 단건 조회", description = """
@@ -103,11 +126,11 @@ public class CompanyController {
             """)
     @GetMapping("/detail/me")
     public ApiResponse<CompanyDetailResponse> findMyCompanyWithDetail(@AuthenticationPrincipal AuthDetails authDetails){
-        Long memberId = Optional.ofNullable(authDetails)
-                .map(AuthDetails::getMemberId)
-                .orElseThrow(() -> new AuthException(AuthErrorType.UNAUTHORIZED_MEMBER_ACCESS));
-
-        return ApiResponse.success(companyFinder.findMyCompanyWithDetail(memberId));
+        Member member = memberFinder.findById(authDetails.getMemberId());
+        if (member.getCompanyId() == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
+        }
+        return ApiResponse.success(companyFinder.findMyCompanyWithDetail(member.getId()));
     }
 
     @Operation(summary = "기업 프로필 목록 조회(필터 적용)", description = """

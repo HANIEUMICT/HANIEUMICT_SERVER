@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 public record AddressRegisterRequest(
         @Schema(description = "배송지명", example = "우리집")
@@ -15,6 +16,7 @@ public record AddressRegisterRequest(
         String recipient,
 
         @Schema(description = "전화번호", example = "010-1234-5678")
+        @Pattern(regexp = "^010-\\d{4}-\\d{4}$", message = "올바른 전화번호 형식이 아닙니다.")
         @NotBlank(message = "전화번호는 필수 입력입니다.")
         String phoneNumber,
 
