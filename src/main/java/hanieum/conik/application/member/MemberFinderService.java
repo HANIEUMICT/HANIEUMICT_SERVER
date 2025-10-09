@@ -1,6 +1,7 @@
 package hanieum.conik.application.member;
 
 import hanieum.conik.adapter.member.dto.MemberAddressResponse;
+import hanieum.conik.adapter.member.dto.MemberInfoResponse;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.required.MemberAddressRepository;
 import hanieum.conik.application.member.required.MemberRepository;
@@ -52,5 +53,13 @@ public class MemberFinderService implements MemberFinder {
         }
 
         return member.getCompanyId();
+    }
+
+    @Override
+    public MemberInfoResponse getMemberInfo(Long memberId) {
+        Member member = memberRepository.findWithAddressesById(memberId)
+                .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+
+        return MemberInfoResponse.from(member);
     }
 }

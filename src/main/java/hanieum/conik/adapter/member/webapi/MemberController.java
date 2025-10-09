@@ -53,8 +53,7 @@ public class MemberController {
     public ApiResponse<MemberInfoResponse> getMemberInfo(
             @AuthenticationPrincipal AuthDetails authDetails
     ) {
-        Member member = memberFinder.findById(authDetails.getMemberId());
-        return ApiResponse.success(MemberInfoResponse.from(member));
+        return ApiResponse.success(memberFinder.getMemberInfo(authDetails.getMemberId()));
     }
 
     @Operation(summary = "회원 정보 - 이름 수정", description = """
