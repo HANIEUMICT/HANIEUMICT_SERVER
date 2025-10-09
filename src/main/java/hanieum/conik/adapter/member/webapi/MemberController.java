@@ -99,7 +99,7 @@ public class MemberController {
     ## 주소 추가를 수행합니다.
     - 사용자가 주소를 추가할 수 있습니다.
     """)
-    @PatchMapping("/addresses") // TODO: address 추가인데 왜 Post말고 Patch로 썼는지 궁금합니당 주소 수정 안되는 거 같던데..!
+    @PostMapping("/addresses")
     public ApiResponse<?> addAddress(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid AddressRegisterRequest request
