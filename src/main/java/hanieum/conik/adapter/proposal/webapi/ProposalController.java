@@ -7,6 +7,7 @@ import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
+import hanieum.conik.domain.project.enumerate.ProgressStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
@@ -78,7 +79,7 @@ public class ProposalController {
         return ApiResponse.success(ProposalResponse.from(proposal));
     }
 
-    @Operation(summary = "프로젝트별 기업 견적서(입찰) 조회 API", description = "기업 견적서(입찰) 목록을 조회합니다.")
+    @Operation(summary = "로그인한 유저의 기업별 기업 견적서(입찰) 목록 조회 API", description = "특정 기업의 기업 견적서(입찰) 목록을 조회합니다.")
     @GetMapping("/{memberId}")
     @AuthorizeUser(sourceType = AuthSourceType.PATH_VARIABLE, paramName = "memberId")
     public ApiResponse<Page<ProposalDetailResponse>> getCompanyProposals(
@@ -92,6 +93,19 @@ public class ProposalController {
         return ApiResponse.success(proposals.map(ProposalDetailResponse::from));
     }
 
+    @Operation(summary = "프로젝트 별 기업 견적서 목록(입찰 현황) 조회 API", description = """
+    ## 특정 프로젝트에 입찰한 기업 견적서(입찰) 목록을 조회합니다.
+    - 거래 전(입찰 상태) / 거래 중 / 거래 완료로 필터링 가능합니다.
+    """)
+    @GetMapping("/project/{projectId}")
+    public ApiResponse<Page<ProposalDetailResponse>> getProjectProposals(
+            @PathVariable("projectId") Long projectId,
+            @RequestParam(required = false) ProgressStatus progressStatus,
+            @PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<Proposal> proposals = proposalFinder.getProjectProposals(projectId, progressStatus, pageable);
+        return ApiResponse.success(proposals.map(ProposalDetailResponse::from));
+    }
 
     @Operation(summary = "기업 견적서(입찰) 단일 조회 API", description = "특정 기업 견적서(입찰)를 조회합니다.")
     @GetMapping("/{proposalId}/detail")

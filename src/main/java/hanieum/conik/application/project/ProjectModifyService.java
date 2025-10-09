@@ -45,6 +45,9 @@ public class ProjectModifyService implements ProjectSaver {
         if (request.submitStatus() != SubmitStatus.SUBMIT) {
             throw new ProjectException(ProjectErrorType.PROJECT_FINAL_SAVE_ERROR);
         }
+
+        // TODO: 기업 하나가 같은 프로젝트에 여러 견적서 등록 못하게 - @seongho5356
+        // TODO: 최종 저장시, ProjectProgress에도 "견적 요청"(REQUESTED) 상태로 등록 필요
         return getSavedProject(projectId, request);
     }
 
