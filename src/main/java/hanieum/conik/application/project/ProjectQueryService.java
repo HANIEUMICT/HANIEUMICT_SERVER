@@ -6,6 +6,7 @@ import hanieum.conik.adapter.project.dto.request.ProjectStatusSummary;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.adapter.proposal.dto.response.ProposalThumbnailResponse;
+import hanieum.conik.application.common.mapper.ProgressStatusMapper;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.favorite.required.FavoriteRepository;
 import hanieum.conik.application.member.required.MemberAddressRepository;
@@ -171,30 +172,16 @@ public class ProjectQueryService implements ProjectFinder {
         }
 
         if (progressStatus != null) {
+            List<ProjectProgressStep> steps = ProgressStatusMapper.map(progressStatus);
+
             spec = spec.and((root, query, cb) -> {
                 Expression<ProjectProgressStep> stepExpr = root.get("currentStep");
 
-                // TODO : ENUM → DB 저장 시 step 필드로 변환하는 Converter 추가하여 매핑 일관성 유지 고려중
-                return switch (progressStatus) {
-                    case BEFORE -> cb.or(
-                            cb.isNull(stepExpr),
-                            stepExpr.in(ProjectProgressStep.OPEN, ProjectProgressStep.REQUESTED)
-                    );
-                    case IN_PROGRESS -> stepExpr.in(
-                            ProjectProgressStep.CONTRACT_CONFIRMED,
-                            ProjectProgressStep.COMPANY_INSPECTION_COMPLETED,
-                            ProjectProgressStep.SAMPLE_PRODUCTION,
-                            ProjectProgressStep.SAMPLE_PRODUCTION_COMPLETED,
-                            ProjectProgressStep.SAMPLE_DELIVERY,
-                            ProjectProgressStep.SAMPLE_DELIVERED,
-                            ProjectProgressStep.SAMPLE_APPROVED,
-                            ProjectProgressStep.SAMPLE_REJECTED,
-                            ProjectProgressStep.MASS_PRODUCTION,
-                            ProjectProgressStep.MASS_PRODUCTION_COMPLETED,
-                            ProjectProgressStep.PRODUCT_DELIVERY
-                    );
-                    case COMPLETED -> stepExpr.in(ProjectProgressStep.CLOSED);
-                };
+                if (ProgressStatusMapper.isBefore(progressStatus)) {
+                    return cb.or(cb.isNull(stepExpr), stepExpr.in(steps));
+                } else {
+                    return stepExpr.in(steps);
+                }
             });
         }
 
