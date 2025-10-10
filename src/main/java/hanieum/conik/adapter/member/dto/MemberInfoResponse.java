@@ -11,9 +11,9 @@ public record MemberInfoResponse(
         Email email,
         String name,
         String phoneNumber,
-        boolean termsOfServiceAgreed,
-        boolean emailMarketingAgreed,
-        boolean smsMarketingAgreed,
+        Boolean termsOfServiceAgreed,
+        Boolean emailMarketingAgreed,
+        Boolean smsMarketingAgreed,
         MemberRole memberType,
         List<MemberAddressResponse> addresses
 ) {
