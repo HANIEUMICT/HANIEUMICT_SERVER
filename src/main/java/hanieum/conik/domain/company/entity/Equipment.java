@@ -15,7 +15,7 @@ import java.util.List;
 public class Equipment extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", nullable = false)
-    private CompanyDetail companyDetail;
+    private Company company;
 
     @Column(nullable = false, length = 200)
     private String name;
@@ -40,7 +40,7 @@ public class Equipment extends AbstractEntity {
         return new Equipment(request.name(), request.description(), request.quantity(), request.imageUrls());
     }
 
-    void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail; }
+    void setCompanyDetail(CompanyDetail detail) { this.company.attachDetail(detail);}
 
     public void update(EquipmentRequest request) {
         if (request.name() != null && !request.name().isBlank()) this.name = request.name().trim();
@@ -50,6 +50,6 @@ public class Equipment extends AbstractEntity {
     }
 
     public void remove() {
-        if (this.companyDetail != null) this.companyDetail.removeEquipment(this.getId());
+        if (this.company.getCompanyDetail() != null) this.company.getCompanyDetail().removeEquipment(this.getId());
     }
 }
