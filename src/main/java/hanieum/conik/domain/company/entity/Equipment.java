@@ -14,11 +14,7 @@ import java.util.List;
 @Getter
 public class Equipment extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "company_id",
-            referencedColumnName = "company_id",
-            nullable = false
-    )
+    @JoinColumn(name = "company_id", nullable = false)
     private CompanyDetail companyDetail;
 
     @Column(nullable = false, length = 200)

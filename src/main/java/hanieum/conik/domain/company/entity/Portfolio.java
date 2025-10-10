@@ -14,11 +14,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Portfolio extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "company_id",
-            referencedColumnName = "company_id",
-            nullable = false
-    )
+    @JoinColumn(name = "company_id", nullable = false)
     private CompanyDetail companyDetail;
 
     @Column(nullable = false)
