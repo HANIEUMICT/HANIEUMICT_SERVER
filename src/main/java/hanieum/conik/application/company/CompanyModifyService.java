@@ -14,7 +14,9 @@ import hanieum.conik.domain.company.entity.Equipment;
 import hanieum.conik.domain.company.entity.Portfolio;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
+import hanieum.conik.domain.member.Member;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,9 +44,8 @@ public class CompanyModifyService implements CompanySaver {
 
     @Override
     public Long registerCompanyDetail(Long memberId, CompanyDetailCreateRequest request) {
-        if (memberId == null || memberId <= 0) {
-            throw new CompanyException(CompanyErrorType.INVALID_INPUT);
-        }
+        Member member = memberFinder.findById(memberId); // 회원 존재 여부 확인
+        Company company = companyFinder.findCompany(member.getCompanyId());// 회원의 회사 존재 여부 확인
 
         if (request == null || request.detail() == null) {
             throw new CompanyException(CompanyErrorType.INVALID_INPUT);
@@ -55,29 +56,33 @@ public class CompanyModifyService implements CompanySaver {
             throw new CompanyException(CompanyErrorType.INVALID_INPUT);
         }
 
-        var member = memberFinder.findById(memberId);
-        Long companyId = member.getCompanyId();
-        if (companyId == null) throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
-
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
-
         if (company.getCompanyDetail() != null) {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_ALREADY_EXISTS);
         }
 
-        List<Equipment> equipments = Optional.ofNullable(request.equipments())
-                .orElseGet(List::of)
-                .stream().map(Equipment::create).toList();
-
-        List<Portfolio> portfolios = Optional.ofNullable(request.portfolios())
-                .orElseGet(List::of)
-                .stream().map(Portfolio::create).toList();
+        List<Equipment> equipments = registerEquipments(request);
+        List<Portfolio> portfolios = registerPortfolios(request);
 
         CompanyDetail companyDetail = CompanyDetail.create(company, request.detail(),equipments, portfolios);
         companyRepository.save(company);
 
         return companyDetail.getId();
+    }
+
+    @NotNull
+    private static List<Portfolio> registerPortfolios(CompanyDetailCreateRequest request) {
+        List<Portfolio> portfolios = Optional.ofNullable(request.portfolios())
+                .orElseGet(List::of)
+                .stream().map(Portfolio::create).toList();
+        return portfolios;
+    }
+
+    @NotNull
+    private static List<Equipment> registerEquipments(CompanyDetailCreateRequest request) {
+        List<Equipment> equipments = Optional.ofNullable(request.equipments())
+                .orElseGet(List::of)
+                .stream().map(Equipment::create).toList();
+        return equipments;
     }
 
     @Override

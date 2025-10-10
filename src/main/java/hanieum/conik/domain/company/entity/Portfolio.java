@@ -45,7 +45,7 @@ public class Portfolio extends AbstractEntity {
         );
     }
 
-    void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail; }
+    void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail;}
 
     public void update(PortfolioRequest request) {
         if (request.quantity() != null) this.quantity = Math.max(0, request.quantity());

@@ -94,10 +94,10 @@ public class CompanyDetail extends BaseEntity {
 
         CompanyDetail detail = new CompanyDetail(company, request.establishedAt(), request.logoUrl(), request.employeeCount(), request.websiteUrl(), request.contactAvailableTime(), request.description());
 
+        company.attachDetail(detail);
+
         if (equipments != null) {equipments.forEach(detail::addEquipment);}
         if (portfolios != null) {portfolios.forEach(detail::addPortfolio);}
-
-        company.attachDetail(detail);
 
         return detail;
     }
