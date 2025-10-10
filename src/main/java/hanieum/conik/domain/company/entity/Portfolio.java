@@ -14,8 +14,12 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Portfolio extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", nullable = false)
-    private Company company;
+    @JoinColumn(
+            name = "company_id",
+            referencedColumnName = "company_id",
+            nullable = false
+    )
+    private CompanyDetail companyDetail;
 
     @Column(nullable = false)
     private Integer quantity;
@@ -45,7 +49,7 @@ public class Portfolio extends AbstractEntity {
         );
     }
 
-    void setCompanyDetail(CompanyDetail detail) { this.company.attachDetail(detail);}
+    void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail;}
 
     public void update(PortfolioRequest request) {
         if (request.quantity() != null) this.quantity = Math.max(0, request.quantity());
@@ -55,6 +59,6 @@ public class Portfolio extends AbstractEntity {
     }
 
     public void remove() {
-        if (this.company.getCompanyDetail() != null) this.company.getCompanyDetail().removePortfolio(this.getId());
+        if (this.companyDetail != null) this.companyDetail.removePortfolio(this.getId());
     }
 }
