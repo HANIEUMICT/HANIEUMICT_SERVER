@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface EquipmentRepository extends JpaRepository<Equipment, Long> {
     Optional<Equipment> findByIdAndCompanyDetailId(Long equipmentId, Long companyDetailId);
     List<Equipment> findByCompanyDetailId(Long companyId);
+    long deleteByCompanyDetailIdAndIdIn(Long companyId, List<Long> equipmentIds);
 }
