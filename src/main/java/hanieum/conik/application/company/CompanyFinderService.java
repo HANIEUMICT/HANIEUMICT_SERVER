@@ -10,6 +10,7 @@ import hanieum.conik.application.company.required.PortfolioRepository;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.entity.CompanyDetail;
 import hanieum.conik.domain.company.entity.Equipment;
 import hanieum.conik.domain.company.entity.Portfolio;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
@@ -43,8 +44,22 @@ public class CompanyFinderService implements CompanyFinder {
 
     @Override
     public Company findCompany(Long companyId) {
+        if(companyId == null){
+            throw new CompanyException(CompanyErrorType.INVALID_INPUT);
+        }
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+    }
+
+    @Override
+    public CompanyDetail findCompanyDetail(Long companyId) {
+        Company company = findCompany(companyId);
+
+        CompanyDetail detail = company.getCompanyDetail();
+        if (detail == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);
+        }
+        return detail;
     }
 
     @Override
@@ -64,8 +79,7 @@ public class CompanyFinderService implements CompanyFinder {
 
     @Override
     public CompanyDetailResponse findCompanyWithDetail(Long companyId) {
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+        Company company = findCompany(companyId);
 
         if (company.getCompanyDetail() == null) {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);

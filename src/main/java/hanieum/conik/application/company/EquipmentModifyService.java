@@ -40,6 +40,10 @@ public class EquipmentModifyService implements EquipmentSaver {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);
         }
 
+        if (equipmentRequests == null || equipmentRequests.isEmpty()) {
+            return;
+        }
+
         List<Equipment> list = equipmentRequests.stream()
                 .map(Equipment::create)
                 .toList();
@@ -57,9 +61,10 @@ public class EquipmentModifyService implements EquipmentSaver {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);
         }
 
-        long deletedCount = equipmentRepository.deleteByCompanyDetailIdAndIdIn(detail.getId(), equipmentIds);
-
-        if (deletedCount != equipmentIds.size()) {
+        List<Long> distinctIds = (equipmentIds == null) ? List.of()
+                : equipmentIds.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        long deletedCount = equipmentRepository.deleteByCompanyDetailIdAndIdIn(detail.getId(), distinctIds);
+        if (deletedCount != distinctIds.size()) {
             throw new CompanyException(CompanyErrorType.EQUIPMENT_NOT_FOUND);
         }
     }

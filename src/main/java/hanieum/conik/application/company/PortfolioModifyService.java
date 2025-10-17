@@ -12,9 +12,9 @@ import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
 import hanieum.conik.global.apiPayload.exception.GlobalException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +40,10 @@ public class PortfolioModifyService implements PortfolioSaver {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);
         }
 
+        if(portfolioRequests == null || portfolioRequests.isEmpty()) {
+            return;
+        }
+
         List<Portfolio> list = portfolioRequests.stream()
                 .map(Portfolio::create)
                 .toList();
@@ -57,10 +61,11 @@ public class PortfolioModifyService implements PortfolioSaver {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);
         }
 
-        long deletedCount = portfolioRepository.deleteByCompanyDetailIdAndIdIn(detail.getId(), portfolioIds);
-
-        if (deletedCount != portfolioIds.size()) {
-            throw new CompanyException(CompanyErrorType.EQUIPMENT_NOT_FOUND);
+        List<Long> distinctIds = (portfolioIds == null) ? List.of()
+                : portfolioIds.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        long deletedCount = portfolioRepository.deleteByCompanyDetailIdAndIdIn(detail.getId(), distinctIds);
+        if (deletedCount != distinctIds.size()) {
+            throw new CompanyException(CompanyErrorType.PORTFOLIO_NOT_FOUND);
         }
     }
 

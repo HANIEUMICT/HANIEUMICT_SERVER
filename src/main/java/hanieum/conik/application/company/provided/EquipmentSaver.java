@@ -7,9 +7,9 @@ import hanieum.conik.domain.company.entity.CompanyDetail;
 import java.util.List;
 
 public interface EquipmentSaver {
-    void add(Long companyDetailId, List<EquipmentRequest> equipmentRequests);
+    void add(Long companyId, List<EquipmentRequest> equipmentRequests);
 
-    void delete(Long companyDetailId, List<Long> equipmentIds);
+    void delete(Long companyId, List<Long> equipmentIds);
 
     void sync(CompanyDetail detail, List<EquipmentUpdateRequest> requested);
 }

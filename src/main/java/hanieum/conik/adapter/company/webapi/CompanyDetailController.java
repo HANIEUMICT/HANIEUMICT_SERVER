@@ -7,6 +7,8 @@ import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.*;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.exception.CompanyErrorType;
+import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
@@ -67,6 +69,10 @@ public class CompanyDetailController {
         Member member = memberFinder.findById(authDetails.getMemberId());
         Long companyId = member.getCompanyId();
 
+        if(companyId == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_DOES_NOT_BELONG_TO_MEMBER);
+        }
+
         long ifMatchEpochMilli = parseIfMatchOrThrow(ifMatch);
 
         companySaver.updateCompanyDetail(companyId, ifMatchEpochMilli, request);
@@ -97,6 +103,10 @@ public class CompanyDetailController {
 
         CompanyDetailResponse response = companyFinder.findCompanyWithDetail(company.getId());
 
+        if (response.detail() == null) {
+            return ResponseEntity.ok().body(ApiResponse.success(response));
+        }
+
         long epochMilli = response.detail().modifiedAt().toInstant(ZoneOffset.UTC).toEpochMilli();
 
         return ResponseEntity.ok().eTag("\"" + epochMilli + "\"").body(ApiResponse.success(response));
@@ -107,7 +117,6 @@ public class CompanyDetailController {
             ## 기업의 프로필 목록을 조회합니다.
             - 필터를 적용해 원하는 기업의 프로필 목록을 조회합니다.
             - 기업 상세 정보를 입력하지 않으면 프로필 목록 조회에서 제외됩니다.
-            - 필터가 존재하지 않으면 거래 건수가 많은 순서대로 조회됩니다.
             """)
     @GetMapping("/profiles")
     public ApiResponse<Page<CompanyProfileResponse>> searchProfiles(

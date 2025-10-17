@@ -4,7 +4,6 @@ import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.application.company.provided.EquipmentSaver;
 import hanieum.conik.application.company.provided.PortfolioSaver;
-import hanieum.conik.application.company.required.CompanyDetailRepository;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.common.email.Email;
@@ -50,7 +49,16 @@ public class CompanyModifyService implements CompanySaver {
     @Override
     public Long registerCompanyDetail(Long memberId, CompanyDetailCreateRequest request) {
         Member member = memberFinder.findById(memberId); // 회원 존재 여부 확인
+
+        if(member.getCompanyId() == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
+        }
+
         Company company = companyFinder.findCompany(member.getCompanyId());// 회원의 회사 존재 여부 확인
+
+        if (company.getCompanyDetail() != null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_ALREADY_EXISTS);
+        }
 
         if (request == null || request.detail() == null) {
             throw new CompanyException(CompanyErrorType.INVALID_INPUT);
@@ -59,10 +67,6 @@ public class CompanyModifyService implements CompanySaver {
         var detail = request.detail();
         if (detail.establishedAt() == null || detail.logoUrl() == null || detail.logoUrl().isBlank()) {
             throw new CompanyException(CompanyErrorType.INVALID_INPUT);
-        }
-
-        if (company.getCompanyDetail() != null) {
-            throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_ALREADY_EXISTS);
         }
 
         List<Equipment> equipments = registerEquipments(request);
@@ -90,8 +94,11 @@ public class CompanyModifyService implements CompanySaver {
 
     @Override
     public void updateCompanyDetail(Long companyId, Long ifMatchEpochMilli, CompanyDetailUpdateRequest request) {
-        Company company = companyFinder.findCompany(companyId);
-        CompanyDetail companyDetail = company.getCompanyDetail();
+        CompanyDetail companyDetail = companyFinder.findCompanyDetail(companyId);
+
+        if (ifMatchEpochMilli == null) {
+            throw new GlobalException(GlobalErrorType.PRECONDITION_FAILED);
+        }
 
         // 1) 동시성: If-Match(modifiedAt) 비교
         long current = companyDetail.getModifiedAt().toInstant(ZoneOffset.UTC).toEpochMilli();

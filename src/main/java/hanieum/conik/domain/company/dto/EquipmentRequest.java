@@ -1,6 +1,5 @@
 package hanieum.conik.domain.company.dto;
 
-import hanieum.conik.domain.company.entity.Equipment;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

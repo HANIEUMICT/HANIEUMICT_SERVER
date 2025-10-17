@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum CompanyErrorType implements ErrorType {
     COMPANY_NOT_FOUND(HttpStatus.NOT_FOUND,"존재하지 않는 기업입니다."),
+    COMPANY_DOES_NOT_BELONG_TO_MEMBER(HttpStatus.FORBIDDEN, "해당 회원은 기업에 속해있지 않습니다."),
     EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 사용중인 이메일입니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "입력 값이 유효하지 않습니다."),
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST, "페이지/사이즈 값이 올바르지 않습니다."),

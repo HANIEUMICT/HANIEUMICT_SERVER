@@ -50,7 +50,6 @@ public class SecurityConfig {
                                 ).permitAll()
                                 .requestMatchers(
                                         "/v1/company",
-                                        "/v1/company/*",
                                         "/v1/company/summaries"
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/v1/bucket/presigned").permitAll()
