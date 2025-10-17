@@ -1,10 +1,7 @@
-package hanieum.conik.adapter.company.webapi.response;
+package hanieum.conik.adapter.company.response;
 
 import hanieum.conik.domain.company.entity.Company;
-import hanieum.conik.domain.company.entity.CompanyAddress;
 import hanieum.conik.domain.company.enumerate.CompanyStatus;
-
-import java.util.List;
 
 public record CompanyResponse(
         Long id,

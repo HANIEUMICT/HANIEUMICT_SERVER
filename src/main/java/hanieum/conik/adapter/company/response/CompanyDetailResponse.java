@@ -1,9 +1,9 @@
-package hanieum.conik.adapter.company.webapi.response;
+package hanieum.conik.adapter.company.response;
 
 import hanieum.conik.domain.company.entity.*;
-import hanieum.conik.domain.company.enumerate.CompanyStatus;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record CompanyDetailResponse(
@@ -40,6 +40,7 @@ public record CompanyDetailResponse(
             String websiteUrl,
             String contactAvailableTime,
             String description,
+            LocalDateTime modifiedAt,
             Integer rating,
             Integer totalOrderCount,
             Integer repeatOrderCount,
@@ -55,6 +56,7 @@ public record CompanyDetailResponse(
                     d.getWebsiteUrl(),
                     d.getContactAvailableTime(),
                     d.getDescription(),
+                    d.getModifiedAt(),
                     d.getRating(),
                     d.getTotalOrderCount(),
                     d.getRepeatOrderCount(),
