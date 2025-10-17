@@ -30,7 +30,7 @@ public class MemberFinderService implements MemberFinder {
     @Override
     public Member findById(Long memberId) {
         if (memberId == null) {
-            throw new GlobalException(GlobalErrorType.UNAUTHORIZED);
+            throw new MemberException(MemberErrorType.INVALID_INPUT);
         }
         return memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
     }
@@ -38,16 +38,16 @@ public class MemberFinderService implements MemberFinder {
     @Override
     public Member findByEmail(Email email) {
         if(email == null){
-            throw new GlobalException(GlobalErrorType.UNAUTHORIZED);
+            throw new MemberException(MemberErrorType.INVALID_INPUT);
         }
         return memberRepository.findByEmail(email).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
     }
 
     @Override
     public Page<MemberAddressResponse> findAddresses(Long memberId, Pageable pageable) {
-       memberRepository.findById(memberId).orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
+        findById(memberId);
 
-       Page<MemberAddress> memberAddresses = memberAddressRepository.findAllByMemberId(memberId, pageable);
+        Page<MemberAddress> memberAddresses = memberAddressRepository.findAllByMemberId(memberId, pageable);
 
        return memberAddresses.map(MemberAddressResponse::from);
     }
@@ -56,9 +56,7 @@ public class MemberFinderService implements MemberFinder {
     public Long findCompanyIdByMemberId(Long memberId) {
         Member member = findById(memberId);
 
-        if(member.getCompanyId() == null){
-            throw new MemberException(MemberErrorType.COMPANY_NOT_FOUND);
-        }
+        if(member.getCompanyId() == null) throw new MemberException(MemberErrorType.COMPANY_NOT_FOUND);
 
         return member.getCompanyId();
     }

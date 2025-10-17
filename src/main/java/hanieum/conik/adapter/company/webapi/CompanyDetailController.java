@@ -49,9 +49,9 @@ public class CompanyDetailController {
             @AuthenticationPrincipal AuthDetails authDetails,
             @Valid @RequestBody CompanyDetailCreateRequest request
     ) {
-        Member member = memberFinder.findById(authDetails.getMemberId());
+        Long companyId = memberFinder.findCompanyIdByMemberId(authDetails.getMemberId());
 
-        return ApiResponse.success(companySaver.registerCompanyDetail(member.getId(), request));
+        return ApiResponse.success(companySaver.registerCompanyDetail(companyId, request));
     }
 
     @Operation(summary = "기업 상세 정보 수정", description = """

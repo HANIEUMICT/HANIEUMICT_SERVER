@@ -12,9 +12,9 @@ import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
 import hanieum.conik.global.apiPayload.exception.GlobalException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
@@ -120,7 +120,7 @@ public class EquipmentModifyService implements EquipmentSaver {
             } else {
                 E exist = byId.get(rid);
                 if (exist == null) {
-                    throw new GlobalException(GlobalErrorType.INVALID_CHILD_ID);
+                    throw new CompanyException(CompanyErrorType.EQUIPMENT_NOT_FOUND);
                 }
                 keep.add(rid);
             }

@@ -14,7 +14,6 @@ import hanieum.conik.domain.company.entity.Equipment;
 import hanieum.conik.domain.company.entity.Portfolio;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
 import hanieum.conik.global.apiPayload.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ import java.util.*;
 @RequiredArgsConstructor
 @Transactional
 public class CompanyModifyService implements CompanySaver {
-    private final MemberFinder memberFinder;
     private final CompanyFinder companyFinder;
     private final CompanyRepository companyRepository;
     private final EquipmentSaver equipmentSaver;
@@ -47,14 +45,8 @@ public class CompanyModifyService implements CompanySaver {
     }
 
     @Override
-    public Long registerCompanyDetail(Long memberId, CompanyDetailCreateRequest request) {
-        Member member = memberFinder.findById(memberId); // 회원 존재 여부 확인
-
-        if(member.getCompanyId() == null) {
-            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
-        }
-
-        Company company = companyFinder.findCompany(member.getCompanyId());// 회원의 회사 존재 여부 확인
+    public Long registerCompanyDetail(Long companyId, CompanyDetailCreateRequest request) {
+        Company company = companyFinder.findCompany(companyId);// 회원의 회사 존재 여부 확인
 
         if (company.getCompanyDetail() != null) {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_ALREADY_EXISTS);
@@ -96,9 +88,8 @@ public class CompanyModifyService implements CompanySaver {
     public void updateCompanyDetail(Long companyId, Long ifMatchEpochMilli, CompanyDetailUpdateRequest request) {
         CompanyDetail companyDetail = companyFinder.findCompanyDetail(companyId);
 
-        if (ifMatchEpochMilli == null) {
-            throw new GlobalException(GlobalErrorType.PRECONDITION_FAILED);
-        }
+        if (ifMatchEpochMilli == null) throw new GlobalException(GlobalErrorType.PRECONDITION_FAILED);
+        if (companyDetail.getModifiedAt() == null) throw new GlobalException(GlobalErrorType.PRECONDITION_FAILED);
 
         // 1) 동시성: If-Match(modifiedAt) 비교
         long current = companyDetail.getModifiedAt().toInstant(ZoneOffset.UTC).toEpochMilli();
@@ -122,18 +113,16 @@ public class CompanyModifyService implements CompanySaver {
 
     @NotNull
     private static List<Portfolio> registerPortfolios(CompanyDetailCreateRequest request) {
-        List<Portfolio> portfolios = Optional.ofNullable(request.portfolios())
+        return Optional.ofNullable(request.portfolios())
                 .orElseGet(List::of)
                 .stream().map(Portfolio::create).toList();
-        return portfolios;
     }
 
     @NotNull
     private static List<Equipment> registerEquipments(CompanyDetailCreateRequest request) {
-        List<Equipment> equipments = Optional.ofNullable(request.equipments())
+        return Optional.ofNullable(request.equipments())
                 .orElseGet(List::of)
                 .stream().map(Equipment::create).toList();
-        return equipments;
     }
 
 }
