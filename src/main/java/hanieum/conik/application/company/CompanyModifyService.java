@@ -2,12 +2,13 @@ package hanieum.conik.application.company;
 
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
+import hanieum.conik.application.company.provided.EquipmentSaver;
+import hanieum.conik.application.company.provided.PortfolioSaver;
+import hanieum.conik.application.company.required.CompanyDetailRepository;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.common.email.Email;
-import hanieum.conik.domain.company.dto.CompanyDetailCreateRequest;
-import hanieum.conik.domain.company.dto.CompanyRegisterRequest;
-import hanieum.conik.domain.company.dto.CompanyUpdateRequest;
+import hanieum.conik.domain.company.dto.*;
 import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.company.entity.CompanyDetail;
 import hanieum.conik.domain.company.entity.Equipment;
@@ -15,13 +16,15 @@ import hanieum.conik.domain.company.entity.Portfolio;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.global.apiPayload.exception.GlobalErrorType;
+import hanieum.conik.global.apiPayload.exception.GlobalException;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.time.ZoneOffset;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +33,8 @@ public class CompanyModifyService implements CompanySaver {
     private final MemberFinder memberFinder;
     private final CompanyFinder companyFinder;
     private final CompanyRepository companyRepository;
+    private final EquipmentSaver equipmentSaver;
+    private final PortfolioSaver portfolioSaver;
 
     @Override
     public Long register(CompanyRegisterRequest request) {
@@ -69,6 +74,45 @@ public class CompanyModifyService implements CompanySaver {
         return companyDetail.getId();
     }
 
+    @Override
+    public void update(Long companyId, CompanyUpdateRequest request) {
+        Company company = companyFinder.findCompany(companyId);
+
+        if (request.email() != null) {
+            Email newEmail = new Email(request.email().trim());
+
+            if (!newEmail.equals(company.getEmail())) {
+                checkDuplicateEmail(newEmail);
+            }
+        }
+        company.update(request);
+    }
+
+    @Override
+    public void updateCompanyDetail(Long companyId, Long ifMatchEpochMilli, CompanyDetailUpdateRequest request) {
+        Company company = companyFinder.findCompany(companyId);
+        CompanyDetail companyDetail = company.getCompanyDetail();
+
+        // 1) 동시성: If-Match(modifiedAt) 비교
+        long current = companyDetail.getModifiedAt().toInstant(ZoneOffset.UTC).toEpochMilli();
+        if (current != ifMatchEpochMilli) {
+            throw new GlobalException(GlobalErrorType.PRECONDITION_FAILED);
+        }
+
+        // 2) 부모 기본 필드 반영
+        companyDetail.update(request.detail());
+
+        // 3) 자식 컬렉션 동기화: Equipments, Portfolios
+        equipmentSaver.sync(companyDetail, request.equipments());
+        portfolioSaver.sync(companyDetail, request.portfolios());
+    }
+
+    private void checkDuplicateEmail(Email email){
+        if (companyRepository.findByEmail(email).isPresent()) {
+            throw new CompanyException(CompanyErrorType.EMAIL_DUPLICATE);
+        }
+    }
+
     @NotNull
     private static List<Portfolio> registerPortfolios(CompanyDetailCreateRequest request) {
         List<Portfolio> portfolios = Optional.ofNullable(request.portfolios())
@@ -85,23 +129,4 @@ public class CompanyModifyService implements CompanySaver {
         return equipments;
     }
 
-    @Override
-    public void update(Long companyId, CompanyUpdateRequest request) {
-        Company company = companyFinder.findCompany(companyId);
-
-        if (request.email() != null) {
-            Email newEmail = new Email(request.email().trim());
-
-            if (!newEmail.equals(company.getEmail())) {
-                checkDuplicateEmail(newEmail);
-            }
-        }
-        company.update(request);
-    }
-
-    private void checkDuplicateEmail(Email email){
-        if (companyRepository.findByEmail(email).isPresent()) {
-            throw new CompanyException(CompanyErrorType.EMAIL_DUPLICATE);
-        }
-    }
 }

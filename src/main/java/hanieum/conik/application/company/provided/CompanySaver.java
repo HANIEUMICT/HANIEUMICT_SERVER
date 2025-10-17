@@ -12,5 +12,5 @@ public interface CompanySaver {
 
     void update(Long companyId, CompanyUpdateRequest request);
 
-    void updateCompanyDetail(Long companyId, CompanyDetailUpdateRequest request);
+    void updateCompanyDetail(Long companyId, Long ifMatchVersion,CompanyDetailUpdateRequest request);
 }

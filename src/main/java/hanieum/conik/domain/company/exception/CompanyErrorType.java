@@ -15,6 +15,8 @@ public enum CompanyErrorType implements ErrorType {
     COMPANY_DETAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 기업 상세가 등록되어 있습니다."),
     COMPANY_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "기업 상세가 존재하지 않습니다."),
     MAPPING_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "엔티티/DTO 매핑 중 오류가 발생했습니다."),
+    EQUIPMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 장비입니다."),
+    PORTFOLIO_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 포트폴리오입니다.")
     ;
 
     public final HttpStatus status;

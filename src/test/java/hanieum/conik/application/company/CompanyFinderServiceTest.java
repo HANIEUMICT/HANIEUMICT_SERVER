@@ -1,8 +1,7 @@
 package hanieum.conik.application.company;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
+import hanieum.conik.adapter.company.response.CompanyProfileResponse;
+import hanieum.conik.adapter.company.response.CompanySummaryResponse;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.company.required.EquipmentRepository;
 import hanieum.conik.application.company.required.PortfolioRepository;
@@ -10,10 +9,7 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
-import hanieum.conik.domain.company.entity.CompanyAddress;
-import hanieum.conik.domain.company.entity.CompanyDetail;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.domain.member.Member;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +24,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -39,13 +34,7 @@ class CompanyFinderServiceTest {
     CompanyFinderService companyFinderService;
 
     @MockBean
-    MemberFinder memberFinder;
-    @MockBean
     CompanyRepository companyRepository;
-    @MockBean
-    EquipmentRepository equipmentRepository;
-    @MockBean
-    PortfolioRepository portfolioRepository;
 
     // ─────────────────────────── findAllCompanySummaries ───────────────────────────
 
@@ -208,77 +197,6 @@ class CompanyFinderServiceTest {
         assertThat(page.getTotalElements()).isZero();
         verify(companyRepository).search(cond, pageable);
     }
-
-    // ─────────────────────────── findMyCompanyWithDetail ───────────────────────────
-
-    @Test
-    @DisplayName("내 기업 상세 조회: 상세가 없으면 CompanyOnly 응답, 장비/포트폴리오 조회 안함")
-    void findMyCompanyWithDetail_noDetail_returnsCompanyOnly() {
-        Long memberId = 3L;
-        Long companyId = 10L;
-
-        Member member = mock(Member.class);
-        given(member.getCompanyId()).willReturn(companyId);
-        given(memberFinder.findById(memberId)).willReturn(member);
-
-        Company company = mock(Company.class);
-        given(company.getId()).willReturn(companyId);
-        given(company.getCompanyDetail()).willReturn(null);
-
-        // ✅ 주소 매핑에서 NPE 방지용 최소 스텁
-        CompanyAddress addr = mock(CompanyAddress.class);
-        given(company.getAddress()).willReturn(addr);
-        given(addr.getPostalCode()).willReturn("12345");
-        given(addr.getStreetAddress()).willReturn("Seoul-ro 1");
-        given(addr.getDetailAddress()).willReturn(null);
-        given(addr.getRecipient()).willReturn("홍길동");
-        given(addr.getPhoneNumber()).willReturn("010-0000-0000");
-
-        given(companyRepository.findById(companyId)).willReturn(Optional.of(company));
-
-        CompanyDetailResponse res = companyFinderService.findMyCompanyWithDetail(memberId);
-
-        assertThat(res).isNotNull();
-        verify(equipmentRepository, never()).findByCompanyDetailId(anyLong());
-        verify(portfolioRepository, never()).findByCompanyDetailId(anyLong());
-    }
-
-    @Test
-    @DisplayName("내 기업 상세 조회: 상세가 있으면 장비/포트폴리오까지 조회")
-    void findMyCompanyWithDetail_withDetail_fetchLists() {
-        Long memberId = 5L;
-        Long companyId = 22L;
-
-        Member member = mock(Member.class);
-        given(member.getCompanyId()).willReturn(companyId);
-        given(memberFinder.findById(memberId)).willReturn(member);
-
-        CompanyDetail detail = mock(CompanyDetail.class);
-        Company company = mock(Company.class);
-        given(company.getId()).willReturn(companyId);
-        given(company.getCompanyDetail()).willReturn(detail);
-
-        // ✅ 주소 매핑에서 NPE 방지용 최소 스텁
-        CompanyAddress addr = mock(CompanyAddress.class);
-        given(company.getAddress()).willReturn(addr);
-        given(addr.getPostalCode()).willReturn("06789");
-        given(addr.getStreetAddress()).willReturn("Busan-ro 2");
-        given(addr.getDetailAddress()).willReturn("2F");
-        given(addr.getRecipient()).willReturn("이몽룡");
-        given(addr.getPhoneNumber()).willReturn("010-1111-2222");
-
-        given(companyRepository.findById(companyId)).willReturn(Optional.of(company));
-
-        given(equipmentRepository.findByCompanyDetailId(anyLong())).willReturn(List.of());
-        given(portfolioRepository.findByCompanyDetailId(anyLong())).willReturn(List.of());
-
-        CompanyDetailResponse res = companyFinderService.findMyCompanyWithDetail(memberId);
-
-        assertThat(res).isNotNull();
-        verify(equipmentRepository).findByCompanyDetailId(anyLong());
-        verify(portfolioRepository).findByCompanyDetailId(anyLong());
-    }
-
 
     // ─────────────────────────── findCompanyWithDetail ───────────────────────────
 
