@@ -18,7 +18,9 @@ import hanieum.conik.domain.company.exception.CompanyException;
 import hanieum.conik.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,6 +110,17 @@ public class CompanyFinderService implements CompanyFinder {
         validatePageable(pageable);
 
         return companyRepository.findCompaniesWithFilter(cond, pageable);
+    }
+
+    @Override
+    public List<CompanyProfileResponse> findRecommendedCompanies() {
+        List<Company> companies = companyRepository.findAll(
+                PageRequest.of(0, 20, Sort.by("id").ascending())
+        ).getContent();
+
+        return companies.stream()
+                .map(CompanyProfileResponse::from)
+                .toList();
     }
 
     private void validatePageable(Pageable p) {

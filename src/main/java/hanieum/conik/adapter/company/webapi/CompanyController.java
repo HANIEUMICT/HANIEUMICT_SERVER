@@ -29,6 +29,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -150,5 +151,13 @@ public class CompanyController {
     ) {
         var cond = new CompanyProfileSearchCondition(keyword, minRating, maxResponseMinutes, minTotalOrderCount, maxProductionHours);
         return ApiResponse.success(companyFinder.findAllCompanyWithFilter(cond, pageable));
+    }
+
+    @Operation(summary = "추천 공급 업체 목록 조회", description = """
+            ## 개인별 추천 공급 업체 top 20개의 프로필 목록을 조회합니다.
+            """)
+    @GetMapping("/profiles/recommend")
+    public ApiResponse<List<CompanyProfileResponse>> recommendProfiles() {
+        return ApiResponse.success(companyFinder.findRecommendedCompanies());
     }
 }
