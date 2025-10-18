@@ -29,4 +29,6 @@ public interface CompanyFinder {
     CompanyDetailResponse findCompanyWithDetail(Long companyId);
 
     Page<CompanyProfileResponse> findAllCompanyWithFilter(CompanyProfileSearchCondition cond, Pageable pageable);
+
+    List<CompanyProfileResponse> findRecommendedCompanies();
 }
