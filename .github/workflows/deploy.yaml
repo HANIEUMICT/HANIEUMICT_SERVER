@@ -47,7 +47,7 @@ jobs:
 
       # Docker 이미지 build 후 DockerHub에 push
       - name: Build Docker
-        run: docker build --platform linux/amd64 -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod .
+        run: docker build -f deploy/Multistage.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod .
       - name: Push Docker
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod
 

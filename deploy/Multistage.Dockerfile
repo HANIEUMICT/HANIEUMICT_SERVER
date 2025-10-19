@@ -11,5 +11,8 @@ RUN ./gradlew build -x test
 FROM eclipse-temurin:21-jre-alpine AS runtime
 WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+ENV TZ Asia/Seoul
+ARG ENV
+
+ENTRYPOINT ["java", "-jar", "-Dserver.env=${ENV}", "app.jar"]
