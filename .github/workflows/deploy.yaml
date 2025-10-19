@@ -77,11 +77,11 @@ jobs:
             echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
           fi
 
-      - name: Docker compose
+      - name: Pull Docker Image on Server
         uses: appleboy/ssh-action@master
         with:
-          username: ubuntu
           host: ${{ secrets.SERVER_DOMAIN }}
+          username: ${{ secrets.NCP_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod
