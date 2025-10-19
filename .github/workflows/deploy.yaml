@@ -10,9 +10,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      APPLICATION_PROD: ${{ secrets.APPLICATION_PROD }}
-
     permissions:
       contents: read
 
