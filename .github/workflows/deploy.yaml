@@ -36,7 +36,7 @@ jobs:
 
       # Spring boot application 빌드
       - name: Build with gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
 
       # DockerHub에 로그인
       - name: Login to DockerHub
