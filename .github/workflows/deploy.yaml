@@ -61,12 +61,12 @@ jobs:
           echo $STATUS
           
           if [ $STATUS = 200 ]; then
-            CURRENT_UPSTREAM=$(curl -s "http://${{ secrets.SERVER_DOMAIN }}:8080/actuator/health/readiness")
+            CURRENT_UPSTREAM=blue
           else
             CURRENT_UPSTREAM=green
           fi
           
-          echo CURRENT_UPSTREAM=$CURRENT_UPSTREAM >> $GITHUB_ENV
+          echo "CURRENT_UPSTREAM=$CURRENT_UPSTREAM" >> $GITHUB_ENV
           if [ $CURRENT_UPSTREAM = blue ]; then
             echo "CURRENT_PORT=8080" >> $GITHUB_ENV
             echo "STOPPED_PORT=8081" >> $GITHUB_ENV
@@ -97,7 +97,7 @@ jobs:
       - name: Change nginx upstream
         uses: appleboy/ssh-action@master
         with:
-          username: ubuntu
+          username: root
           host: ${{ secrets.SERVER_DOMAIN }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -106,7 +106,7 @@ jobs:
       - name: Stop current server
         uses: appleboy/ssh-action@master
         with:
-          username: ubuntu
+          username: root
           host: ${{ secrets.SERVER_DOMAIN }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
