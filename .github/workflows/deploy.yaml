@@ -57,11 +57,11 @@ jobs:
     steps:
       - name: Set target IP
         run: |
-          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.SERVER_DOMAIN }}/actuator/health/readiness")
+          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.SERVER_DOMAIN }}:8080/actuator/health/readiness")
           echo $STATUS
           
           if [ $STATUS = 200 ]; then
-            CURRENT_UPSTREAM=$(curl -s "http://${{ secrets.SERVER_DOMAIN }}/actuator/health/readiness")
+            CURRENT_UPSTREAM=$(curl -s "http://${{ secrets.SERVER_DOMAIN }}:8080/actuator/health/readiness")
           else
             CURRENT_UPSTREAM=green
           fi
