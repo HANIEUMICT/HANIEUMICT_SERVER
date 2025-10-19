@@ -85,7 +85,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod
-            sudo docker-compose -f docker-compose.yml up -d ${{ env.TARGET_UPSTREAM }}
+            sudo docker-compose -f docker-compose.yaml up -d ${{ env.TARGET_UPSTREAM }}
 
       - name: Check deploy server URL
         uses: jtalk/url-health-check-action@v4
