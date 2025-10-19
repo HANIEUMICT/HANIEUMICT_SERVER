@@ -83,7 +83,6 @@ jobs:
           username: ubuntu
           host: ${{ secrets.SERVER_DOMAIN }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod
             sudo docker-compose -f docker-compose.yml up -d ${{ env.TARGET_UPSTREAM }}
@@ -101,7 +100,6 @@ jobs:
           username: ubuntu
           host: ${{ secrets.SERVER_DOMAIN }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true
           script: |
             sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc && nginx -s reload' 
 
@@ -111,7 +109,6 @@ jobs:
           username: ubuntu
           host: ${{ secrets.SERVER_DOMAIN }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script_stop: true   # 실행 중 문제가 생기면 더 진행 X
           script: |
             sudo docker stop ${{ env.CURRENT_UPSTREAM }}
             sudo docker rm ${{ env.CURRENT_UPSTREAM }}
