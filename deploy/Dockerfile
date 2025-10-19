@@ -1,4 +1,7 @@
 FROM eclipse-temurin:21-alpine
-WORKDIR /app
 COPY build/libs/*.jar app.jar
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+ENV TZ Asia/Seoul
+ARG ENV
+
+ENTRYPOINT ["java", "-jar","-Dspring.profiles.active=prod", "-Dserver.env=${ENV}", "app.jar"]
