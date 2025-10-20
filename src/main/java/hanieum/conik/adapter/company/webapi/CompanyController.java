@@ -1,7 +1,7 @@
 package hanieum.conik.adapter.company.webapi;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
+import hanieum.conik.adapter.company.response.CompanyResponse;
+import hanieum.conik.adapter.company.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.application.member.provided.MemberFinder;
