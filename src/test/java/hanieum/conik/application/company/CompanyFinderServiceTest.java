@@ -1,11 +1,8 @@
 package hanieum.conik.application.company;
 
-import hanieum.conik.adapter.company.response.CompanyProfileResponse;
-import hanieum.conik.adapter.company.response.CompanySummaryResponse;
+import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
+import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.required.CompanyRepository;
-import hanieum.conik.application.company.required.EquipmentRepository;
-import hanieum.conik.application.company.required.PortfolioRepository;
-import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;

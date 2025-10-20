@@ -1,7 +1,5 @@
 package hanieum.conik.adapter.company.webapi;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanyResponse;
 import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
@@ -29,7 +27,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -95,69 +92,5 @@ public class CompanyController {
     public ApiResponse<CompanyResponse> findCompany(@PathVariable Long companyId) {
         Company company = companyFinder.findCompany(companyId);
         return ApiResponse.success(CompanyResponse.from(company));
-    }
-
-    @Operation(summary = "기업 상세 정보 등록", description = """
-                ## 기업 회원이 기업의 상세 정보를 등록합니다.
-                - 기업 상세 정보 + 장비/포트폴리오 목록을 한 번에 전송합니다.
-                """)
-    @PostMapping("/detail")
-    public ApiResponse<Long> registerCompanyDetail(
-            @AuthenticationPrincipal AuthDetails authDetails,
-            @Valid @RequestBody CompanyDetailCreateRequest request
-    ) {
-        Member member = memberFinder.findById(authDetails.getMemberId());
-
-        return ApiResponse.success(companySaver.registerCompanyDetail(member.getId(), request));
-    }
-
-    @Operation(summary = "기업 상세 페이지 단건 조회", description = """
-            ## 기업 상세 페이지를 조회합니다.
-            - 기업 상세 내용이 입력되지 않은 경우 예외가 터집니다.(조회 불가능)
-            """)
-    @GetMapping("/detail/{companyId}")
-    public ApiResponse<CompanyDetailResponse> findCompanyWithDetail(@PathVariable Long companyId){
-        return ApiResponse.success(companyFinder.findCompanyWithDetail(companyId));
-    }
-
-    @Operation(summary = "기업 상세 마이페이지 조회", description = """
-            ## 기업 회원 상세페이지 조회합니다.
-            - 기업 회원이 자신의 기업 상세 페이지를 조회합니다.
-            - 기업 상세 내용이 등록되지 않으면 상세 내용은 null로 반환됩니다.
-            """)
-    @GetMapping("/detail/me")
-    public ApiResponse<CompanyDetailResponse> findMyCompanyWithDetail(@AuthenticationPrincipal AuthDetails authDetails){
-        Member member = memberFinder.findById(authDetails.getMemberId());
-        if (member.getCompanyId() == null) {
-            throw new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND);
-        }
-        return ApiResponse.success(companyFinder.findMyCompanyWithDetail(member.getId()));
-    }
-
-    @Operation(summary = "기업 프로필 목록 조회(필터 적용)", description = """
-            ## 기업의 프로필 목록을 조회합니다.
-            - 필터를 적용해 원하는 기업의 프로필 목록을 조회합니다.
-            - 기업 상세 정보를 입력하지 않으면 프로필 목록 조회에서 제외됩니다.
-            - 필터가 존재하지 않으면 거래 건수가 많은 순서대로 조회됩니다.
-            """)
-    @GetMapping("/profiles")
-    public ApiResponse<Page<CompanyProfileResponse>> searchProfiles(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) Integer minRating,
-            @RequestParam(required = false) Integer maxResponseMinutes,
-            @RequestParam(required = false) Integer minTotalOrderCount,
-            @RequestParam(required = false) Integer maxProductionHours,
-            @ParameterObject @PageableDefault(size = 20, sort = "rating", direction = Sort.Direction.DESC) Pageable pageable
-    ) {
-        var cond = new CompanyProfileSearchCondition(keyword, minRating, maxResponseMinutes, minTotalOrderCount, maxProductionHours);
-        return ApiResponse.success(companyFinder.findAllCompanyWithFilter(cond, pageable));
-    }
-
-    @Operation(summary = "추천 공급 업체 목록 조회", description = """
-            ## 개인별 추천 공급 업체 top 20개의 프로필 목록을 조회합니다.
-            """)
-    @GetMapping("/profiles/recommend")
-    public ApiResponse<List<CompanyProfileResponse>> recommendProfiles() {
-        return ApiResponse.success(companyFinder.findRecommendedCompanies());
     }
 }
