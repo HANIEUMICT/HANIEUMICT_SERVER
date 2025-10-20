@@ -53,8 +53,4 @@ public class Portfolio extends AbstractEntity {
         this.imageUrls = request.imageUrls();
         this.category = request.category();
     }
-
-    public void remove() {
-        if (this.companyDetail != null) this.companyDetail.removePortfolio(this.getId());
-    }
 }

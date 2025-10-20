@@ -34,4 +34,13 @@ public record EquipmentRequest(
             @Size(max = 512, message = "이미지 URL은 512자 이하여야 합니다.")
             String
             > imageUrls
-) {}
+) {
+    public static EquipmentRequest fromEquipmentUpdateRequest(EquipmentUpdateRequest request) {
+        return new EquipmentRequest(
+                request.name(),
+                request.description(),
+                request.quantity(),
+                request.imageUrls()
+        );
+    }
+}

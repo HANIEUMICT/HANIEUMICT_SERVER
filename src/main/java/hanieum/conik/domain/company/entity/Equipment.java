@@ -48,8 +48,4 @@ public class Equipment extends AbstractEntity {
         if (request.quantity() != null) this.quantity = Math.max(0, request.quantity());
         this.imageUrls = request.imageUrls();
     }
-
-    public void remove() {
-        if (this.companyDetail != null) this.companyDetail.removeEquipment(this.getId());
-    }
 }

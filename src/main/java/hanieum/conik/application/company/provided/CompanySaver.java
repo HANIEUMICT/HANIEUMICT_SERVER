@@ -11,4 +11,6 @@ public interface CompanySaver {
     Long registerCompanyDetail(Long memberId, CompanyDetailCreateRequest request);
 
     void update(Long companyId, CompanyUpdateRequest request);
+
+    void updateCompanyDetail(Long companyId, Long ifMatchVersion,CompanyDetailUpdateRequest request);
 }

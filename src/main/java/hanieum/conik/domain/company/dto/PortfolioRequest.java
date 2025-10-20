@@ -32,4 +32,13 @@ public record PortfolioRequest(
         @Schema(description = "포트폴리오 카테고리", example = "기계가공")
         @NotBlank
         String category
-) {}
+) {
+    public static PortfolioRequest fromPortfolioUpdateRequest(PortfolioUpdateRequest request) {
+        return new PortfolioRequest(
+                request.quantity(),
+                request.description(),
+                request.imageUrls(),
+                request.category()
+        );
+    }
+}
