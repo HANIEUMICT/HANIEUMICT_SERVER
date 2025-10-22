@@ -104,7 +104,7 @@ jobs:
       - name: Change nginx upstream
         uses: appleboy/ssh-action@master
         with:
-          username: root
+          username: ${{ secrets.NCP_USER }}
           host: ${{ secrets.SERVER_DOMAIN }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
@@ -113,7 +113,7 @@ jobs:
       - name: Stop current server
         uses: appleboy/ssh-action@master
         with:
-          username: root
+          username: ${{ secrets.NCP_USER }}
           host: ${{ secrets.SERVER_DOMAIN }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
