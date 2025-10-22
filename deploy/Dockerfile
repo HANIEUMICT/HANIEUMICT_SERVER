@@ -1,7 +1,7 @@
-FROM eclipse-temurin:21-alpine
-COPY build/libs/*.jar app.jar
+FROM eclipse-temurin:21-jre-alpine
+COPY --from=builder /app/build/libs/*.jar app.jar
 
 ENV TZ Asia/Seoul
 ARG ENV
 
-ENTRYPOINT ["java", "-jar","-Dspring.profiles.active=prod", "-Dserver.env=${ENV}", "app.jar"]
+ENTRYPOINT java -jar -Dserver.env=${ENV} app.jar
