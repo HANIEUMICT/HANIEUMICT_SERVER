@@ -57,10 +57,6 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-	// S3
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.4'
-	implementation 'io.awspring.cloud:spring-cloud-starter-aws-secrets-manager-config:2.4.4'
-
 	// feign Client
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.5'
 
@@ -81,6 +77,11 @@ dependencies {
 
 	// CoolSms
 	implementation 'net.nurigo:sdk:4.3.0'
+
+	// AWS SDK for S3
+	implementation 'software.amazon.awssdk:s3:2.20.40'
+	implementation 'software.amazon.awssdk:auth:2.20.40'
+	implementation 'software.amazon.awssdk:regions:2.20.40'
 }
 
 test {
