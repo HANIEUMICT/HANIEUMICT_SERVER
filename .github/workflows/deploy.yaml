@@ -1,0 +1,135 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'corretto'
+
+      # application.yml 파일 생성
+      - name: Create application.yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_YML_CLOUD }}" > ./src/main/resources/application-cloud.yml
+          echo "${{ secrets.APPLICATION_YML_SWAGGER }}" > ./src/main/resources/application-swagger.yml
+          echo "${{ secrets.APPLICATION_YML_ACTUATOR }}" > ./src/main/resources/application-actuator.yml 
+
+      # Gradle 실행권한 부여
+      - name: Grant execute permission to gradlew
+        run: chmod +x ./gradlew
+
+      # Spring boot application 빌드
+      - name: Build with gradle
+        run: ./gradlew clean build -x test
+
+      # DockerHub에 로그인
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      # Docker 이미지 build 후 DockerHub에 push
+      - name: Build Docker
+        run: docker build -f deploy/Multistage.Dockerfile -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod .
+      - name: Push Docker
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set target IP
+        run: |
+          BLUE_STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}:8080/actuator/health/readiness" || echo 000)
+          GREEN_STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}:8081/actuator/health/readiness" || echo 000)
+          
+          echo "BLUE_STATUS=$BLUE_STATUS"
+          echo "GREEN_STATUS=$GREEN_STATUS"
+          
+          if [ "$BLUE_STATUS" = "200" ]; then
+            CURRENT_UPSTREAM=blue
+            TARGET_UPSTREAM=green
+            CURRENT_PORT=8080
+            STOPPED_PORT=8081
+          elif [ "$GREEN_STATUS" = "200" ]; then
+            CURRENT_UPSTREAM=green
+            TARGET_UPSTREAM=blue
+            CURRENT_PORT=8081
+            STOPPED_PORT=8080
+          else
+            echo "Notice: No active upstream detected. Defaulting to blue."
+            CURRENT_UPSTREAM=blue
+            TARGET_UPSTREAM=green
+            CURRENT_PORT=8080
+            STOPPED_PORT=8081
+          fi
+          
+          echo "CURRENT_UPSTREAM=$CURRENT_UPSTREAM" >> $GITHUB_ENV
+          echo "TARGET_UPSTREAM=$TARGET_UPSTREAM" >> $GITHUB_ENV
+          echo "CURRENT_PORT=$CURRENT_PORT" >> $GITHUB_ENV
+          echo "STOPPED_PORT=$STOPPED_PORT" >> $GITHUB_ENV
+
+      - name: Debug upstream variables
+        run: |
+          echo "CURRENT_UPSTREAM=${{ env.CURRENT_UPSTREAM }}"
+          echo "TARGET_UPSTREAM=${{ env.TARGET_UPSTREAM }}"
+          echo "CURRENT_PORT=${{ env.CURRENT_PORT }}"
+          echo "STOPPED_PORT=${{ env.STOPPED_PORT }}"
+
+      - name: Pull Docker Image on Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_DOMAIN }}
+          username: ${{ secrets.NCP_USER }}
+          key: ${{ secrets.NCP_SSH_KEY }}
+          script: |
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod
+            sudo docker-compose -f docker-compose.yaml up -d ${{ env.TARGET_UPSTREAM }}
+
+      - name: Check deploy server URL
+        uses: jtalk/url-health-check-action@v4
+        with:
+          url: http://${{ secrets.LIVE_SERVER_IP }}:${{ env.STOPPED_PORT }}/actuator/health/readiness
+          max-attempts: 5
+          retry-delay: 10s
+
+      - name: Change nginx upstream
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.NCP_USER }}
+          host: ${{ secrets.SERVER_DOMAIN }}
+          key: ${{ secrets.NCP_SSH_KEY }}
+          script: | 
+            set -e
+            sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc'
+            sudo docker exec -i nginxserver nginx -s reload
+            echo "Nginx upstream changed to ${{ env.TARGET_UPSTREAM }}"
+
+      - name: Stop current server
+        uses: appleboy/ssh-action@master
+        with:
+          username: ${{ secrets.NCP_USER }}
+          host: ${{ secrets.SERVER_DOMAIN }}
+          key: ${{ secrets.NCP_SSH_KEY }}
+          script: |
+            sudo docker stop ${{ env.CURRENT_UPSTREAM }}
+            sudo docker rm ${{ env.CURRENT_UPSTREAM }}
