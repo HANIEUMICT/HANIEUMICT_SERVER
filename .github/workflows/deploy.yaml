@@ -57,25 +57,34 @@ jobs:
     steps:
       - name: Set target IP
         run: |
-          STATUS=$(curl -o /dev/null -w "%{http_code}" "https://${{ secrets.SERVER_DOMAIN }}/actuator/health/readiness")
-          echo $STATUS
+          BLUE_STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}:8080/actuator/health/readiness" || echo 000)
+          GREEN_STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}:8081/actuator/health/readiness" || echo 000)
           
-          if [ $STATUS = 200 ]; then
+          echo "BLUE_STATUS=$BLUE_STATUS"
+          echo "GREEN_STATUS=$GREEN_STATUS"
+          
+          if [ "$BLUE_STATUS" = "200" ]; then
             CURRENT_UPSTREAM=blue
-          else
+            TARGET_UPSTREAM=green
+            CURRENT_PORT=8080
+            STOPPED_PORT=8081
+          elif [ "$GREEN_STATUS" = "200" ]; then
             CURRENT_UPSTREAM=green
+            TARGET_UPSTREAM=blue
+            CURRENT_PORT=8081
+            STOPPED_PORT=8080
+          else
+            echo "Notice: No active upstream detected. Defaulting to blue."
+            CURRENT_UPSTREAM=blue
+            TARGET_UPSTREAM=green
+            CURRENT_PORT=8080
+            STOPPED_PORT=8081
           fi
           
           echo "CURRENT_UPSTREAM=$CURRENT_UPSTREAM" >> $GITHUB_ENV
-          if [ $CURRENT_UPSTREAM = blue ]; then
-            echo "CURRENT_PORT=8080" >> $GITHUB_ENV
-            echo "STOPPED_PORT=8081" >> $GITHUB_ENV
-            echo "TARGET_UPSTREAM=green" >> $GITHUB_ENV
-          else
-            echo "CURRENT_PORT=8081" >> $GITHUB_ENV
-            echo "STOPPED_PORT=8080" >> $GITHUB_ENV
-            echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
-          fi
+          echo "TARGET_UPSTREAM=$TARGET_UPSTREAM" >> $GITHUB_ENV
+          echo "CURRENT_PORT=$CURRENT_PORT" >> $GITHUB_ENV
+          echo "STOPPED_PORT=$STOPPED_PORT" >> $GITHUB_ENV
 
       - name: Debug upstream variables
         run: |
