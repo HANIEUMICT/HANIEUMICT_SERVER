@@ -98,7 +98,7 @@ jobs:
         with:
           host: ${{ secrets.SERVER_DOMAIN }}
           username: ${{ secrets.NCP_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.NCP_SSH_KEY }}
           script: |
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}:prod
             sudo docker-compose -f docker-compose.yaml up -d ${{ env.TARGET_UPSTREAM }}
@@ -115,7 +115,7 @@ jobs:
         with:
           username: ${{ secrets.NCP_USER }}
           host: ${{ secrets.SERVER_DOMAIN }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.NCP_SSH_KEY }}
           script: | 
             set -e
             sudo docker exec -i nginxserver bash -c 'echo "set \$service_url ${{ env.TARGET_UPSTREAM }};" > /etc/nginx/conf.d/service-env.inc'
@@ -127,7 +127,7 @@ jobs:
         with:
           username: ${{ secrets.NCP_USER }}
           host: ${{ secrets.SERVER_DOMAIN }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.NCP_SSH_KEY }}
           script: |
             sudo docker stop ${{ env.CURRENT_UPSTREAM }}
             sudo docker rm ${{ env.CURRENT_UPSTREAM }}
