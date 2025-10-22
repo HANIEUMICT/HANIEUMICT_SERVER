@@ -57,7 +57,7 @@ jobs:
     steps:
       - name: Set target IP
         run: |
-          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.SERVER_DOMAIN }}/actuator/health/readiness")
+          STATUS=$(curl -o /dev/null -w "%{http_code}" "https://${{ secrets.SERVER_DOMAIN }}/actuator/health/readiness")
           echo $STATUS
           
           if [ $STATUS = 200 ]; then
@@ -76,6 +76,13 @@ jobs:
             echo "STOPPED_PORT=8080" >> $GITHUB_ENV
             echo "TARGET_UPSTREAM=blue" >> $GITHUB_ENV
           fi
+
+      - name: Debug upstream variables
+        run: |
+          echo "CURRENT_UPSTREAM=${{ env.CURRENT_UPSTREAM }}"
+          echo "TARGET_UPSTREAM=${{ env.TARGET_UPSTREAM }}"
+          echo "CURRENT_PORT=${{ env.CURRENT_PORT }}"
+          echo "STOPPED_PORT=${{ env.STOPPED_PORT }}"
 
       - name: Pull Docker Image on Server
         uses: appleboy/ssh-action@master
