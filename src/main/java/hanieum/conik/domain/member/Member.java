@@ -1,6 +1,7 @@
 package hanieum.conik.domain.member;
 
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
+import hanieum.conik.domain.chat.entity.ChatRoomMember;
 import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.domain.member.enumerate.MemberRole;
@@ -63,6 +64,9 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY) // 기본 배송지 FK
     @JoinColumn(name = "default_member_address_id")
     private MemberAddress defaultAddress;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
 
     /* ========= 생성/팩토리 ========= */
 
