@@ -5,6 +5,8 @@ import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -18,6 +20,7 @@ public class ChatNotification extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private ChatRoom chatRoom; // 어떤 방에서 발생한 알림인지
 
     @Column(nullable = false)
@@ -26,6 +29,15 @@ public class ChatNotification extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ChatNotificationStatus status; // SENT, READ, DELETED 등
+
+    public static ChatNotification create(Member receiver, ChatRoom chatRoom, String content) {
+        return ChatNotification.builder()
+                .receiver(receiver)
+                .chatRoom(chatRoom)
+                .content(content)
+                .status(ChatNotificationStatus.SENT)
+                .build();
+    }
 
     /** 알림 읽음 처리 */
     public void markAsRead() {

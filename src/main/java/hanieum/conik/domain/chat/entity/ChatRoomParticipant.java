@@ -26,9 +26,9 @@ public class ChatRoomParticipant implements Serializable {
     @Indexed
     private String memberId;
 
-    private Instant enteredAt;   // 입장 시각
+    private Instant enteredAt;    // 입장 시각
     private Instant lastActiveAt; // 마지막 활동 시각
-    private Long lastReadSeq;           // 마지막 읽은 메시지 번호
+    private Long lastReadSeq;     // 마지막 읽은 메시지 번호
 
     /** 입장 처리 */
     public static ChatRoomParticipant enter(String roomId, String memberId) {
@@ -41,7 +41,6 @@ public class ChatRoomParticipant implements Serializable {
                 .lastReadSeq(0L)
                 .build();
     }
-
 
     /** 활동 시간 갱신 */
     public void refreshActivity() {

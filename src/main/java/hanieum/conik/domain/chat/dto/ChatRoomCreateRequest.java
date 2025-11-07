@@ -1,14 +1,14 @@
 package hanieum.conik.domain.chat.dto;
 
-import hanieum.conik.domain.chat.entity.ChatRoomMember;
 import hanieum.conik.domain.chat.enumerate.ChatRoomType;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
 public record ChatRoomCreateRequest(
-        @Schema(description = "채팅방 이름", example = "마이데이 단톡방")
-        String title,
+        @Schema(description = "채팅방 타입", example = "GROUP")
         ChatRoomType type,
-        List<ChatRoomMember> chatRoomMembers
+
+        @Schema(description = "참여자 ID 목록", example = "[1, 2, 3]")
+        List<Long> memberIds
 ) {}
