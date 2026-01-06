@@ -1,6 +1,9 @@
 package hanieum.conik.application.chat.required;
 
 import hanieum.conik.domain.chat.entity.ChatRoomMember;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,7 +24,8 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     long countByChatRoom_Id(Long roomId);
 
     // 특정 멤버가 속한 모든 ChatRoomMember 엔티티 조회
-    List<ChatRoomMember> findByMember_Id(Long memberId);
+    @EntityGraph(attributePaths = {"chatRoom"})
+    Page<ChatRoomMember> findByMember_Id(Long memberId, Pageable pageable);
 
     // 특정 멤버가 특정 방에서 마지막으로 읽은 메시지의 시퀀스(seq) 번호 조회
     @Query("""

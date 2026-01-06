@@ -1,6 +1,7 @@
 package hanieum.conik.application.chat;
 
 import hanieum.conik.adapter.chat.dto.ChatRoomSummary;
+import hanieum.conik.adapter.chat.dto.ChatMessageRequest;
 import hanieum.conik.application.chat.provided.ChatFinder;
 import hanieum.conik.application.chat.provided.ChatSaver;
 import hanieum.conik.application.chat.required.*;
@@ -36,20 +37,27 @@ public class ChatModifyService implements ChatSaver {
     private final SimpMessagingTemplate messagingTemplate;     // STOMP 브로드캐스트
 
     @Override
-    public ChatMessage sendMessage(ChatMessageDto request) {
+    public ChatMessage sendMessage(Long roomId, ChatMessageRequest request) {
         // 채팅방 및 발신자 검증
-        ChatRoom chatRoom = chatFinder.findRoomByRoomId(request.roomId());
+        ChatRoom chatRoom = chatFinder.findRoomByRoomId(request.roomId()); // ChatRoomSummary 생성을 위해 필요
         Member sender = memberFinder.findById(request.senderId());
-        chatFinder.findChatRoomMember(chatRoom.getId(), sender.getId());
+        chatFinder.findChatRoomMember(request.roomId(), sender.getId()); // 멤버 유효성 검증
 
         // 채팅 메시지 저장
         long seq = nextSequence(request.roomId());
-        ChatMessage chatMessage = ChatMessage.create(request, seq);
+        ChatMessage chatMessage = ChatMessage.create(
+                request.roomId(),
+                request.senderId(),
+                request.content(),
+                request.type(),
+                request.fileUrl(),
+                request.fileName(),
+                request.fileSize(),
+                seq);
         chatMessage = chatMessageRepository.save(chatMessage);
 
         // 발신자 본인의 읽음 처리 업데이트
         updateLastRead(request.roomId(), request.senderId(), seq);
-        long currentSeq = chatFinder.fetchCurrentRoomLatestSeq(request.roomId());
 
         // STOMP 채팅방으로 브로드캐스트
         messagingTemplate.convertAndSend("/topic/chat/room/" + request.roomId(), toPayload(chatMessage));
@@ -60,20 +68,23 @@ public class ChatModifyService implements ChatSaver {
             Long memberId = m.getMember().getId();
 
             // 읽지 않은 메시지 수 계산
-            long unread = calculateUnreadMessage(request, m, memberId, currentSeq);
+            long unread = calculateUnreadMessage(request, m, memberId, seq);
 
-            messagingTemplate.convertAndSend("/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, unread, request));
+            // ChatRoomSummary 생성
+            ChatMessageDto chatMessageDto = ChatMessageDto.fromEntity(chatMessage);
+            messagingTemplate.convertAndSend("/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, unread, chatMessageDto));
             log.info("📡 [convertAndSend] 개인 토픽 전송: /topic/user.{}.room-summary", memberId);
         }
 
         return chatMessage;
     }
 
-    private static long calculateUnreadMessage(ChatMessageDto request, ChatRoomMember m, Long memberId, long currentSeq) {
-        long lastReadSeq = Optional.ofNullable(m.getLastReadSeq()).orElse(0L);
-        long unread = memberId.equals(request.senderId()) ? 0L : Math.max(0, currentSeq - lastReadSeq);
-        return unread;
-    }
+private static long calculateUnreadMessage(ChatMessageRequest request, ChatRoomMember m, Long memberId, long currentSeq) {
+    long lastReadSeq = Optional.ofNullable(m.getLastReadSeq()).orElse(0L);
+    long unread = memberId.equals(request.senderId()) ? 0L : Math.max(0, currentSeq - lastReadSeq);
+
+    return unread;
+}
 
     @Override
     public Long createPrivateRoom(Long memberAId, Long memberBId) {

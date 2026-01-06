@@ -17,9 +17,6 @@ public interface ChatFinder {
 
     List<ChatRoomMember> findRoomMembers(Long roomId);
 
-    // 현재 채팅방의 최신 seq 조회
-    long fetchCurrentRoomLatestSeq(Long roomId);
-
     // 내가 속한 채팅방 목록
     Page<ChatRoomSummary> findRoomsByMember(Long memberId, Pageable pageable);
 

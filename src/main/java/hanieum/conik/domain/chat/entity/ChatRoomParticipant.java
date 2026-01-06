@@ -15,42 +15,60 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RedisHash(value = "chat_room_participant", timeToLive = 300)
+@RedisHash("chat_room_participant")
 public class ChatRoomParticipant implements Serializable {
     @Id
     private String id;
 
     @Indexed
-    private String roomId;
+    private Long roomId;
 
     @Indexed
-    private String memberId;
+    private Long memberId;
 
-    private Instant enteredAt;    // 입장 시각
-    private Instant lastActiveAt; // 마지막 활동 시각
-    private Long lastReadSeq;     // 마지막 읽은 메시지 번호
+    private String serverId;
 
-    /** 입장 처리 */
-    public static ChatRoomParticipant enter(String roomId, String memberId) {
+    private String sessionId;
+
+    private Instant enteredAt;
+
+    private Instant lastActiveAt;
+
+    /* ===================== 생성 ===================== */
+
+    public static ChatRoomParticipant enter(
+            Long roomId,
+            Long memberId,
+            String serverId,
+            String sessionId
+    ) {
+        Instant now = Instant.now();
         return ChatRoomParticipant.builder()
                 .id(roomId + ":" + memberId)
                 .roomId(roomId)
                 .memberId(memberId)
-                .enteredAt(Instant.now())
-                .lastActiveAt(Instant.now())
-                .lastReadSeq(0L)
+                .serverId(serverId)
+                .sessionId(sessionId)
+                .enteredAt(now)
+                .lastActiveAt(now)
                 .build();
     }
 
-    /** 활동 시간 갱신 */
+    /* ===================== 상태 갱신 ===================== */
+
+    /** 메시지 전송 / heartbeat / activity 시 호출 */
     public void refreshActivity() {
         this.lastActiveAt = Instant.now();
     }
 
-    /** 메시지 읽음 위치 갱신 */
-    public void updateLastRead(Long seq) {
-        if (seq != null && seq > (this.lastReadSeq == null ? 0 : this.lastReadSeq)) {
-            this.lastReadSeq = seq;
-        }
+    /* ===================== 온라인 판단 ===================== */
+
+    /**
+     * onlineThresholdSeconds 예: 30초
+     * now - lastActiveAt <= threshold → 온라인
+     */
+    public boolean isOnline(long onlineThresholdSeconds) {
+        return lastActiveAt != null &&
+                lastActiveAt.isAfter(Instant.now().minusSeconds(onlineThresholdSeconds));
     }
 }

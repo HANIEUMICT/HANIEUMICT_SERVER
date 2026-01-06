@@ -2,10 +2,12 @@ package hanieum.conik.domain.chat.dto;
 
 import hanieum.conik.domain.chat.entity.ChatMessage;
 import hanieum.conik.domain.chat.enumerate.MessageType;
+import org.bson.Document;
 
 import java.time.Instant;
 
 public record ChatMessageDto(
+        long seq,
         Long roomId,
         Long senderId,
         MessageType type,
@@ -15,24 +17,9 @@ public record ChatMessageDto(
         Long fileSize,              // 파일 크기
         Instant createdAt
 ) {
-    public static ChatMessageDto text(ChatMessage chatMessage) {
-        return new ChatMessageDto(
-                chatMessage.getRoomId(),
-                chatMessage.getSenderId(),
-                MessageType.TEXT,
-                chatMessage.getContent(),
-                null,
-                null,
-                null,
-                chatMessage.getCreatedAt());
-    }
-
-    public static ChatMessageDto system(Long roomId, String content) {
-        return new ChatMessageDto(roomId, null, MessageType.SYSTEM, content, null, null, null, Instant.now());
-    }
-
     public static ChatMessageDto fromEntity(ChatMessage chatMessage) {
         return new ChatMessageDto(
+                chatMessage.getSeq(),
                 chatMessage.getRoomId(),
                 chatMessage.getSenderId(),
                 chatMessage.getType(),
@@ -41,6 +28,24 @@ public record ChatMessageDto(
                 chatMessage.getFileName(),
                 chatMessage.getFileSize(),
                 chatMessage.getCreatedAt()
+        );
+    }
+
+    public static ChatMessageDto fromDocument(Document doc) {
+        if (doc == null) {
+            return null;
+        }
+
+        return new ChatMessageDto(
+                doc.getLong("seq"),
+                doc.getLong("roomId"),
+                doc.getLong("senderId"),
+                MessageType.valueOf(doc.getString("type")),
+                doc.getString("content"),
+                doc.getString("fileUrl"),
+                doc.getString("fileName"),
+                doc.getLong("fileSize"),
+                doc.getDate("createdAt").toInstant()
         );
     }
 }

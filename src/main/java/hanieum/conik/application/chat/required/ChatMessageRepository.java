@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface ChatMessageRepository extends MongoRepository<ChatMessage, String>, ChatMessageRepositoryCustom {
-
     // 최근 메시지 N건: roomId 일치, seq DESC, limit(pageable)
     List<ChatMessage> findByRoomIdOrderBySeqDesc(Long roomId, Pageable pageable);
 

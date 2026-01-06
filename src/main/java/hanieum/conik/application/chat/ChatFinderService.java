@@ -13,7 +13,6 @@ import hanieum.conik.domain.chat.exception.ChatException;
 import hanieum.conik.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ChatFinderService implements ChatFinder {
     private final ChatRoomRepository chatRoomRepository;
@@ -31,8 +30,6 @@ public class ChatFinderService implements ChatFinder {
     private final MemberFinder memberFinder;
 
     private final ChatMessageRepository chatMessageRepository;  // Mongo
-
-    private final StringRedisTemplate stringRedisTemplate; // seq 발급용(INCR)
 
     @Override
     public ChatRoom findRoomByRoomId(Long roomId) {
@@ -52,30 +49,37 @@ public class ChatFinderService implements ChatFinder {
     }
 
     @Override
-    public long fetchCurrentRoomLatestSeq(Long roomId){
-        return chatMessageRepository.findTopByRoomIdOrderBySeqDesc(roomId).map(ChatMessage::getSeq).orElse(0L);
-    }
-
-    @Override
     public Page<ChatRoomSummary> findRoomsByMember(Long memberId, Pageable pageable) {
         Member member = memberFinder.findById(memberId);
-        List<ChatRoomMember> chatRoomMembers = chatRoomMemberRepository.findByMember_Id(member.getId());
-        if(chatRoomMembers.isEmpty()) return Page.empty(pageable);
 
-        // member가 속해있는 채팅방들
-        List<ChatRoom> chatRooms = chatRoomMembers.stream()
-                .map(ChatRoomMember::getChatRoom)
+        Page<ChatRoomMember> page = chatRoomMemberRepository.findByMember_Id(member.getId(), pageable);
+        if (page.isEmpty()) return Page.empty(pageable);
+
+        List<ChatRoomMember> chatRoomMembers = page.getContent();
+
+        List<Long> roomIds = chatRoomMembers.stream()
+                .map(crm -> crm.getChatRoom().getId())
                 .toList();
 
-        // 방 ID 목록
-        List<Long> roomIds = chatRooms.stream()
-                .map(ChatRoom::getId)
+        LastMessageInfo info = getLastMessageInfo(memberId, roomIds);
+
+        List<ChatRoomSummary> summaries = chatRoomMembers.stream()
+                .map(crm -> getRoomSummary(crm, info))
                 .toList();
 
-        // 1) Mongo에서 방별 최신 seq를 한 번에 조회
-        Map<Long, Long> latestSeqMap = chatMessageRepository.findMaxSeqForRoomIds(roomIds);
 
-        // 2) RDB(ChatRoomMember)에서 내 lastReadSeq를 한 번에 조회
+        return new PageImpl<>(summaries, pageable, page.getTotalElements());
+    }
+
+    private LastMessageInfo getLastMessageInfo(Long memberId, List<Long> roomIds) {
+        Map<Long, ChatMessageDto> lastMessageMap = chatMessageRepository.findLastMessagesForRooms(roomIds)
+                .stream()
+                .collect(Collectors.toMap(
+                        ChatMessageDto::roomId,
+                        dto -> dto,
+                        (a, b) -> a
+                ));
+
         Map<Long, Long> myLastReadMap = chatRoomMemberRepository.findLastReadSeqs(memberId, roomIds)
                 .stream()
                 .collect(Collectors.toMap(
@@ -83,18 +87,27 @@ public class ChatFinderService implements ChatFinder {
                         v -> Optional.ofNullable(v.getLastReadSeq()).orElse(0L)
                 ));
 
-        // 3) 각 방별로 요약 정보 생성
-        List<ChatRoomSummary> summaries = chatRooms.stream()
-                .map(room -> {
-                    long latest = Optional.ofNullable(latestSeqMap.get(room.getId())).orElse(0L);
-                    long myLast = Optional.ofNullable(myLastReadMap.get(room.getId())).orElse(0L);
-                    long unread = Math.max(0L, latest - myLast);
-                    ChatMessageDto last = findLastMessage(room.getId()).orElse(null);
-                    return ChatRoomSummary.of(room, unread, last);
-                })
-                .toList();
+        return new LastMessageInfo(lastMessageMap, myLastReadMap);
+    }
 
-        return new PageImpl<>(summaries, pageable, chatRoomMembers.size());
+    private record LastMessageInfo(
+            Map<Long, ChatMessageDto> lastMessageMap,
+            Map<Long, Long> myLastReadMap
+    ) {}
+
+    private ChatRoomSummary getRoomSummary(ChatRoomMember crm, LastMessageInfo info) {
+        Long roomId = crm.getChatRoom().getId();
+        ChatMessageDto last = info.lastMessageMap().get(roomId);
+
+        // 마지막 메시지가 없으면 unread는 0
+        if (last == null) {
+            return ChatRoomSummary.of(crm.getChatRoom(), 0, null);
+        }
+
+        long myLast = info.myLastReadMap().getOrDefault(roomId, 0L);
+        long unread = Math.max(0L, last.seq() - myLast);
+
+        return ChatRoomSummary.of(crm.getChatRoom(), unread, last);
     }
 
     // 특정 메시지(seq) 이전의 N개 메시지를 가져온다.
@@ -118,36 +131,21 @@ public class ChatFinderService implements ChatFinder {
         boolean hasNext = rows.size() > size;
         if (hasNext) rows = rows.subList(0, size);
 
-        // 화면 노출은 보통 오래된→최신 순이 편하므로 ASC로 뒤집기
         Collections.reverse(rows);
 
         List<ChatMessageDto> content = rows.stream().map(ChatMessageDto::fromEntity).toList();
-        return new SliceImpl<>(content, PageRequest.of(0, size), hasNext);
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 
-    @Override
-    public boolean isRoomMember(Long roomId, Long memberId) {
-        return chatRoomMemberRepository.findByChatRoom_IdAndMember_Id(roomId, memberId).isPresent();
-    }
+        @Override
+        public boolean isRoomMember(Long roomId, Long memberId) {
+            return chatRoomMemberRepository.findByChatRoom_IdAndMember_Id(roomId, memberId).isPresent();
+        }
 
-    @Override
-    public long findLatestMessageSeq(Long roomId) {
-        long currentSeq = getCurrentSeq(roomId); // 이미 서비스에 있음
-        if (currentSeq > 0) return currentSeq;
-
-        return chatMessageRepository.findTopByRoomIdOrderBySeqDesc(roomId)
-                .map(ChatMessage::getSeq)
-                .orElse(0L);
-    }
-
-    private long getCurrentSeq(Long roomId) {
-        String seqStr = stringRedisTemplate.opsForValue().get("chat:seq:" + roomId);
-        if (seqStr == null) return 0L;
-        try { return Long.parseLong(seqStr); } catch (NumberFormatException e) { return 0L; }
-    }
-
-    private Optional<ChatMessageDto> findLastMessage(Long roomId) {
-        return chatMessageRepository.findTopByRoomIdOrderBySeqDesc(roomId)
-                .map(ChatMessageDto::fromEntity);
-    }
+        @Override
+        public long findLatestMessageSeq(Long roomId) {
+            return chatMessageRepository.findTopByRoomIdOrderBySeqDesc(roomId)
+                    .map(ChatMessage::getSeq)
+                    .orElse(0L);
+        }
 }
