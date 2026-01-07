@@ -14,9 +14,10 @@ public record ChatRoomSummary(
         ChatRoomType type,
         long unreadCount,
         String lastMessagePreview,     // 미리보기용 문자열
+        String roomName,
         LocalDateTime lastMessageAt
 ) {
-    public static ChatRoomSummary of(ChatRoom room, long unread, ChatMessageDto last) {
+    public static ChatRoomSummary of(ChatRoom room, String roomName,long unread, ChatMessageDto last) {
         LocalDateTime lastAt = (last == null) ? null : toLocalDateTime(last.createdAt());
         String preview = makePreview(last);
 
@@ -25,6 +26,7 @@ public record ChatRoomSummary(
                 room.getType(),
                 unread,
                 preview,
+                roomName,
                 lastAt
         );
     }

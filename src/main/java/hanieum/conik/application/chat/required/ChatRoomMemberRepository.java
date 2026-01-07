@@ -27,17 +27,17 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     @EntityGraph(attributePaths = {"chatRoom"})
     Page<ChatRoomMember> findByMember_Id(Long memberId, Pageable pageable);
 
-    // 특정 멤버가 특정 방에서 마지막으로 읽은 메시지의 시퀀스(seq) 번호 조회
-    @Query("""
-        select crm.lastReadSeq
-        from ChatRoomMember crm
-        where crm.chatRoom.id = :roomId and crm.member.id = :memberId
-    """)
-    Optional<Long> findLastReadSeq(@Param("roomId") Long roomId, @Param("memberId") Long memberId);
+    @EntityGraph(attributePaths = {"member", "chatRoom"})
+    List<ChatRoomMember> findByChatRoom_IdIn(List<Long> roomIds);
 
     // 배치로 방별 lastReadSeq를 한 번에 읽기 위한 Projection
     interface LastReadView {
         Long getRoomId();
+        Long getLastReadSeq();
+    }
+
+    interface LastReadSeqView {
+        Long getMemberId();
         Long getLastReadSeq();
     }
 

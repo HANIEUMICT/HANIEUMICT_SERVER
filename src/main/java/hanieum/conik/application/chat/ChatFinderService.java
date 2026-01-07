@@ -8,6 +8,7 @@ import hanieum.conik.domain.chat.dto.ChatMessageDto;
 import hanieum.conik.domain.chat.entity.ChatMessage;
 import hanieum.conik.domain.chat.entity.ChatRoom;
 import hanieum.conik.domain.chat.entity.ChatRoomMember;
+import hanieum.conik.domain.chat.enumerate.ChatRoomType;
 import hanieum.conik.domain.chat.exception.ChatErrorType;
 import hanieum.conik.domain.chat.exception.ChatException;
 import hanieum.conik.domain.member.Member;
@@ -63,10 +64,13 @@ public class ChatFinderService implements ChatFinder {
 
         LastMessageInfo info = getLastMessageInfo(memberId, roomIds);
 
-        List<ChatRoomSummary> summaries = chatRoomMembers.stream()
-                .map(crm -> getRoomSummary(crm, info))
-                .toList();
+        Map<Long, List<ChatRoomMember>> roomMembersMap = chatRoomMemberRepository.findByChatRoom_IdIn(roomIds)
+                .stream()
+                .collect(Collectors.groupingBy(crm -> crm.getChatRoom().getId()));
 
+        List<ChatRoomSummary> summaries = chatRoomMembers.stream()
+                .map(crm -> getRoomSummary(crm, info, roomMembersMap))
+                .toList();
 
         return new PageImpl<>(summaries, pageable, page.getTotalElements());
     }
@@ -95,20 +99,73 @@ public class ChatFinderService implements ChatFinder {
             Map<Long, Long> myLastReadMap
     ) {}
 
-    private ChatRoomSummary getRoomSummary(ChatRoomMember crm, LastMessageInfo info) {
-        Long roomId = crm.getChatRoom().getId();
+    private ChatRoomSummary getRoomSummary(
+            ChatRoomMember crm,
+            LastMessageInfo info,
+            Map<Long, List<ChatRoomMember>> roomMembersMap
+    ) {
+        ChatRoom room = crm.getChatRoom();
+        Long roomId = room.getId();
+
+        List<ChatRoomMember> members = roomMembersMap.getOrDefault(roomId, List.of());
+        String roomName = buildRoomNameForMember(room, crm.getMember().getId(), members);
+
         ChatMessageDto last = info.lastMessageMap().get(roomId);
 
-        // 마지막 메시지가 없으면 unread는 0
         if (last == null) {
-            return ChatRoomSummary.of(crm.getChatRoom(), 0, null);
+            return ChatRoomSummary.of(room, roomName, 0, null);
         }
 
         long myLast = info.myLastReadMap().getOrDefault(roomId, 0L);
         long unread = Math.max(0L, last.seq() - myLast);
 
-        return ChatRoomSummary.of(crm.getChatRoom(), unread, last);
+        return ChatRoomSummary.of(room, roomName, unread, last);
     }
+
+
+    private String buildRoomNameForMember(ChatRoom room, Long myId, List<ChatRoomMember> members) {
+        // memberId -> 표시 이름
+        Map<Long, String> idToName = members.stream()
+                .collect(Collectors.toMap(
+                        m -> m.getMember().getId(),
+                        m -> m.getMember().getName(), // nickname이면 바꾸기
+                        (a, b) -> a
+                ));
+
+        if (room.getType() == ChatRoomType.PRIVATE) {
+            // 나 제외 1명
+            return members.stream()
+                    .map(m -> m.getMember().getId())
+                    .filter(id -> !id.equals(myId))
+                    .findFirst()
+                    .map(idToName::get)
+                    .orElse("(알 수 없음)");
+        }
+
+        // GROUP: 나 제외 이름들로 "A, B, C 외 n명"
+        List<String> others = members.stream()
+                .map(m -> m.getMember().getId())
+                .filter(id -> !id.equals(myId))
+                .map(idToName::get)
+                .filter(n -> n != null && !n.isBlank())
+                .distinct()
+                .sorted()
+                .toList();
+
+        return formatGroupRoomName(others, 3);
+    }
+
+    private String formatGroupRoomName(List<String> names, int limit) {
+        if (names == null || names.isEmpty()) return "그룹 채팅";
+
+        List<String> shown = names.stream().limit(limit).toList();
+        int remain = names.size() - shown.size();
+
+        String base = String.join(", ", shown);
+        return remain > 0 ? base + " 외 " + remain + "명" : base;
+    }
+
+
 
     // 특정 메시지(seq) 이전의 N개 메시지를 가져온다.
     @Override
@@ -133,19 +190,26 @@ public class ChatFinderService implements ChatFinder {
 
         Collections.reverse(rows);
 
-        List<ChatMessageDto> content = rows.stream().map(ChatMessageDto::fromEntity).toList();
+        List<ChatMessageDto> content = rows.stream()
+                .map(msg -> ChatMessageDto.fromEntity(msg, getSenderName(msg.getSenderId())))
+                .toList();
         return new SliceImpl<>(content, pageable, hasNext);
     }
 
-        @Override
-        public boolean isRoomMember(Long roomId, Long memberId) {
-            return chatRoomMemberRepository.findByChatRoom_IdAndMember_Id(roomId, memberId).isPresent();
-        }
+    private String getSenderName(Long senderId) {
+        Member sender = memberFinder.findById(senderId);
+        return sender.getName();
+    }
 
-        @Override
-        public long findLatestMessageSeq(Long roomId) {
-            return chatMessageRepository.findTopByRoomIdOrderBySeqDesc(roomId)
-                    .map(ChatMessage::getSeq)
-                    .orElse(0L);
-        }
+    @Override
+    public boolean isRoomMember(Long roomId, Long memberId) {
+        return chatRoomMemberRepository.findByChatRoom_IdAndMember_Id(roomId, memberId).isPresent();
+    }
+
+    @Override
+    public long findLatestMessageSeq(Long roomId) {
+        return chatMessageRepository.findTopByRoomIdOrderBySeqDesc(roomId)
+                .map(ChatMessage::getSeq)
+                .orElse(0L);
+    }
 }

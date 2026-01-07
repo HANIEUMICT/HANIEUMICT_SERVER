@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -60,31 +61,96 @@ public class ChatModifyService implements ChatSaver {
         updateLastRead(request.roomId(), request.senderId(), seq);
 
         // STOMP 채팅방으로 브로드캐스트
-        messagingTemplate.convertAndSend("/topic/chat/room/" + request.roomId(), toPayload(chatMessage));
+        messagingTemplate.convertAndSend("/topic/chat/room/" + request.roomId(), toPayload(chatMessage, sender.getName()));
 
         // 채팅방 요약 정보 개인 토픽으로 전송
         List<ChatRoomMember> chatRoomMembers = chatFinder.findRoomMembers(request.roomId());
+        Map<Long, String> roomNameMap = buildRoomNamePerMember(chatRoom, chatRoomMembers);
+
         for (ChatRoomMember m : chatRoomMembers) {
             Long memberId = m.getMember().getId();
 
             // 읽지 않은 메시지 수 계산
             long unread = calculateUnreadMessage(request, m, memberId, seq);
+            String roomName = roomNameMap.getOrDefault(memberId, "채팅");
 
             // ChatRoomSummary 생성
-            ChatMessageDto chatMessageDto = ChatMessageDto.fromEntity(chatMessage);
-            messagingTemplate.convertAndSend("/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, unread, chatMessageDto));
+            ChatMessageDto chatMessageDto = ChatMessageDto.fromEntity(chatMessage, sender.getName());
+            messagingTemplate.convertAndSend("/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, roomName, unread, chatMessageDto));
             log.info("📡 [convertAndSend] 개인 토픽 전송: /topic/user.{}.room-summary", memberId);
         }
 
         return chatMessage;
     }
 
-private static long calculateUnreadMessage(ChatMessageRequest request, ChatRoomMember m, Long memberId, long currentSeq) {
-    long lastReadSeq = Optional.ofNullable(m.getLastReadSeq()).orElse(0L);
-    long unread = memberId.equals(request.senderId()) ? 0L : Math.max(0, currentSeq - lastReadSeq);
+    private static long calculateUnreadMessage(ChatMessageRequest request, ChatRoomMember m, Long memberId, long currentSeq) {
+        long lastReadSeq = Optional.ofNullable(m.getLastReadSeq()).orElse(0L);
+        long unread = memberId.equals(request.senderId()) ? 0L : Math.max(0, currentSeq - lastReadSeq);
 
-    return unread;
-}
+        return unread;
+    }
+
+    private Map<Long, String> buildRoomNamePerMember(
+            ChatRoom room,
+            List<ChatRoomMember> members
+    ) {
+        // memberId -> 이름
+        Map<Long, String> idToName = members.stream()
+                .collect(Collectors.toMap(
+                        m -> m.getMember().getId(),
+                        m -> m.getMember().getName() // nickname이면 변경
+                ));
+
+        Map<Long, String> result = new HashMap<>();
+
+        for (ChatRoomMember me : members) {
+            Long myId = me.getMember().getId();
+
+            if (room.getType() == ChatRoomType.PRIVATE) {
+                // DM: 나 제외한 한 명
+                String opponent = members.stream()
+                        .map(m -> m.getMember().getId())
+                        .filter(id -> !id.equals(myId))
+                        .findFirst()
+                        .map(idToName::get)
+                        .orElse("(알 수 없음)");
+
+                result.put(myId, opponent);
+                continue;
+            }
+
+            // GROUP: 나 제외한 이름들
+            List<String> others = members.stream()
+                    .map(m -> m.getMember().getId())
+                    .filter(id -> !id.equals(myId))
+                    .map(idToName::get)
+                    .filter(n -> n != null && !n.isBlank())
+                    .distinct()
+                    .sorted()
+                    .toList();
+
+            result.put(myId, formatGroupRoomName(others, 3));
+        }
+        return result;
+    }
+
+    private String formatGroupRoomName(List<String> names, int limit) {
+        if (names == null || names.isEmpty()) {
+            return "그룹 채팅";
+        }
+
+        List<String> shown = names.stream()
+                .limit(limit)
+                .toList();
+
+        int remain = names.size() - shown.size();
+        String base = String.join(", ", shown);
+
+        return (remain > 0)
+                ? base + " 외 " + remain + "명"
+                : base;
+    }
+
 
     @Override
     public Long createPrivateRoom(Long memberAId, Long memberBId) {
@@ -128,12 +194,13 @@ private static long calculateUnreadMessage(ChatMessageRequest request, ChatRoomM
         }
     }
 
-    private Map<String, Object> toPayload(ChatMessage m) {
+    private Map<String, Object> toPayload(ChatMessage m, String senderName) {
         Map<String, Object> payload = new HashMap<>();
 
         payload.put("roomId",   m.getRoomId());                 // 반드시 값 있음
         payload.put("senderId", m.getSenderId());               // 반드시 값 있음
         payload.put("type",     m.getType().name());     // enum은 name()로 문자열 전송 권장
+        payload.put("senderName", senderName);
         payload.put("seq",      m.getSeq());
         payload.put("createdAt", m.getCreatedAt());
 
