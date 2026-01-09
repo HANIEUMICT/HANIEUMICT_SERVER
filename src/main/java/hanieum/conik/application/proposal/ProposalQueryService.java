@@ -1,11 +1,17 @@
 package hanieum.conik.application.proposal;
 
 import hanieum.conik.adapter.proposal.dto.response.ProposalDetailResponse;
+import hanieum.conik.application.common.mapper.ProgressStatusMapper;
 import hanieum.conik.application.member.provided.MemberFinder;
+import hanieum.conik.application.project.required.ProjectProgressRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.required.ProposalRepository;
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.project.enumerate.ProgressStatus;
+import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
+import hanieum.conik.domain.project.exception.ProjectErrorType;
+import hanieum.conik.domain.project.exception.ProjectException;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.exception.ProposalErrorType;
 import hanieum.conik.domain.proposal.exception.ProposalException;
@@ -23,6 +29,7 @@ import java.util.List;
 public class ProposalQueryService implements ProposalFinder {
     private final MemberFinder memberFinder;
     private final ProposalRepository proposalRepository;
+    private final ProjectProgressRepository projectProgressRepository;
 
     @Override
     public Proposal findProposal(Long proposalId) {
@@ -45,6 +52,23 @@ public class ProposalQueryService implements ProposalFinder {
 
         Page<Proposal> proposals = proposalRepository.findByCompanyId(companyId, pageable);
         return proposals.map(ProposalDetailResponse::from);
+    }
+
+    @Override
+    public Page<Proposal> getProjectProposals(Long projectId, ProgressStatus progressStatus, Pageable pageable) {
+        if (projectId == null) {
+            throw new ProjectException(ProjectErrorType.PROJECT_NOT_FOUND);
+        }
+
+        List<Long> companyIds;
+        if (progressStatus != null) {
+            List<ProjectProgressStep> steps = ProgressStatusMapper.map(progressStatus);
+            companyIds = projectProgressRepository.findCompanyIdsByProjectIdAndProgressStepIn(projectId, steps);
+        } else {
+            companyIds = projectProgressRepository.findCompanyIdsByProjectId(projectId);
+        }
+
+        return proposalRepository.findBySubmitStatusAndProjectIdAndCompanyIdIn(SubmitStatus.SUBMIT, projectId, companyIds, pageable);
     }
 
     private Page<Proposal> findProposalsWithStatus(SubmitStatus submitStatus, Long companyId, Long projectId, Pageable pageable) {

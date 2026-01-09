@@ -1,9 +1,12 @@
 package hanieum.conik.application.project.provided;
 
+import hanieum.conik.adapter.project.dto.request.ProjectListResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.ProgressStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
+import hanieum.conik.global.adapter.security.AuthDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +17,9 @@ public interface ProjectFinder {
 
     ProjectWithProposalsResponse getProjectDetailWithProposals(Long projectId);
 
-    Page<ProjectDetailResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable);
+    ProjectListResponse getMemberProjects(AuthDetails authDetails, Long memberId, SubmitStatus submitStatus, ProgressStatus progressStatus, Pageable pageable);
 
     Page<ProjectDetailResponse> findProjectsByCompanyId(Long companyId, Pageable pageable);
+
+    void deleteProject(Long currentMemberId, Long projectId);
 }

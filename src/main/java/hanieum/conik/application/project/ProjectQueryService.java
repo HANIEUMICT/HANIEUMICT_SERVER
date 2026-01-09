@@ -1,21 +1,37 @@
 package hanieum.conik.application.project;
 
+import hanieum.conik.adapter.member.dto.MemberAddressResponse;
+import hanieum.conik.adapter.project.dto.request.ProjectListResponse;
+import hanieum.conik.adapter.project.dto.request.ProjectStatusSummary;
 import hanieum.conik.adapter.project.dto.response.ProjectDetailResponse;
 import hanieum.conik.adapter.project.dto.response.ProjectWithProposalsResponse;
 import hanieum.conik.adapter.proposal.dto.response.ProposalThumbnailResponse;
+import hanieum.conik.application.common.mapper.ProgressStatusMapper;
 import hanieum.conik.application.company.provided.CompanyFinder;
+import hanieum.conik.application.favorite.required.FavoriteRepository;
+import hanieum.conik.application.member.required.MemberAddressRepository;
+import hanieum.conik.application.member.required.MemberRepository;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.MemberAddress;
+import hanieum.conik.domain.member.exception.MemberErrorType;
+import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.ProgressStatus;
+import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
+import hanieum.conik.global.adapter.security.AuthDetails;
+import jakarta.persistence.criteria.Expression;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +47,11 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ProjectQueryService implements ProjectFinder {
     private final ProjectRepository projectRepository;
+    private final FavoriteRepository favoriteRepository;
+    private final MemberRepository memberRepository;
     private final ProposalFinder proposalFinder;
     private final CompanyFinder companyFinder;
+    private final MemberAddressRepository memberAddressRepository;
 
     @Override
     public Project findProject(Long projectId) {
@@ -40,17 +59,23 @@ public class ProjectQueryService implements ProjectFinder {
                 .orElseThrow(() -> new ProjectException(ProjectErrorType.PROJECT_NOT_FOUND));
     }
 
+    // TODO : Pagable 응답 커스텀하여 전체적으로 필요한 필드만 반환하도록 수정
     @Override
-    public Page<ProjectDetailResponse> getMemberProjects(Long memberId, SubmitStatus submitStatus, Pageable pageable) {
-        Page<Project> projects;
+    public ProjectListResponse getMemberProjects(
+            AuthDetails authDetails, Long memberId, SubmitStatus submitStatus, ProgressStatus progressStatus, Pageable pageable
+    ) {
+        Member currentMember = (authDetails != null)
+                ? memberRepository.findById(authDetails.getMemberId())
+                    .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND))
+                : null;
 
-        if (memberId != null) {
-            projects = findProjectsWithStatus(submitStatus, memberId, pageable);
-        } else {
-            projects = findAllProjectsWithStatus(submitStatus, pageable);
-        }
+        Specification<Project> spec = buildProjectSpec(memberId, submitStatus, progressStatus);
+        Page<Project> projects = projectRepository.findAll(spec, pageable);
 
-        return projects.map(ProjectDetailResponse::from);
+        ProjectStatusSummary summary = buildProjectStatusSummary(memberId, submitStatus);
+        Page<ProjectDetailResponse> projectResponses = projects.map(project -> buildProjectResponse(project, currentMember));
+
+        return ProjectListResponse.from(summary, projectResponses);
     }
 
     @Override
@@ -59,16 +84,18 @@ public class ProjectQueryService implements ProjectFinder {
         return projects.map(ProjectDetailResponse::from);
     }
 
-    private Page<Project> findProjectsWithStatus(SubmitStatus submitStatus, Long memberId, Pageable pageable) {
-        return (submitStatus == null)
-                ? projectRepository.findByMemberIdAndSubmitStatusIn(memberId, List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
-                : projectRepository.findByMemberIdAndSubmitStatus(memberId, submitStatus, pageable);
-    }
+    @Override
+    public void deleteProject(Long currentMemberId, Long projectId) {
+        Project project = findProject(projectId);
 
-    private Page<Project> findAllProjectsWithStatus(SubmitStatus submitStatus, Pageable pageable) {
-        return (submitStatus == null)
-                ? projectRepository.findBySubmitStatusIn(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT), pageable)
-                : projectRepository.findBySubmitStatus(submitStatus, pageable);
+        if (!project.getMemberId().equals(currentMemberId)) {
+            throw new ProjectException(ProjectErrorType.UNAUTHORIZED);
+        }
+        if (project.getCurrentStep() != null && project.getCurrentStep().getStep() > 0) {
+            throw new ProjectException(ProjectErrorType.PROJECT_ALREADY_IN_PROGRESS);
+        }
+
+        projectRepository.delete(project);
     }
 
     @Override
@@ -102,10 +129,19 @@ public class ProjectQueryService implements ProjectFinder {
                 .map(p -> ProposalThumbnailResponse.from(p, companyMap.get(p.getCompanyId())))
                 .toList();
 
+        Long addressId = project.getAddressId();
+        if (addressId == null) {
+            throw new ProjectException(ProjectErrorType.PROJECT_ADDRESS_NOT_FOUND);
+        }
+
+        MemberAddress address = memberAddressRepository.findById(addressId)
+                .orElseThrow(() -> new ProjectException(ProjectErrorType.PROJECT_ADDRESS_NOT_FOUND));
+
         // 4. 최종 응답 조합
         return new ProjectWithProposalsResponse(
                 ProjectDetailResponse.from(project),
-                proposalThumbnails
+                proposalThumbnails,
+                MemberAddressResponse.from(address)
         );
     }
 
@@ -113,5 +149,58 @@ public class ProjectQueryService implements ProjectFinder {
         Company companyWithDetail = companyFinder.findCompany(proposal.getCompanyId());
 
         return ProposalThumbnailResponse.from(proposal, companyWithDetail);
+    }
+
+    private Specification<Project> buildProjectSpec(
+            Long memberId,
+            SubmitStatus submitStatus,
+            ProgressStatus progressStatus
+    ) {
+        Specification<Project> spec = Specification.where(null);
+
+        if (memberId != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("memberId"), memberId));
+        }
+
+        if (submitStatus == null) {
+            spec = spec.and((root, query, cb) ->
+                    root.get("submitStatus").in(List.of(SubmitStatus.TEMPORARY_SAVE, SubmitStatus.SUBMIT)));
+        } else {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("submitStatus"), submitStatus));
+        }
+
+        if (progressStatus != null) {
+            List<ProjectProgressStep> steps = ProgressStatusMapper.map(progressStatus);
+
+            spec = spec.and((root, query, cb) -> {
+                Expression<ProjectProgressStep> stepExpr = root.get("currentStep");
+
+                if (ProgressStatusMapper.isBefore(progressStatus)) {
+                    return cb.or(cb.isNull(stepExpr), stepExpr.in(steps));
+                } else {
+                    return stepExpr.in(steps);
+                }
+            });
+        }
+
+        return spec;
+    }
+
+    private ProjectDetailResponse buildProjectResponse(Project project, Member currentMember) {
+        long favoriteCount = favoriteRepository.countByProjectId(project.getId());
+        boolean isFavorite = (currentMember != null)
+                && favoriteRepository.existsByCompanyIdAndProjectId(currentMember.getCompanyId(), project.getId());
+
+        return ProjectDetailResponse.from(project, favoriteCount, isFavorite);
+    }
+
+    private ProjectStatusSummary buildProjectStatusSummary(Long memberId, SubmitStatus submitStatus) {
+        long beforeCount = projectRepository.count(buildProjectSpec(memberId, submitStatus, ProgressStatus.BEFORE));
+        long inProgressCount = projectRepository.count(buildProjectSpec(memberId, submitStatus, ProgressStatus.IN_PROGRESS));
+        long completedCount = projectRepository.count(buildProjectSpec(memberId, submitStatus, ProgressStatus.COMPLETED));
+
+        return ProjectStatusSummary.from(beforeCount, inProgressCount, completedCount);
     }
 }

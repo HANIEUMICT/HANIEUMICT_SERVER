@@ -1,6 +1,8 @@
 package hanieum.conik.domain.project;
 
 import hanieum.conik.domain.project.entity.Project;
+import hanieum.conik.domain.project.enumerate.ConsultType;
+import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 
 import java.time.LocalDate;
@@ -24,8 +26,10 @@ public final class ProjectFixtures {
                 10_000,                   // requestEstimate
                 LocalDate.now().plusDays(30),    // publicUntil
                 ProjectStatus.PUBLIC,     // projectStatus
+                ConsultType.ALL_FACTORY,   // consultType
                 true,                     // canPhoneConsult
-                "Seoul, Korea"            // deliveryAddress
+                1L,                       // addressId (테스트용 addressId)
+                ProjectProgressStep.OPEN  // currentStep
         );
     }
 
