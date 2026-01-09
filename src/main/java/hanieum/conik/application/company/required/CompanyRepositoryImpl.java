@@ -6,7 +6,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
+import hanieum.conik.adapter.company.response.CompanyProfileResponse;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;

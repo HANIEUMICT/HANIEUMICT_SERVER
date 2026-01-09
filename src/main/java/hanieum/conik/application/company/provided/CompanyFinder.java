@@ -1,11 +1,12 @@
 package hanieum.conik.application.company.provided;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
+import hanieum.conik.adapter.company.response.CompanyDetailResponse;
+import hanieum.conik.adapter.company.response.CompanyProfileResponse;
+import hanieum.conik.adapter.company.response.CompanySummaryResponse;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.entity.CompanyDetail;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,13 +21,15 @@ public interface CompanyFinder {
 
     Company findCompany(Long companyId);
 
-    Page<CompanySummaryResponse> searchCompanySummaries(CompanySummarySearchCondition cond, Pageable pageable);
+    CompanyDetail findCompanyDetail(Long companyId);
 
-    CompanyDetailResponse findMyCompanyWithDetail(Long memberId);
+    Page<CompanySummaryResponse> searchCompanySummaries(CompanySummarySearchCondition cond, Pageable pageable);
 
     List<Company> findCompaniesByIds(Collection<Long> ids);
 
     CompanyDetailResponse findCompanyWithDetail(Long companyId);
 
     Page<CompanyProfileResponse> findAllCompanyWithFilter(CompanyProfileSearchCondition cond, Pageable pageable);
+
+    List<CompanyProfileResponse> findRecommendedCompanies();
 }

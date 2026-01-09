@@ -1,6 +1,6 @@
 package hanieum.conik.application.company.required;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
+import hanieum.conik.adapter.company.response.CompanyProfileResponse;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;

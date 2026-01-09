@@ -1,24 +1,25 @@
 package hanieum.conik.application.company;
 
-import hanieum.conik.adapter.company.webapi.response.CompanyDetailResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanyProfileResponse;
-import hanieum.conik.adapter.company.webapi.response.CompanySummaryResponse;
+import hanieum.conik.adapter.company.response.CompanyDetailResponse;
+import hanieum.conik.adapter.company.response.CompanyProfileResponse;
+import hanieum.conik.adapter.company.response.CompanySummaryResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.company.required.EquipmentRepository;
 import hanieum.conik.application.company.required.PortfolioRepository;
-import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.company.dto.CompanyProfileSearchCondition;
 import hanieum.conik.domain.company.dto.CompanySummarySearchCondition;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.company.entity.CompanyDetail;
 import hanieum.conik.domain.company.entity.Equipment;
 import hanieum.conik.domain.company.entity.Portfolio;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
 import hanieum.conik.domain.company.exception.CompanyException;
-import hanieum.conik.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CompanyFinderService implements CompanyFinder {
-    private final MemberFinder memberFinder;
     private final CompanyRepository companyRepository;
     private final EquipmentRepository equipmentRepository;
     private final PortfolioRepository portfolioRepository;
@@ -44,8 +44,22 @@ public class CompanyFinderService implements CompanyFinder {
 
     @Override
     public Company findCompany(Long companyId) {
+        if(companyId == null){
+            throw new CompanyException(CompanyErrorType.INVALID_INPUT);
+        }
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+    }
+
+    @Override
+    public CompanyDetail findCompanyDetail(Long companyId) {
+        Company company = findCompany(companyId);
+
+        CompanyDetail detail = company.getCompanyDetail();
+        if (detail == null) {
+            throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);
+        }
+        return detail;
     }
 
     @Override
@@ -53,27 +67,6 @@ public class CompanyFinderService implements CompanyFinder {
         validatePageable(pageable);
         Page<Company> search = companyRepository.search(cond, pageable);
         return search.map(CompanySummaryResponse::from);
-    }
-
-    @Override
-    public CompanyDetailResponse findMyCompanyWithDetail(Long memberId){
-        Member member = memberFinder.findById(memberId);
-
-        Company company = companyRepository.findById(member.getCompanyId())
-                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
-
-        if (company.getCompanyDetail() == null) {
-            return CompanyDetailResponse.fromCompanyOnly(company);
-        }
-
-        List<Equipment> equipments = equipmentRepository.findByCompanyDetailId(company.getId());
-        List<Portfolio> portfolios = portfolioRepository.findByCompanyDetailId(company.getId());
-
-        try {
-            return CompanyDetailResponse.from(company, equipments, portfolios);
-        } catch (RuntimeException e) {
-            throw new CompanyException(CompanyErrorType.MAPPING_ERROR);
-        }
     }
 
     @Override
@@ -86,8 +79,7 @@ public class CompanyFinderService implements CompanyFinder {
 
     @Override
     public CompanyDetailResponse findCompanyWithDetail(Long companyId) {
-        Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new CompanyException(CompanyErrorType.COMPANY_NOT_FOUND));
+        Company company = findCompany(companyId);
 
         if (company.getCompanyDetail() == null) {
             throw new CompanyException(CompanyErrorType.COMPANY_DETAIL_NOT_FOUND);
@@ -108,6 +100,17 @@ public class CompanyFinderService implements CompanyFinder {
         validatePageable(pageable);
 
         return companyRepository.findCompaniesWithFilter(cond, pageable);
+    }
+
+    @Override
+    public List<CompanyProfileResponse> findRecommendedCompanies() {
+        List<Company> companies = companyRepository.findAll(
+                PageRequest.of(0, 20, Sort.by("id").ascending())
+        ).getContent();
+
+        return companies.stream()
+                .map(CompanyProfileResponse::from)
+                .toList();
     }
 
     private void validatePageable(Pageable p) {

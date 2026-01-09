@@ -6,8 +6,7 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.member.provided.MemberSaver;
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
 import hanieum.conik.domain.member.Member;
-import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
-import hanieum.conik.domain.member.dto.PasswordChangeRequest;
+import hanieum.conik.domain.member.dto.*;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +36,7 @@ public class MemberController {
     ## 회원 정보 수정을 수행합니다.
     - 사용자의 이름, 전화번호, 비밀번호, 이용약관 정보를 수정합니다.
     """)
-    @PatchMapping("/profile")
+    @PatchMapping("/profile") // TODO : 이거 공장 마이페이지 떄문에 만들었던 건가요?! UI가 이후에 수정된 거 같은데 안 쓰면 없애도 될 거 같아서용!
     public ApiResponse<?> updateMemberProfile(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid MemberProfileUpdateRequest request
@@ -47,21 +46,86 @@ public class MemberController {
     }
 
     @Operation(summary = "내 정보 조회", description = """
-            ## 내 정보를 조회합니다.
-            - 사용자의 기본 정보를 조회할 수 있습니다.
-            """)
+    ## 내 정보를 조회합니다.
+    - 사용자의 기본 정보를 조회할 수 있습니다.
+    - 주소 목록 중 기본 배송지는 먼저 조회됩니다.
+    """)
     @GetMapping("/me")
     public ApiResponse<MemberInfoResponse> getMemberInfo(
             @AuthenticationPrincipal AuthDetails authDetails
     ) {
-        Member member = memberFinder.findById(authDetails.getMemberId());
-        return ApiResponse.success(MemberInfoResponse.from(member));
+        return ApiResponse.success(memberFinder.getMemberInfo(authDetails.getMemberId()));
+    }
+
+    @Operation(summary = "회원 정보 - 이름 수정", description = """
+    ## 회원 정보 - 이름 수정을 수행합니다.
+    - 사용자의 이름을 변경합니다.
+    """)
+    @PatchMapping("/me/name")
+    public ApiResponse<String> updateMemberName(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @RequestBody @Valid MemberNameUpdateRequest request
+    ) {
+        memberSaver.updateName(authDetails.getMemberId(), request);
+        return ApiResponse.success("회원 이름 수정이 완료되었습니다.");
+    }
+
+    @Operation(summary = "회원 정보 - 비밀번호 수정", description = """
+    ## 회원 정보 - 비밀번호 수정을 수행합니다.
+    - 사용자의 비밀번호를 변경합니다.
+    """)
+    @PatchMapping("/me/password")
+    public ApiResponse<String> updateMemberPassword(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @RequestBody @Valid MemberPasswordUpdateRequest request
+    ) {
+        memberSaver.updatePassword(authDetails.getMemberId(), request);
+        return ApiResponse.success("회원 비밀번호 수정이 완료되었습니다.");
+    }
+
+    @Operation(summary = "회원 정보 - 전화번호 수정", description = """
+    ## 회원 정보 - 전화번호 수정을 수행합니다.
+    - 사용자의 전화번호를 인증 후 변경합니다.
+    """)
+    @PatchMapping("/me/phone-number")
+    public ApiResponse<String> updateMemberPhoneNumber(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @RequestBody @Valid MemberPhoneNumberUpdateRequest request
+    ) {
+        memberSaver.updatePhoneNumber(authDetails.getMemberId(), request);
+        return ApiResponse.success("회원 전화번호 수정이 완료되었습니다.");
+    }
+
+    @Operation(summary = "회원 정보 - 이메일 혜택/이벤트 정보 알림 수신 동의 여부 수정", description = """
+    ## 회원 정보 -  이메일 혜택/이벤트 정보 알림 수신 동의 여부 수정을 수행합니다.
+    - 사용자의 이메일 혜택/이벤트 정보 알림 수신 동의 여부를 수정합니다.
+    """)
+    @PatchMapping("/me/email-marketing-consent")
+    public ApiResponse<String> updateMemberEmailMarketingConsent(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @RequestBody @Valid MemberEmailMarketingConsentUpdateRequest request
+    ) {
+        memberSaver.updateEmailMarketingConsent(authDetails.getMemberId(), request);
+        return ApiResponse.success("이메일 혜택/이벤트 정보 알림 수신 동의 여부 수정이 완료되었습니다.");
+    }
+
+    @Operation(summary = "회원 정보 - 전화번호 혜택/이벤트 정보 알림 수신 동의 여부 수정", description = """
+    ## 회원 정보 - 전화번호 혜택/이벤트 정보 알림 수신 동의 여부 수정을 수행합니다.
+    - 사용자의 전화번호 혜택/이벤트 정보 알림 수신 동의 여부를 수정합니다.
+    """)
+    @PatchMapping("/me/sms-marketing-consent")
+    public ApiResponse<String> updateMemberSmsMarketingConsent(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @RequestBody @Valid MemberSmsMarketingConsentUpdateRequest request
+    ) {
+        memberSaver.updateSmsMarketingConsent(authDetails.getMemberId(), request);
+        return ApiResponse.success("전화번호 혜택/이벤트 정보 알림 수신 동의 여부 수정이 완료되었습니다.");
     }
 
     @Operation(summary = "비밀번호 인증하기", description = """
-            ## 입력한 비밀번호가 현재 비밀번호와 일치하는지 확인합니다.
-            - 사용자가 현재 비밀번호를 인증할 수 있습니다.
-            """)
+    ## 입력한 비밀번호가 현재 비밀번호와 일치하는지 확인합니다.
+    - 사용자가 현재 비밀번호를 인증할 수 있습니다.
+    """)
     @PostMapping("/password")
     public ApiResponse<?> certificatePassword(
             @AuthenticationPrincipal AuthDetails authDetails,
@@ -83,17 +147,43 @@ public class MemberController {
         return ApiResponse.success(memberFinder.findAddresses(authDetails.getMemberId(), pageable));
     }
 
+    @Operation(summary = "마이페이지 특정 주소 조회", description = """
+    ## 특정 주소 조회를 수행합니다.
+    - 사용자가 등록한 주소 중, 특정 주소를 조회할 수 있습니다.
+    """)
+    @GetMapping("/me/addresses/{addressId}")
+    public ApiResponse<MemberAddressResponse> getMyAddress(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long addressId
+    ) {
+        return ApiResponse.success(memberFinder.findAddress(authDetails.getMemberId(), addressId));
+    }
+
     @Operation(summary = "주소 추가", description = """
     ## 주소 추가를 수행합니다.
     - 사용자가 주소를 추가할 수 있습니다.
     """)
-    @PatchMapping("/addresses")
+    @PostMapping("/addresses")
     public ApiResponse<?> addAddress(
             @AuthenticationPrincipal AuthDetails authDetails,
             @RequestBody @Valid AddressRegisterRequest request
     ) {
         memberSaver.addAddress(authDetails.getMemberId(), request);
         return ApiResponse.success("주소 추가가 완료되었습니다.");
+    }
+
+    @Operation(summary = "주소 수정", description = """
+    ## 주소를 업데이트합니다.
+    - 사용자가 입력한 주소를 수정할 수 있습니다.
+    """)
+    @PutMapping("/addresses/{addressId}")
+    public ApiResponse<?> updateAddress(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long addressId,
+            @RequestBody @Valid AddressRegisterRequest request
+    ) {
+        memberSaver.updateAddress(authDetails.getMemberId(), addressId, request);
+        return ApiResponse.success("주소 수정이 완료되었습니다.");
     }
 
     @Operation(summary = "주소 삭제", description = """

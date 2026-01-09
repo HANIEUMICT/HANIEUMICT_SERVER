@@ -61,4 +61,8 @@ public class MemberAddress extends AddressBase {
     void setMember(Member member) {
         this.member = member;
     }
+
+    public void update(MemberAddress address) {
+        updateAddressBase(address);
+    }
 }

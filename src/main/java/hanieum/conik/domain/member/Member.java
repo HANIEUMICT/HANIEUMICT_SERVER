@@ -1,12 +1,11 @@
 package hanieum.conik.domain.member;
 
-import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
-import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
+import hanieum.conik.domain.common.email.Email;
+import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.domain.member.enumerate.MemberRole;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
-import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -44,6 +43,13 @@ public class Member extends BaseEntity {
     @Column(name = "terms_of_service_agreed", nullable = false)
     private Boolean termsOfServiceAgreed;
 
+    // TODO : k8s 연결 후 RDS 기본 값 설정, 이후 nullable = false로 변경
+    @Column(name = "email_marketing_agreed", nullable = true)
+    private Boolean emailMarketingAgreed;
+
+    @Column(name = "sms_marketing_agreed", nullable = true)
+    private Boolean smsMarketingAgreed;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
     private MemberRole role;
@@ -69,6 +75,8 @@ public class Member extends BaseEntity {
         this.hashedPassword = hashedPassword;
         this.phoneNumber = phoneNumber;
         this.termsOfServiceAgreed = termsOfServiceAgreed;
+        this.emailMarketingAgreed = false;
+        this.smsMarketingAgreed = false;
         this.role = role;
         if (memberAddress != null) {
             addAddress(memberAddress);
@@ -144,6 +152,33 @@ public class Member extends BaseEntity {
     }
 
     /**
+     * 이메일 마케팅 수신동의 여부 수정
+     */
+    public void updateEmailMarketingAgreed(boolean emailMarketingAgreed) {
+        this.emailMarketingAgreed = emailMarketingAgreed;
+    }
+
+    /**
+     * 전화번호 마케팅 수신동의 여부 수정
+     */
+    public void updateSmsMarketingAgreed(boolean smsMarketingAgreed) {
+        this.smsMarketingAgreed = smsMarketingAgreed;
+    }
+
+    /**
+     * 회원 주소 정렬 조회 (기본 배송지 먼저)
+     */
+    public List<MemberAddress> getSortedAddresses() {
+        return addresses.stream()
+                .sorted((a, b) -> {
+                    boolean aDefault = defaultAddress != null && defaultAddress.equals(a);
+                    boolean bDefault = defaultAddress != null && defaultAddress.equals(b);
+                    return Boolean.compare(bDefault, aDefault);
+                })
+                .toList();
+    }
+
+    /**
      * 회원 주소 추가
      */
     public void addAddress(MemberAddress address) {
@@ -164,6 +199,27 @@ public class Member extends BaseEntity {
             setDefaultAddress(address);
         }
         return address;
+    }
+
+    /**
+     * 회원 주소 수정
+     */
+    public void updateAddress(Long addressId, MemberAddress updatedAddress, boolean setAsDefault) {
+        MemberAddress target = addresses.stream()
+                .filter(a -> a.getId().equals(addressId))
+                .findFirst()
+                .orElseThrow(() -> new MemberException(MemberErrorType.ADDRESS_NOT_FOUND));
+
+        target.update(updatedAddress);
+
+        boolean wasDefault = (defaultAddress != null && defaultAddress.equals(target));
+        if (wasDefault && !setAsDefault) {
+            throw new MemberException(MemberErrorType.CANNOT_UNSET_DEFAULT_ADDRESS);
+        }
+
+        if (setAsDefault) {
+            setDefaultAddress(target);
+        }
     }
 
     /**

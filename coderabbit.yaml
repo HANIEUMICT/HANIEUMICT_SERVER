@@ -16,7 +16,7 @@ reviews:
     enabled: true
     review_status: true
     auto_incremental_review: true
-    drafts: false
+    drafts: true
 chat:
   auto_reply: true
 

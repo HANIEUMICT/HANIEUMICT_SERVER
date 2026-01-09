@@ -1,7 +1,7 @@
 package hanieum.conik.application.member.provided;
 
 import hanieum.conik.domain.common.address.dto.AddressRegisterRequest;
-import hanieum.conik.domain.member.dto.MemberProfileUpdateRequest;
+import hanieum.conik.domain.member.dto.*;
 
 /**
  * 회원정보 변경/저장을 담당하는 포트 인터페이스
@@ -15,6 +15,16 @@ public interface MemberSaver {
      */
     void updateProfile(Long memberId, MemberProfileUpdateRequest updateReq);
 
+    void updateName(Long memberId, MemberNameUpdateRequest request);
+
+    void updatePassword(Long memberId, MemberPasswordUpdateRequest request);
+
+    void updatePhoneNumber(Long memberId, MemberPhoneNumberUpdateRequest request);
+
+    void updateEmailMarketingConsent(Long memberId, MemberEmailMarketingConsentUpdateRequest request);
+
+    void updateSmsMarketingConsent(Long memberId, MemberSmsMarketingConsentUpdateRequest request);
+
     void validateCurrentPassword(Long memberId, String currentPassword);
 
     /**
@@ -24,6 +34,15 @@ public interface MemberSaver {
      * @param addressRegister   새로운 주소 정보를 담은 DTO
      */
     void addAddress(Long memberId, AddressRegisterRequest addressRegister);
+
+    /**
+     * 회원 주소를 수정합니다.
+     *
+     * @param memberId    수정할 멤버의 id
+     * @param addressId    수정할 주소의 id
+     * @param addressRegister   새로운 주소 정보를 담은 DTO
+     */
+    void updateAddress(Long memberId, Long addressId, AddressRegisterRequest addressRegister);
 
     /**
      * 회원의 주소를 삭제합니다.

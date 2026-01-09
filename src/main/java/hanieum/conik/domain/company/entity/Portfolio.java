@@ -45,16 +45,12 @@ public class Portfolio extends AbstractEntity {
         );
     }
 
-    void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail; }
+    void setCompanyDetail(CompanyDetail detail) { this.companyDetail = detail;}
 
     public void update(PortfolioRequest request) {
         if (request.quantity() != null) this.quantity = Math.max(0, request.quantity());
         this.description = request.description();
         this.imageUrls = request.imageUrls();
         this.category = request.category();
-    }
-
-    public void remove() {
-        if (this.companyDetail != null) this.companyDetail.removePortfolio(this.getId());
     }
 }

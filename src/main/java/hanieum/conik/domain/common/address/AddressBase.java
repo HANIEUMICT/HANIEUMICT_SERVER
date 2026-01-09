@@ -42,4 +42,13 @@ public class AddressBase extends BaseEntity {
         this.recipient = recipient;
         this.phoneNumber = phoneNumber;
     }
+
+    protected void updateAddressBase(AddressBase addressBase) {
+        this.postalCode = addressBase.getPostalCode();
+        this.streetAddress = addressBase.getStreetAddress();
+        this.detailAddress = addressBase.getDetailAddress();
+        this.addressName = addressBase.getAddressName();
+        this.recipient = addressBase.getRecipient();
+        this.phoneNumber = addressBase.getPhoneNumber();
+    }
 }

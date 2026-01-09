@@ -1,4 +1,4 @@
-package hanieum.conik.adapter.company.webapi.response;
+package hanieum.conik.adapter.company.response;
 
 import hanieum.conik.domain.company.entity.Portfolio;
 

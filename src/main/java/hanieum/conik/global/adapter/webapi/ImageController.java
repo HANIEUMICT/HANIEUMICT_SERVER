@@ -22,4 +22,9 @@ public class ImageController {
         ReadPreSignedUrlResponse response = bucketClient.getPreSignedUrl(imageUploadRequest);
         return ApiResponse.success(response);
     }
+
+    @PostMapping("/presigned/public")
+    public ApiResponse<?> finalizePublic(@RequestParam String objectUrl) {
+        return ApiResponse.success(bucketClient.makePublic(objectUrl));
+    }
 }

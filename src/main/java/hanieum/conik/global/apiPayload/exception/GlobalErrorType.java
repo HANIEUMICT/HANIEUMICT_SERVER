@@ -27,7 +27,15 @@ public enum GlobalErrorType implements ErrorType {
 
     //Email
     EMAIL_REQUIRED(HttpStatus.BAD_REQUEST, "이메일은 필수입니다."),
-    EMAIL_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "이메일 형식이 아닙니다.");
+    EMAIL_INVALID_FORMAT(HttpStatus.BAD_REQUEST, "이메일 형식이 아닙니다."),
+
+    //Conditional Request / Concurrency (ETag / If-Match)
+    PRECONDITION_REQUIRED(HttpStatus.PRECONDITION_REQUIRED, "If-Match 헤더가 필요합니다."),
+    PRECONDITION_FAILED(HttpStatus.PRECONDITION_FAILED, "리소스 버전이 일치하지 않습니다. 새로고침 후 다시 시도하세요."),
+
+    // 컬렉션 델타 검증
+    DUPLICATED_CHILD_ID(HttpStatus.BAD_REQUEST, "요청에 중복된 자식 ID가 포함되어 있습니다."),
+    INVALID_CHILD_ID(HttpStatus.BAD_REQUEST, "유효하지 않은 자식 ID입니다.");
 
     private final HttpStatus status;
 

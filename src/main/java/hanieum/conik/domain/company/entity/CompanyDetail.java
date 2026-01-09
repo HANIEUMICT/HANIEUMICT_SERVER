@@ -1,7 +1,6 @@
 package hanieum.conik.domain.company.entity;
 
 import hanieum.conik.domain.company.dto.CompanyDetailRequest;
-import hanieum.conik.domain.company.dto.CompanyDetailUpdateRequest;
 import hanieum.conik.global.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -94,10 +93,10 @@ public class CompanyDetail extends BaseEntity {
 
         CompanyDetail detail = new CompanyDetail(company, request.establishedAt(), request.logoUrl(), request.employeeCount(), request.websiteUrl(), request.contactAvailableTime(), request.description());
 
+        company.attachDetail(detail);
+
         if (equipments != null) {equipments.forEach(detail::addEquipment);}
         if (portfolios != null) {portfolios.forEach(detail::addPortfolio);}
-
-        company.attachDetail(detail);
 
         return detail;
     }
@@ -112,7 +111,7 @@ public class CompanyDetail extends BaseEntity {
     /**
      * 장비를 추가한다.
      */
-    public void addEquipment( Equipment equipment) {
+    public void addEquipment(Equipment equipment) {
         equipments.add(equipment);
         equipment.setCompanyDetail(this);
     }
@@ -128,38 +127,22 @@ public class CompanyDetail extends BaseEntity {
     /**
      * 장비를 제거한다.
      */
-    public boolean removeEquipment(Long equipmentId) {
-        if (equipmentId == null) return false;
-        for (var it = equipments.iterator(); it.hasNext(); ) {
-            Equipment e = it.next();
-            Long id = e.getId();
-            if (id != null && id.equals(equipmentId)) {
-                it.remove();
-                e.setCompanyDetail(null);
-                return true;
-            }
-        }
-        return false;
+    public void removeEquipment(Equipment equipment) {
+        if (equipment == null) return;
+        equipments.remove(equipment);
+        equipment.setCompanyDetail(null);
     }
 
     /**
      * 포트폴리오를 제거한다.
      */
-    public boolean removePortfolio(Long portfolioId) {
-        if (portfolioId == null) return false;
-        for (var it = portfolios.iterator(); it.hasNext(); ) {
-            Portfolio p = it.next();
-            Long id = p.getId();
-            if (id != null && id.equals(portfolioId)) {
-                it.remove();
-                p.setCompanyDetail(null);
-                return true;
-            }
-        }
-        return false;
+    public void removePortfolio(Portfolio portfolio) {
+        if (portfolio == null) return;
+        portfolios.remove(portfolio);
+        portfolio.setCompanyDetail(null);
     }
 
-    public void update(CompanyDetailUpdateRequest detail) {
+    public void update(CompanyDetailRequest detail) {
         if (detail == null) return;
         if (detail.establishedAt() != null) this.establishedAt = detail.establishedAt();
         if (detail.logoUrl() != null) this.logoUrl = detail.logoUrl();
