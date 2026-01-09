@@ -1,7 +1,6 @@
 package hanieum.conik.adapter.project.dto.request;
 
 import hanieum.conik.domain.project.entity.Project;
-import hanieum.conik.domain.project.enumerate.ConsultType;
 import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
 import hanieum.conik.domain.project.enumerate.ProjectStatus;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
@@ -68,16 +67,12 @@ public record ProjectRegisterRequest (
         ProjectStatus projectStatus,
 
         @NotNull
-        @Schema(description = "프로젝트(공고) 상담 유형", example = "BID_ONLY | ALL_FACTORY")
-        ConsultType consultType,
-
-        @NotNull
         @Schema(description = "프로젝트(공고) 전화 상담 여부", example = "true")
         Boolean canPhoneConsult,
 
         @NotNull
-        @Schema(description = "배송지 아이디", example = "123456")
-        Long addressId,
+        @Schema(description = "배송지", example = "123456")
+        String deliveryAddress,
 
         @NotNull
         @Schema(description = "공고 상태", example = "PRE_BID | BID_CLOSED | BIDDING")
@@ -103,9 +98,8 @@ public record ProjectRegisterRequest (
                         project.getRequestEstimate(),
                         project.getPublicUntil(),
                         project.getProjectStatus(),
-                        project.getConsultType(),
                         project.isCanPhoneConsult(),
-                        project.getAddressId(),
+                        project.getDeliveryAddress(),
                         project.getProjectBidStatus(),
                         project.getSubmitStatus()
 

@@ -1,20 +1,17 @@
 package hanieum.conik.application.proposal.required;
 
-import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public interface ProposalRepository extends JpaRepository<Proposal, Long>, JpaSpecificationExecutor<Project> {
+public interface ProposalRepository extends JpaRepository<Proposal, Long> {
     @Query("select distinct p from Proposal p " +
             "left join fetch p.items " +
             "left join fetch p.drawingFiles " +
@@ -33,6 +30,4 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long>, JpaSp
     Page<Proposal> findByCompanyIdAndProjectIdAndSubmitStatus(Long companyId, Long projectId, SubmitStatus submitStatus, Pageable pageable);
 
     Page<Proposal> findByCompanyId(Long companyId, Pageable pageable);
-
-    Page<Proposal> findBySubmitStatusAndProjectIdAndCompanyIdIn(SubmitStatus submitStatus, Long projectId, Collection<Long> companyId, Pageable pageable);
 }

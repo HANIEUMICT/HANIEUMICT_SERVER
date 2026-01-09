@@ -2,9 +2,13 @@ package hanieum.conik.domain.project.entity;
 
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
-import hanieum.conik.domain.project.enumerate.*;
+import hanieum.conik.domain.project.enumerate.ProjectBidStatus;
+import hanieum.conik.domain.project.enumerate.ProjectStatus;
+import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.global.domain.AbstractEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,27 +50,22 @@ public class Project extends AbstractEntity {
 
     private ProjectStatus projectStatus;
 
-    private ConsultType consultType;
-
     private boolean canPhoneConsult;
 
-    private Long addressId;
+    private String deliveryAddress;
 
     private SubmitStatus submitStatus = SubmitStatus.INITIALIZE;
 
     private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
 
-    @Enumerated(EnumType.STRING)
-    private ProjectProgressStep currentStep = ProjectProgressStep.OPEN;
-
-    @BatchSize(size = 250)
+    @BatchSize( size = 250)
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectDrawingFile> drawingFiles = new ArrayList<>();
 
     public static Project create(Long userId, String projectTitle, String category, String categoryDetail, String categoryDetailEtc,
                                  String purpose, String purposeEtc, Integer projectQuantity, String projectRequests,
                                  LocalDate projectDeadline, boolean canDeadlineChange, Integer projectRequestEstimate, LocalDate projectPublicUntil,
-                                 ProjectStatus projectStatus, ConsultType consultType, boolean canPhoneConsult, Long addressId, ProjectProgressStep currentStep
+                                 ProjectStatus projectStatus, boolean canPhoneConsult, String projectAddress
     ) {
         Project project = new Project();
         project.memberId            = userId;
@@ -83,10 +82,8 @@ public class Project extends AbstractEntity {
         project.requestEstimate     = projectRequestEstimate;
         project.publicUntil         = projectPublicUntil;
         project.projectStatus       = projectStatus;
-        project.consultType         = consultType;
         project.canPhoneConsult     = canPhoneConsult;
-        project.addressId           = addressId;
-        project.currentStep         = currentStep;
+        project.deliveryAddress     = projectAddress;
         return project;
     }
 
@@ -110,10 +107,9 @@ public class Project extends AbstractEntity {
         this.canDeadlineChange = request.canDeadlineChange();
         this.requestEstimate = request.requestEstimate();
         this.publicUntil = request.publicUntil();
-        this.consultType = request.consultType();
         this.projectStatus = request.projectStatus();
         this.canPhoneConsult = request.canPhoneConsult();
-        this.addressId = request.addressId();
+        this.deliveryAddress = request.deliveryAddress();
         this.submitStatus = request.submitStatus();
 
         finalizeDrawingFiles();
@@ -137,9 +133,4 @@ public class Project extends AbstractEntity {
     }
 
     public void finalizeDrawingFiles() { this.drawingFiles.forEach(ProjectDrawingFile::finalizeFile); }
-
-    // TODO : Progress 변경 시 currentStep도 함께 갱신되도록 수정 (데이터 일관성 유지)
-    public void updateCurrentStep(ProjectProgressStep step) {
-        this.currentStep = step;
-    }
 }

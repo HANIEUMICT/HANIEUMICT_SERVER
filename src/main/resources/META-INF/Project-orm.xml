@@ -51,15 +51,11 @@
                 <column name="project_status"/>
                 <enumerated>STRING</enumerated>
             </basic>
-            <basic name="consultType">
-                <column name="consult_type"/>
-                <enumerated>STRING</enumerated>
-            </basic>
             <basic name="canPhoneConsult">
                 <column name="can_phone_consult"/>
             </basic>
-            <basic name="addressId">
-                <column name="address_id"/>
+            <basic name="deliveryAddress">
+                <column name="delivery_address"/>
             </basic>
             <basic name="submitStatus">
                 <column name="submit_status"/>
@@ -67,10 +63,6 @@
             </basic>
             <basic name="projectBidStatus">
                 <column name="project_bid_status"/>
-                <enumerated>STRING</enumerated>
-            </basic>
-            <basic name="currentStep">
-                <column name="current_step"/>
                 <enumerated>STRING</enumerated>
             </basic>
 

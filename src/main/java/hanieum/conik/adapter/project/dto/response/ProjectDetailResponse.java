@@ -19,19 +19,9 @@ public record ProjectDetailResponse(
         ProjectRegisterRequest projectRegisterRequest,
 
         @Schema(description = "프로젝트 도면 파일 목록")
-        List<String> drawingUrls,
-
-        @Schema(description = "프로젝트 찜 수")
-        Long favoriteCount,
-
-        @Schema(description = "(로그인 한 사용자의 경우) 찜 여부")
-        Boolean isFavorite
+        List<String> drawingUrls
 ) {
-    public static ProjectDetailResponse from(Project project) {
-        return from(project, null, false);
-    };
-
-    public static ProjectDetailResponse from(Project project, Long favoriteCount, Boolean isFavorite) {
+    public static ProjectDetailResponse from(Project project){
         List<String> drawingUrls = (project.getDrawingFiles() != null)
                 ? project.getDrawingFiles().stream()
                 .map(ProjectDrawingFile::getDrawingUrl)
@@ -42,9 +32,7 @@ public record ProjectDetailResponse(
                 project.getId(),
                 project.getModifiedAt(),
                 ProjectRegisterRequest.from(project),
-                drawingUrls,
-                favoriteCount,
-                isFavorite
+                drawingUrls
         );
     }
 }

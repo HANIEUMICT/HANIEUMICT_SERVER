@@ -52,12 +52,6 @@ public class SecurityConfig {
                                         "/v1/company",
                                         "/v1/company/summaries"
                                 ).permitAll()
-                                .requestMatchers(
-                                        "/v1/project"
-                                ).permitAll()
-                                .requestMatchers(
-                                        "/v1/proposal/project/*"
-                                ).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/v1/bucket/presigned", "/v1/bucket/presigned/public").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/v1/company/detail/**").hasAuthority("OWNER")
                                 .anyRequest().authenticated()

@@ -15,5 +15,5 @@ public class ProjectProgressPicture extends AbstractEntity {
 
     private ProjectProgressStep projectProgressStep;
 
-    private String pictureUrl; // TODO: 리스트 가능하게 수정
+    private String pictureUrl;
 }

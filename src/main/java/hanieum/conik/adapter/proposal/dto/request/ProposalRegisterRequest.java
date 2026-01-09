@@ -38,7 +38,7 @@ public record ProposalRegisterRequest(
         List<ProposalItemRequest> items,
 
         @NotNull
-        @Schema(description = "작성 상태", example = "PRE_BID | BID_CLOSED | BIDDING")
+        @Schema(description = "작성 상태", example = "INITIALIZE | TEMPORARY_SAVE | SUBMIT")
         ProposalBidStatus proposalBidStatus,
 
         @NotNull
