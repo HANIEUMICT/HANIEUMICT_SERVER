@@ -1,4 +1,4 @@
-package hanieum.conik.domain.project.entity;
+package hanieum.conik.domain.deal.entity;
 
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.Entity;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProjectRequest extends AbstractEntity {
+public class DealRequest extends AbstractEntity {
     private Long projectId;
 
     private Long companyId;

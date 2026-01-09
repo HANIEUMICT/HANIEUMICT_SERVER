@@ -15,13 +15,13 @@ import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.required.ProjectRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.domain.company.entity.Company;
+import hanieum.conik.domain.deal.enumerate.DealStep;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.member.MemberAddress;
 import hanieum.conik.domain.member.exception.MemberErrorType;
 import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.ProgressStatus;
-import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
@@ -172,10 +172,10 @@ public class ProjectQueryService implements ProjectFinder {
         }
 
         if (progressStatus != null) {
-            List<ProjectProgressStep> steps = ProgressStatusMapper.map(progressStatus);
+            List<DealStep> steps = ProgressStatusMapper.map(progressStatus);
 
             spec = spec.and((root, query, cb) -> {
-                Expression<ProjectProgressStep> stepExpr = root.get("currentStep");
+                Expression<DealStep> stepExpr = root.get("currentStep");
 
                 if (ProgressStatusMapper.isBefore(progressStatus)) {
                     return cb.or(cb.isNull(stepExpr), stepExpr.in(steps));

@@ -6,9 +6,9 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.project.required.ProjectProgressRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.required.ProposalRepository;
+import hanieum.conik.domain.deal.enumerate.DealStep;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.project.enumerate.ProgressStatus;
-import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
@@ -62,7 +62,7 @@ public class ProposalQueryService implements ProposalFinder {
 
         List<Long> companyIds;
         if (progressStatus != null) {
-            List<ProjectProgressStep> steps = ProgressStatusMapper.map(progressStatus);
+            List<DealStep> steps = ProgressStatusMapper.map(progressStatus);
             companyIds = projectProgressRepository.findCompanyIdsByProjectIdAndProgressStepIn(projectId, steps);
         } else {
             companyIds = projectProgressRepository.findCompanyIdsByProjectId(projectId);
