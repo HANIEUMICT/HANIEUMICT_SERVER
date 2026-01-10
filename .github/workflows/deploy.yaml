@@ -59,34 +59,22 @@ jobs:
     steps:
       - name: Set target IP
         run: |
-          BLUE_STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}:8080/actuator/health/readiness" || echo 000)
-          GREEN_STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}:8081/actuator/health/readiness" || echo 000)
+          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}/actuator/health/readiness" || echo 000)
           
-          echo "BLUE_STATUS=$BLUE_STATUS"
-          echo "GREEN_STATUS=$GREEN_STATUS"
-          
-          if [ "$BLUE_STATUS" = "200" ]; then
-            CURRENT_UPSTREAM=blue
-            TARGET_UPSTREAM=green
-            CURRENT_PORT=8080
-            STOPPED_PORT=8081
-          elif [ "$GREEN_STATUS" = "200" ]; then
+          echo "NGINX_STATUS=$STATUS"
+            
+          if [ "$STATUS" = "200" ]; then
+            echo "Detected active service via Nginx"
             CURRENT_UPSTREAM=green
             TARGET_UPSTREAM=blue
-            CURRENT_PORT=8081
-            STOPPED_PORT=8080
           else
-            echo "Notice: No active upstream detected. Defaulting to blue."
+            echo "No active service detected, defaulting to blue"
             CURRENT_UPSTREAM=blue
             TARGET_UPSTREAM=green
-            CURRENT_PORT=8080
-            STOPPED_PORT=8081
           fi
-          
+            
           echo "CURRENT_UPSTREAM=$CURRENT_UPSTREAM" >> $GITHUB_ENV
           echo "TARGET_UPSTREAM=$TARGET_UPSTREAM" >> $GITHUB_ENV
-          echo "CURRENT_PORT=$CURRENT_PORT" >> $GITHUB_ENV
-          echo "STOPPED_PORT=$STOPPED_PORT" >> $GITHUB_ENV
 
       - name: Debug upstream variables
         run: |
