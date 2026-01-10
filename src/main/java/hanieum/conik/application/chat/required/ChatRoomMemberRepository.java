@@ -35,12 +35,6 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
         Long getRoomId();
         Long getLastReadSeq();
     }
-
-    interface LastReadSeqView {
-        Long getMemberId();
-        Long getLastReadSeq();
-    }
-
     // 특정 멤버가 여러 방에서 마지막으로 읽은 시퀀스(lastReadSeq)를 한 번에 조회
     @Query("""
         select crm.chatRoom.id as roomId, crm.lastReadSeq as lastReadSeq

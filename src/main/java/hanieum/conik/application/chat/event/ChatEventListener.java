@@ -1,4 +1,4 @@
-package hanieum.conik.domain.chat.event;
+package hanieum.conik.application.chat.event;
 
 import hanieum.conik.application.chat.required.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;

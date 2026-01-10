@@ -9,22 +9,20 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.chat.dto.ChatMessageDto;
 import hanieum.conik.domain.chat.entity.*;
 import hanieum.conik.domain.chat.enumerate.ChatRoomType;
-import hanieum.conik.domain.chat.event.ChatRoomDeletedEvent;
+import hanieum.conik.application.chat.event.ChatRoomDeletedEvent;
 import hanieum.conik.domain.chat.exception.ChatErrorType;
 import hanieum.conik.domain.chat.exception.ChatException;
 import hanieum.conik.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -100,20 +98,13 @@ public class ChatModifyService implements ChatSaver {
             ChatRoom room,
             List<ChatRoomMember> members
     ) {
-        // memberId -> 이름
-        Map<Long, String> idToName = members.stream()
-                .collect(Collectors.toMap(
-                        ChatRoomMember::getMemberId,
-                        m -> memberFinder.findById(m.getMemberId()).getName()
-                ));
-
+        Map<Long, String> idToName = getMemberNameMap(members);
         Map<Long, String> result = new HashMap<>();
 
         for (ChatRoomMember me : members) {
             Long myId = me.getMemberId();
 
             if (room.getType() == ChatRoomType.PRIVATE) {
-                // DM: 나 제외한 한 명
                 String opponent = members.stream()
                         .map(ChatRoomMember::getMemberId)
                         .filter(id -> !id.equals(myId))
@@ -138,6 +129,22 @@ public class ChatModifyService implements ChatSaver {
             result.put(myId, formatGroupRoomName(others, 3));
         }
         return result;
+    }
+
+    @NotNull
+    private Map<Long, String> getMemberNameMap(List<ChatRoomMember> members) {
+        Set<Long> memberIds = members.stream()
+                .map(ChatRoomMember::getMemberId)
+                .collect(Collectors.toSet());
+
+        List<Member> memberList = memberFinder.findAllByIds(new ArrayList<>(memberIds));
+
+        Map<Long, String> idToName = memberList.stream()
+                .collect(Collectors.toMap(
+                        Member::getId,   // Key: memberId
+                        Member::getName  // Value: 이름
+                ));
+        return idToName;
     }
 
     private String formatGroupRoomName(List<String> names, int limit) {
@@ -189,9 +196,6 @@ public class ChatModifyService implements ChatSaver {
         long remain = chatRoomMemberRepository.countByChatRoom_Id(roomId);
 
         if (remain == 0) {
-            long deleted = chatMessageRepository.deleteByRoomId(roomId);
-            log.info("[CHAT] deleted messages for room {} = {}", roomId, deleted);
-
             eventPublisher.publishEvent(new ChatRoomDeletedEvent(roomId));
         }
     }

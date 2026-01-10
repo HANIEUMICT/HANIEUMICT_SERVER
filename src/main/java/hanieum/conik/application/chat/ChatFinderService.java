@@ -175,29 +175,47 @@ public class ChatFinderService implements ChatFinder {
         chatRoomMemberRepository.findByChatRoom_IdAndMemberId(roomId, memberId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.MEMBER_NOT_IN_CHAT_ROOM));
 
+        // 메시지 조회
         Pageable pageable = PageRequest.of(0, size + 1, Sort.by(DESC, "seq"));
-        List<ChatMessage> rows;
+        List<ChatMessage> rawMessages;
 
         if (beforeSeq == null) {
-            rows = chatMessageRepository.findByRoomIdOrderBySeqDesc(roomId, pageable);
+            rawMessages = chatMessageRepository.findByRoomIdOrderBySeqDesc(roomId, pageable);
         } else {
-            rows = chatMessageRepository.findByRoomIdAndSeqLessThanOrderBySeqDesc(roomId, beforeSeq, pageable);
+            rawMessages = chatMessageRepository.findByRoomIdAndSeqLessThanOrderBySeqDesc(roomId, beforeSeq, pageable);
         }
 
-        boolean hasNext = rows.size() > size;
-        if (hasNext) rows = rows.subList(0, size);
+        // 3. 다음 페이지 여부 확인 및 리스트 자르기
+        boolean hasNext = rawMessages.size() > size;
+        List<ChatMessage> pagedMessages = hasNext ? rawMessages.subList(0, size) : rawMessages;
 
-        Collections.reverse(rows);
+        // 4. [Exception 방지] 수정 가능한 리스트로 복사 후 역정렬
+        // (MongoDB 리턴값이나 subList 뷰는 불변일 수 있어 Collections.reverse 시 에러 발생 가능)
+        List<ChatMessage> mutableMessages = new ArrayList<>(pagedMessages);
+        Collections.reverse(mutableMessages); // 과거 -> 최신 순으로 정렬 변경
 
-        List<ChatMessageDto> content = rows.stream()
-                .map(msg -> ChatMessageDto.fromEntity(msg, getSenderName(msg.getSenderId())))
+        // 5. [N+1 해결] 메시지 작성자(Sender) ID 일괄 수집
+        Set<Long> senderIds = mutableMessages.stream()
+                .map(ChatMessage::getSenderId)
+                .collect(Collectors.toSet());
+
+        // 6. [N+1 해결] 작성자 정보 일괄 조회
+        Map<Long, String> senderNameMap = memberFinder.findAllByIds(new ArrayList<>(senderIds))
+                .stream()
+                .collect(Collectors.toMap(
+                        Member::getId,
+                        Member::getName,
+                        (a, b) -> a
+                ));
+
+        // 7. DTO 변환 (DB 조회 없이 Map에서 이름 매핑)
+        List<ChatMessageDto> content = mutableMessages.stream()
+                .map(msg -> {
+                    String senderName = senderNameMap.getOrDefault(msg.getSenderId(), "(알 수 없음)");
+                    return ChatMessageDto.fromEntity(msg, senderName);
+                })
                 .toList();
         return new SliceImpl<>(content, pageable, hasNext);
-    }
-
-    private String getSenderName(Long senderId) {
-        Member sender = memberFinder.findById(senderId);
-        return sender.getName();
     }
 
     @Override
