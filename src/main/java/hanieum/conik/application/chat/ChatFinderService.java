@@ -53,21 +53,26 @@ public class ChatFinderService implements ChatFinder {
     public Page<ChatRoomSummary> findRoomsByMember(Long memberId, Pageable pageable) {
         Member member = memberFinder.findById(memberId);
 
+        // 1. 내가 참여 중인 채팅방 목록 조회 (페이징)
         Page<ChatRoomMember> page = chatRoomMemberRepository.findByMemberId(member.getId(), pageable);
         if (page.isEmpty()) return Page.empty(pageable);
 
         List<ChatRoomMember> chatRoomMembers = page.getContent();
 
+        // 2. 조회된 채팅방들의 ID 추출
         List<Long> roomIds = chatRoomMembers.stream()
                 .map(crm -> crm.getChatRoom().getId())
                 .toList();
 
+        // 3. 각 채팅방의 마지막 메시지/안 읽은 개수 조회 (MongoDB)
         LastMessageInfo info = getLastMessageInfo(memberId, roomIds);
 
+        // 4. 각 채팅방의 '모든 참여자' 정보 조회 (방 제목/썸네일 생성용)
         Map<Long, List<ChatRoomMember>> roomMembersMap = chatRoomMemberRepository.findByChatRoom_IdIn(roomIds)
                 .stream()
                 .collect(Collectors.groupingBy(crm -> crm.getChatRoom().getId()));
 
+        // 5. 데이터 조합하여 DTO 변환
         List<ChatRoomSummary> summaries = chatRoomMembers.stream()
                 .map(crm -> getRoomSummary(crm, info, roomMembersMap))
                 .toList();
@@ -163,8 +168,6 @@ public class ChatFinderService implements ChatFinder {
         return remain > 0 ? base + " 외 " + remain + "명" : base;
     }
 
-
-
     // 특정 메시지(seq) 이전의 N개 메시지를 가져온다.
     @Override
     public Slice<ChatMessageDto> fetchMessagesBeforeSeq(Long roomId, Long beforeSeq, int size, Long memberId) {
@@ -176,10 +179,8 @@ public class ChatFinderService implements ChatFinder {
         List<ChatMessage> rows;
 
         if (beforeSeq == null) {
-            // 첫 로딩: 최신부터 size개
             rows = chatMessageRepository.findByRoomIdOrderBySeqDesc(roomId, pageable);
         } else {
-            // 이전 페이지: beforeSeq 미만
             rows = chatMessageRepository.findByRoomIdAndSeqLessThanOrderBySeqDesc(roomId, beforeSeq, pageable);
         }
 
