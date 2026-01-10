@@ -5,6 +5,7 @@ import hanieum.conik.domain.chat.enumerate.MessageType;
 import org.bson.Document;
 
 import java.time.Instant;
+import java.util.Date;
 
 public record ChatMessageDto(
         long seq,
@@ -38,17 +39,32 @@ public record ChatMessageDto(
             return null;
         }
 
+        String typeStr = doc.getString("type");
+        MessageType messageType;
+        try {
+            if (typeStr != null) {
+                messageType = MessageType.valueOf(typeStr);
+            } else {
+                messageType = MessageType.TEXT;
+            }
+        } catch (IllegalArgumentException e) {
+            messageType = MessageType.TEXT;
+        }
+
+        Date date = doc.getDate("createdAt");
+        Instant createdAt = (date != null) ? date.toInstant() : null;
+
         return new ChatMessageDto(
                 doc.getLong("seq"),
                 doc.getLong("roomId"),
                 doc.getLong("senderId"),
-                MessageType.valueOf(doc.getString("type")),
+                messageType, // 수정된 변수 사용
                 null,
                 doc.getString("content"),
                 doc.getString("fileUrl"),
                 doc.getString("fileName"),
                 doc.getLong("fileSize"),
-                doc.getDate("createdAt").toInstant()
+                createdAt    // 수정된 변수 사용
         );
     }
 }

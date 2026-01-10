@@ -60,6 +60,10 @@ public class ChatMessage{
             Long fileSize,
             long seq
     ){
+        if(roomId == null || senderId == null){
+            throw new ChatException(ChatErrorType.INVALID_MESSAGE); // 필수 값 누락
+        }
+
         MessageType mt = (type != null) ? type : MessageType.TEXT;
 
         switch (mt) {

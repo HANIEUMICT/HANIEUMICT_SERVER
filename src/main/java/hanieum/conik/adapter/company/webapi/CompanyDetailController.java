@@ -29,6 +29,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.ZoneOffset;
+import java.util.List;
 
 @RestController
 @RequestMapping("/v1/company/detail")
@@ -120,14 +121,14 @@ public class CompanyDetailController {
             """)
     @GetMapping("/profiles")
     public ApiResponse<Page<CompanyProfileResponse>> searchProfiles(
-            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> categories,
             @RequestParam(required = false) Integer minRating,
             @RequestParam(required = false) Integer maxResponseMinutes,
             @RequestParam(required = false) Integer minTotalOrderCount,
             @RequestParam(required = false) Integer maxProductionHours,
             @ParameterObject @PageableDefault(size = 20, sort = "rating", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        var cond = new CompanyProfileSearchCondition(keyword, minRating, maxResponseMinutes, minTotalOrderCount, maxProductionHours);
+        var cond = new CompanyProfileSearchCondition(categories, minRating, maxResponseMinutes, minTotalOrderCount, maxProductionHours);
         return ApiResponse.success(companyFinder.findAllCompanyWithFilter(cond, pageable));
     }
 

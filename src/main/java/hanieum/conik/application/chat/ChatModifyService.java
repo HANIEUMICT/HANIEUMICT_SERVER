@@ -61,14 +61,14 @@ public class ChatModifyService implements ChatSaver {
         updateLastRead(request.roomId(), request.senderId(), seq);
 
         // STOMP 채팅방으로 브로드캐스트
-        messagingTemplate.convertAndSend("/topic/chat/room/" + request.roomId(), toPayload(chatMessage, sender.getName()));
+        messagingTemplate.convertAndSend("/v1/topic/chat/room/" + request.roomId(), toPayload(chatMessage, sender.getName()));
 
         // 채팅방 요약 정보 개인 토픽으로 전송
         List<ChatRoomMember> chatRoomMembers = chatFinder.findRoomMembers(request.roomId());
         Map<Long, String> roomNameMap = buildRoomNamePerMember(chatRoom, chatRoomMembers);
 
         for (ChatRoomMember m : chatRoomMembers) {
-            Long memberId = m.getMember().getId();
+            Long memberId = m.getMemberId();
 
             // 읽지 않은 메시지 수 계산
             long unread = calculateUnreadMessage(request, m, memberId, seq);
@@ -76,8 +76,8 @@ public class ChatModifyService implements ChatSaver {
 
             // ChatRoomSummary 생성
             ChatMessageDto chatMessageDto = ChatMessageDto.fromEntity(chatMessage, sender.getName());
-            messagingTemplate.convertAndSend("/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, roomName, unread, chatMessageDto));
-            log.info("📡 [convertAndSend] 개인 토픽 전송: /topic/user.{}.room-summary", memberId);
+            messagingTemplate.convertAndSend(".v1/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, roomName, unread, chatMessageDto));
+            log.info("📡 [convertAndSend] 개인 토픽 전송: /v1/topic/user.{}.room-summary", memberId);
         }
 
         return chatMessage;
@@ -97,19 +97,19 @@ public class ChatModifyService implements ChatSaver {
         // memberId -> 이름
         Map<Long, String> idToName = members.stream()
                 .collect(Collectors.toMap(
-                        m -> m.getMember().getId(),
-                        m -> m.getMember().getName() // nickname이면 변경
+                        ChatRoomMember::getMemberId,
+                        m -> memberFinder.findById(m.getMemberId()).getName()
                 ));
 
         Map<Long, String> result = new HashMap<>();
 
         for (ChatRoomMember me : members) {
-            Long myId = me.getMember().getId();
+            Long myId = me.getMemberId();
 
             if (room.getType() == ChatRoomType.PRIVATE) {
                 // DM: 나 제외한 한 명
                 String opponent = members.stream()
-                        .map(m -> m.getMember().getId())
+                        .map(ChatRoomMember::getMemberId)
                         .filter(id -> !id.equals(myId))
                         .findFirst()
                         .map(idToName::get)
@@ -121,7 +121,7 @@ public class ChatModifyService implements ChatSaver {
 
             // GROUP: 나 제외한 이름들
             List<String> others = members.stream()
-                    .map(m -> m.getMember().getId())
+                    .map(ChatRoomMember::getMemberId)
                     .filter(id -> !id.equals(myId))
                     .map(idToName::get)
                     .filter(n -> n != null && !n.isBlank())

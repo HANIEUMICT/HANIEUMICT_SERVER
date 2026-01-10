@@ -108,7 +108,7 @@ public class ChatFinderService implements ChatFinder {
         Long roomId = room.getId();
 
         List<ChatRoomMember> members = roomMembersMap.getOrDefault(roomId, List.of());
-        String roomName = buildRoomNameForMember(room, crm.getMember().getId(), members);
+        String roomName = buildRoomNameForMember(room, crm.getMemberId(), members);
 
         ChatMessageDto last = info.lastMessageMap().get(roomId);
 
@@ -127,15 +127,15 @@ public class ChatFinderService implements ChatFinder {
         // memberId -> 표시 이름
         Map<Long, String> idToName = members.stream()
                 .collect(Collectors.toMap(
-                        m -> m.getMember().getId(),
-                        m -> m.getMember().getName(), // nickname이면 바꾸기
+                        ChatRoomMember::getMemberId,
+                        m -> memberFinder.findById(m.getMemberId()).getName(),
                         (a, b) -> a
                 ));
 
         if (room.getType() == ChatRoomType.PRIVATE) {
             // 나 제외 1명
             return members.stream()
-                    .map(m -> m.getMember().getId())
+                    .map(ChatRoomMember::getMemberId)
                     .filter(id -> !id.equals(myId))
                     .findFirst()
                     .map(idToName::get)
@@ -144,7 +144,7 @@ public class ChatFinderService implements ChatFinder {
 
         // GROUP: 나 제외 이름들로 "A, B, C 외 n명"
         List<String> others = members.stream()
-                .map(m -> m.getMember().getId())
+                .map(ChatRoomMember::getMemberId)
                 .filter(id -> !id.equals(myId))
                 .map(idToName::get)
                 .filter(n -> n != null && !n.isBlank())

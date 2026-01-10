@@ -49,9 +49,19 @@ public class StompHandler implements ChannelInterceptor {
         if(StompCommand.SUBSCRIBE == accessor.getCommand()){
             log.info("[preSend|SUBSCRIBE] SUBSCRIBE 진입");
 
-            Authentication auth = getAuthentication(accessor);
             log.info("[preSend] accessor.getUser(): " + accessor.getUser());
+            Authentication auth = (Authentication) accessor.getUser();
 
+            if (auth == null && accessor.getSessionAttributes() != null) {
+                auth = (Authentication) accessor.getSessionAttributes().get("AUTH");
+            }
+            if (auth == null) {
+                auth = getAuthentication(accessor);
+                accessor.getSessionAttributes().put("AUTH", auth);
+            } else {
+                accessor.setUser(auth);
+            }
+            log.info("[preSend] accessor.getUser(): {}", accessor.getUser());
             final String destination = accessor.getDestination();
             log.info("[preSend|SUBSCRIBE] destination = {}", destination);
 

@@ -1,6 +1,5 @@
 package hanieum.conik.domain.chat.entity;
 
-import hanieum.conik.domain.member.Member;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -26,9 +25,8 @@ public class ChatRoomMember extends AbstractEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ChatRoom chatRoom;
 
-    @ManyToOne(fetch = LAZY, optional = false)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Column(nullable = false)
     private Long lastReadSeq = 0L;
@@ -43,12 +41,14 @@ public class ChatRoomMember extends AbstractEntity {
         }
     }
 
-    private ChatRoomMember(ChatRoom chatRoom, Member member) {
+    // 변경됨: 생성자에서 Member 객체 대신 memberId를 직접 받음
+    private ChatRoomMember(ChatRoom chatRoom, Long memberId) {
         this.chatRoom = chatRoom;
-        this.member = member;
+        this.memberId = memberId;
     }
 
-    public static ChatRoomMember create(ChatRoom chatRoom, Member member) {
-        return new ChatRoomMember(chatRoom, member);
+    // 변경됨: 팩토리 메서드도 ID를 받도록 수정
+    public static ChatRoomMember create(ChatRoom chatRoom, Long memberId) {
+        return new ChatRoomMember(chatRoom, memberId);
     }
 }

@@ -23,8 +23,8 @@ public class StompEventListener {
     public void connectHandle(SessionConnectEvent event) { // event 안에 사용자의 요청 정보가 담겨있다.
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         sessions.add(accessor.getSessionId());
-        System.out.println("Stomp connected. Current session count: " + sessions.size());
-        System.out.println("Connected session ID: " + accessor.getSessionId());
+        log.info("Stomp connected. Current session count: {}", sessions.size());
+        log.info("Connected session ID: {}", accessor.getSessionId());
     }
 
     @EventListener
@@ -39,7 +39,7 @@ public class StompEventListener {
     public void disconnectHandle(SessionDisconnectEvent event) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         sessions.remove(accessor.getSessionId());
-        System.out.println("Stomp disconnected. Current session count: " + sessions.size());
-        System.out.println("Disconnected session ID: " + accessor.getSessionId());
+        log.info("Stomp disconnected. Current session count: {}", sessions.size());
+        log.info("Disconnected session ID: {}", accessor.getSessionId());
     }
 }

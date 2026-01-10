@@ -65,9 +65,6 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "default_member_address_id")
     private MemberAddress defaultAddress;
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
-
     /* ========= 생성/팩토리 ========= */
 
     private Member(String name, Email email, String hashedPassword, String phoneNumber, Boolean termsOfServiceAgreed, MemberRole role, MemberAddress memberAddress) {

@@ -41,13 +41,13 @@ public class ChatRoom extends AbstractEntity {
 
     public void addMember(Member member) {
         boolean exists = chatRoomMembers.stream()
-                .anyMatch(m -> m.getMember().getId().equals(member.getId()));
+                .anyMatch(m -> m.getMemberId().equals(member.getId()));
         if (exists) throw new ChatException(ChatErrorType.ALREADY_IN_CHAT_ROOM);
 
-        chatRoomMembers.add(ChatRoomMember.create(this, member));
+        chatRoomMembers.add(ChatRoomMember.create(this, member.getId()));
     }
 
     public void removeMember(Member member) {
-        chatRoomMembers.removeIf(m -> m.getMember().equals(member));
+        chatRoomMembers.removeIf(m -> m.getMemberId().equals(member.getId()));
     }
 }

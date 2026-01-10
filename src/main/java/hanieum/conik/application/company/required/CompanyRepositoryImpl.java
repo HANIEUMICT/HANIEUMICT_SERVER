@@ -30,24 +30,41 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom{
 
     @Override
     public Page<CompanyProfileResponse> findCompaniesWithFilter(CompanyProfileSearchCondition cond, Pageable pageable) {
-
         QCompany c = QCompany.company;
         QCompanyDetail d = QCompanyDetail.companyDetail;
 
         BooleanBuilder where = new BooleanBuilder();
 
-        if (cond.keyword() != null && !cond.keyword().isBlank()) {
-            String kw = cond.keyword().trim().toLowerCase();
-            where.and(c.name.lower().like("%" + kw + "%")
-                    .or(c.industry.lower().like("%" + kw + "%")));
+        // 1. 카테고리(업종) 리스트 필터링
+        if (cond.categories() != null && !cond.categories().isEmpty()) {
+            // 여러 카테고리 중 하나라도 포함되면 검색 (OR 조건)
+            where.and(c.industry.in(cond.categories()));
         }
-        if (cond.minRating() != null)          where.and(d.rating.goe(cond.minRating()));
-        if (cond.maxResponseMinutes() != null) where.and(d.avgResponseMinutes.loe(cond.maxResponseMinutes()));
-        if (cond.minTotalOrderCount() != null) where.and(d.totalOrderCount.goe(cond.minTotalOrderCount()));
-        if (cond.maxProductionHours() != null) where.and(d.avgProductionLeadHours.loe(cond.maxProductionHours()));
+
+        // 2. 평점 필터링 (평점은 평균 점수이므로 데이터가 없는 신규 업체는 null임)
+        if (cond.minRating() != null) {
+            // 평점이 null(데이터 없음)이거나, 입력한 기준치 이상인 경우 포함
+            where.and(d.rating.isNull().or(d.rating.goe(cond.minRating())));
+        }
+
+        // 3. 응답 시간 필터링 (이하)
+        if (cond.maxResponseMinutes() != null) {
+            where.and(d.avgResponseMinutes.loe(cond.maxResponseMinutes()));
+        }
+
+        // 4. 거래 건수 필터링 (이상)
+        if (cond.minTotalOrderCount() != null) {
+            where.and(d.totalOrderCount.goe(cond.minTotalOrderCount()));
+        }
+
+        // 5. 제작 기간 필터링 (이하)
+        if (cond.maxProductionHours() != null) {
+            where.and(d.avgProductionLeadHours.loe(cond.maxProductionHours()));
+        }
 
         OrderSpecifier<?>[] orderSpecs = toOrderSpec(pageable.getSort(), c, d);
 
+        // 데이터 조회 쿼리
         List<CompanyProfileResponse> content = qf
                 .select(Projections.constructor(CompanyProfileResponse.class,
                         c.id,
@@ -65,23 +82,26 @@ public class CompanyRepositoryImpl implements CompanyRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long total = qf.select(c.count())
+        // 카운트 쿼리 (최적화)
+        JPAQuery<Long> countQuery = qf
+                .select(c.count())
                 .from(c)
                 .join(c.companyDetail, d)
-                .where(where)
-                .fetchOne();
+                .where(where);
 
-        return new PageImpl<>(content, pageable, total == null ? 0 : total);
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
     private OrderSpecifier<?>[] toOrderSpec(Sort sort, QCompany c, QCompanyDetail d) {
         if (sort == null || sort.isUnsorted()) {
             return new OrderSpecifier[]{
+                    // 평균 점수(rating)가 높은 순을 기본으로 하되, 점수 없는 업체는 뒤로
                     d.rating.desc().nullsLast(),
                     d.totalOrderCount.desc().nullsLast(),
                     c.id.desc()
             };
         }
+
         List<OrderSpecifier<?>> list = new ArrayList<>();
         for (Sort.Order o : sort) {
             ComparableExpressionBase<?> path = switch (o.getProperty()) {
