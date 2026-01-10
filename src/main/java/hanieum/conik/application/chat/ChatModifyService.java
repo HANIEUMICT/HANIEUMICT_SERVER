@@ -9,6 +9,8 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.chat.dto.ChatMessageDto;
 import hanieum.conik.domain.chat.entity.*;
 import hanieum.conik.domain.chat.enumerate.ChatRoomType;
+import hanieum.conik.domain.chat.exception.ChatErrorType;
+import hanieum.conik.domain.chat.exception.ChatException;
 import hanieum.conik.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -154,6 +156,11 @@ public class ChatModifyService implements ChatSaver {
 
     @Override
     public Long createPrivateRoom(Long memberAId, Long memberBId) {
+        // 자기 자신과 1:1 채팅방 생성 불가
+        if(memberAId.equals(memberBId)) {
+            throw new ChatException(ChatErrorType.MEMBER_CANNOT_CREATE_CHAT_ROOM_WITH_SELF);
+        }
+
         // member 조회
         Member memberA = memberFinder.findById(memberAId);
         Member memberB = memberFinder.findById(memberBId);

@@ -13,7 +13,8 @@ public enum ChatErrorType implements ErrorType {
     MEMBER_NOT_IN_CHAT_ROOM(HttpStatus.FORBIDDEN, "채팅방에 속하지 않은 사용자입니다."),
     ALREADY_IN_CHAT_ROOM(HttpStatus.CONFLICT, "이미 채팅방에 속한 사용자입니다."),
     NOT_INCLUDED_IN_CHAT_ROOM(HttpStatus.BAD_REQUEST, "채팅방에 포함되지 않은 사용자입니다."),
-    PRIVATE_CHAT_ROOM_ALREADY_EXISTS(HttpStatus.CONFLICT, "1:1 채팅방이 이미 존재합니다.");
+    PRIVATE_CHAT_ROOM_ALREADY_EXISTS(HttpStatus.CONFLICT, "1:1 채팅방이 이미 존재합니다."),
+    MEMBER_CANNOT_CREATE_CHAT_ROOM_WITH_SELF(HttpStatus.BAD_REQUEST, "자기 자신과 채팅방을 생성할 수 없습니다.");
 
     private final HttpStatus status;
     private final String message;
