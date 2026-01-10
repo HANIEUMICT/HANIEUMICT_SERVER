@@ -18,11 +18,15 @@ public class StompWebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${cors.origin.development}")
     private String devOrigin;
 
+    @Value("${cors.origin.test}")
+    private String testOrigin;
+
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/v1/connect")
                 .setAllowedOrigins(devOrigin)
+                .setAllowedOrigins(testOrigin)
                 .withSockJS(); // ws://가 아닌 http:// 엔드포인트를 사용할 수 있게 해주는 sockJs 라이브러리를 통한 요청을 허용하는 설정
     }
 
