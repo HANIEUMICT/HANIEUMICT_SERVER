@@ -59,7 +59,7 @@ jobs:
     steps:
       - name: Set target IP
         run: |
-          STATUS=$(curl -o /dev/null -w "%{http_code}" "http://${{ secrets.LIVE_SERVER_IP }}/actuator/health/readiness" || echo 000)
+          STATUS=$(curl -o /dev/null -w "%{http_code}" "https://${{ secrets.LIVE_SERVER_IP }}/actuator/health/readiness" || echo 000)
           
           echo "NGINX_STATUS=$STATUS"
             
