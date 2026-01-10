@@ -3,6 +3,7 @@ package hanieum.conik.application.proposal;
 import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
 import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
+import hanieum.conik.application.deal.provided.DealSaver;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.proposal.provided.ProposalDrawingSaver;
@@ -10,8 +11,10 @@ import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.provided.ProposalSaver;
 import hanieum.conik.application.proposal.required.ProposalDrawingFileRepository;
 import hanieum.conik.application.proposal.required.ProposalRepository;
+import hanieum.conik.domain.member.exception.MemberException;
 import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
+import hanieum.conik.domain.project.exception.ProjectException;
 import hanieum.conik.domain.proposal.domain.entity.Proposal;
 import hanieum.conik.domain.proposal.domain.entity.ProposalDrawingFile;
 import hanieum.conik.domain.proposal.domain.enumerate.ProposalBidStatus;
@@ -33,6 +36,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
     private final ProposalFinder proposalFinder;
     private final ProjectFinder projectFinder;
     private final MemberFinder memberFinder;
+    private final DealSaver dealSaver;
 
     private final Map<SubmitStatus, Consumer<Proposal>> statusHandlers = Map.of(
             SubmitStatus.TEMPORARY_SAVE, Proposal::updateToDraft,
@@ -47,6 +51,8 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
             Proposal proposal = Proposal.initiate(memberFinder.findById(memberId), project);
 
             return proposalRepository.save(proposal);
+        } catch (ProjectException | MemberException | ProposalException e) {
+            throw e;
         } catch (Exception e) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_INITIATE_ERROR);
         }
@@ -65,6 +71,7 @@ public class ProposalModifyService implements ProposalSaver, ProposalDrawingSave
         if (!SubmitStatus.SUBMIT.equals(proposalRegisterRequest.submitStatus())) {
             throw new ProposalException(ProposalErrorType.PROPOSAL_FINAL_REQUEST_ERROR);
         }
+        dealSaver.request(proposalRegisterRequest.projectId());
         return getSavedProposal(proposalId, proposalRegisterRequest);
     }
 

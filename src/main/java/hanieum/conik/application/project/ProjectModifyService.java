@@ -2,6 +2,7 @@ package hanieum.conik.application.project;
 
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
+import hanieum.conik.application.deal.provided.DealSaver;
 import hanieum.conik.application.project.provided.ProjectFinder;
 import hanieum.conik.application.project.provided.ProjectSaver;
 import hanieum.conik.application.project.required.ProjectRepository;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProjectModifyService implements ProjectSaver {
     private final ProjectRepository projectRepository;
     private final ProjectFinder projectFinder;
+    private final DealSaver dealSaver;
 
     @Override
     public Project initiate(Long memberId) {
@@ -47,7 +49,9 @@ public class ProjectModifyService implements ProjectSaver {
         }
 
         // TODO: 기업 하나가 같은 프로젝트에 여러 견적서 등록 못하게 - @seongho5356
-        // TODO: 최종 저장시, ProjectProgress에도 "견적 요청"(REQUESTED) 상태로 등록 필요
+        // TODO: 최종 저장 시 기업이 만든 프로젝트인 경우 아직 고려 x
+        dealSaver.open(projectId, request.memberId());
+
         return getSavedProject(projectId, request);
     }
 
