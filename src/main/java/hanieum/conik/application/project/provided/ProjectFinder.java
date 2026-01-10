@@ -10,6 +10,9 @@ import hanieum.conik.global.adapter.security.AuthDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface ProjectFinder {
     Project findProject(Long projectId);
 
@@ -22,4 +25,6 @@ public interface ProjectFinder {
     Page<ProjectDetailResponse> findProjectsByCompanyId(Long companyId, Pageable pageable);
 
     void deleteProject(Long currentMemberId, Long projectId);
+
+    List<Project> findProjectsByIds(Collection<Long> ids);
 }

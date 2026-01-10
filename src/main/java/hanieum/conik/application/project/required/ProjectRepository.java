@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,10 +34,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long>, JpaSpec
 
     @Query("""
         select distinct p
-        from Project p, ProjectRequest pr
+        from Project p, DealRequest pr
         where pr.projectId = p.id
           and pr.companyId = :companyId
     """)
     Page<Project> findByCompanyId(@Param("companyId")Long companyId, Pageable pageable);
+
+    List<Project> findByIdIn(Collection<Long> ids);
 }
 
