@@ -70,8 +70,8 @@ public class StompHandler implements ChannelInterceptor {
             }
 
             // 1) 개인 토픽: /topic/user.{memberId}.room-summary
-            if (destination.startsWith("/topic/user.")) {
-                String afterPrefix = destination.substring("/topic/user.".length()); // e.g. "1.room-summary"
+            if (destination.startsWith("/v1/topic/user.")) {
+                String afterPrefix = destination.substring("/v1/topic/user.".length()); // e.g. "1.room-summary"
                 String[] parts = afterPrefix.split("\\.");
                 if (parts.length < 1) {
                     throw new MessagingException("Invalid personal topic: " + destination);
@@ -88,7 +88,7 @@ public class StompHandler implements ChannelInterceptor {
             }
 
             // 2) 방 토픽: /topic/chat/room/{roomId}
-            if (destination.startsWith("/topic/chat/room/")) {
+            if (destination.startsWith("/v1/topic/chat/room/")) {
                 String[] segs = destination.split("/");
                 // ["", "topic", "chat", "room", "{roomId}"]
                 if (segs.length < 5) {
