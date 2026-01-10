@@ -2,7 +2,6 @@ package hanieum.conik.application.proposal;
 
 import hanieum.conik.adapter.proposal.dto.request.ProposalDrawingUploadRequest;
 import hanieum.conik.adapter.proposal.dto.request.ProposalRegisterRequest;
-import hanieum.conik.adapter.proposal.dto.response.ProposalResponse;
 import hanieum.conik.application.deal.provided.DealSaver;
 import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.application.project.provided.ProjectFinder;
