@@ -40,7 +40,7 @@ public class ChatFinderService implements ChatFinder {
 
     @Override
     public ChatRoomMember findChatRoomMember(Long roomId, Long memberId){
-        return chatRoomMemberRepository.findByChatRoom_IdAndMember_Id(roomId, memberId)
+        return chatRoomMemberRepository.findByChatRoom_IdAndMemberId(roomId, memberId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.MEMBER_NOT_IN_CHAT_ROOM));
     }
 
@@ -53,7 +53,7 @@ public class ChatFinderService implements ChatFinder {
     public Page<ChatRoomSummary> findRoomsByMember(Long memberId, Pageable pageable) {
         Member member = memberFinder.findById(memberId);
 
-        Page<ChatRoomMember> page = chatRoomMemberRepository.findByMember_Id(member.getId(), pageable);
+        Page<ChatRoomMember> page = chatRoomMemberRepository.findByMemberId(member.getId(), pageable);
         if (page.isEmpty()) return Page.empty(pageable);
 
         List<ChatRoomMember> chatRoomMembers = page.getContent();
@@ -122,15 +122,13 @@ public class ChatFinderService implements ChatFinder {
         return ChatRoomSummary.of(room, roomName, unread, last);
     }
 
-
     private String buildRoomNameForMember(ChatRoom room, Long myId, List<ChatRoomMember> members) {
         // memberId -> 표시 이름
-        Map<Long, String> idToName = members.stream()
-                .collect(Collectors.toMap(
-                        ChatRoomMember::getMemberId,
-                        m -> memberFinder.findById(m.getMemberId()).getName(),
-                        (a, b) -> a
-                ));
+        List<Long> memberIds = members.stream()
+                .map(ChatRoomMember::getMemberId)
+                .toList();
+        Map<Long, String> idToName = memberFinder.findAllByIds(memberIds).stream()
+                .collect(Collectors.toMap(Member::getId, Member::getName, (a, b) -> a));
 
         if (room.getType() == ChatRoomType.PRIVATE) {
             // 나 제외 1명
@@ -171,7 +169,7 @@ public class ChatFinderService implements ChatFinder {
     @Override
     public Slice<ChatMessageDto> fetchMessagesBeforeSeq(Long roomId, Long beforeSeq, int size, Long memberId) {
         // 멤버가 채팅방의 구성원인지 확인
-        chatRoomMemberRepository.findByChatRoom_IdAndMember_Id(roomId, memberId)
+        chatRoomMemberRepository.findByChatRoom_IdAndMemberId(roomId, memberId)
                 .orElseThrow(() -> new ChatException(ChatErrorType.MEMBER_NOT_IN_CHAT_ROOM));
 
         Pageable pageable = PageRequest.of(0, size + 1, Sort.by(DESC, "seq"));
@@ -203,7 +201,7 @@ public class ChatFinderService implements ChatFinder {
 
     @Override
     public boolean isRoomMember(Long roomId, Long memberId) {
-        return chatRoomMemberRepository.findByChatRoom_IdAndMember_Id(roomId, memberId).isPresent();
+        return chatRoomMemberRepository.findByChatRoom_IdAndMemberId(roomId, memberId).isPresent();
     }
 
     @Override

@@ -15,7 +15,7 @@ import java.util.Optional;
 @Repository
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
     // 특정 방에 특정 멤버로 가입된 ChatRoomMember 엔티티 조회
-    Optional<ChatRoomMember> findByChatRoom_IdAndMember_Id(Long roomId, Long memberId);
+    Optional<ChatRoomMember> findByChatRoom_IdAndMemberId(Long roomId, Long memberId);
 
     // 특정 방에 속한 모든 ChatRoomMember 엔티티 조회
     List<ChatRoomMember> findByChatRoom_Id(Long roomId);
@@ -25,9 +25,9 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
 
     // 특정 멤버가 속한 모든 ChatRoomMember 엔티티 조회
     @EntityGraph(attributePaths = {"chatRoom"})
-    Page<ChatRoomMember> findByMember_Id(Long memberId, Pageable pageable);
+    Page<ChatRoomMember> findByMemberId(Long memberId, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"member", "chatRoom"})
+    @EntityGraph(attributePaths = {"chatRoom"})
     List<ChatRoomMember> findByChatRoom_IdIn(List<Long> roomIds);
 
     // 배치로 방별 lastReadSeq를 한 번에 읽기 위한 Projection
@@ -45,7 +45,7 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
     @Query("""
         select crm.chatRoom.id as roomId, crm.lastReadSeq as lastReadSeq
         from ChatRoomMember crm
-        where crm.member.id = :memberId and crm.chatRoom.id in :roomIds
+        where crm.memberId= :memberId and crm.chatRoom.id in :roomIds
     """)
     List<LastReadView> findLastReadSeqs(@Param("memberId") Long memberId, @Param("roomIds") List<Long> roomIds);
 }

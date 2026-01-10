@@ -17,11 +17,11 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
         where r.type = :type
           and exists (
             select 1 from ChatRoomMember m
-            where m.chatRoom = r and m.member.id = :memberAId
+            where m.chatRoom = r and m.memberId = :memberAId
           )
           and exists (
             select 1 from ChatRoomMember m
-            where m.chatRoom = r and m.member.id = :memberBId
+            where m.chatRoom = r and m.memberId = :memberBId
           )
     """)
     Optional<ChatRoom> findPrivateRoomBetweenMembers(

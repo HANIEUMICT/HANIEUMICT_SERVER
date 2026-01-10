@@ -9,11 +9,13 @@ import hanieum.conik.application.member.provided.MemberFinder;
 import hanieum.conik.domain.chat.dto.ChatMessageDto;
 import hanieum.conik.domain.chat.entity.*;
 import hanieum.conik.domain.chat.enumerate.ChatRoomType;
+import hanieum.conik.domain.chat.event.ChatRoomDeletedEvent;
 import hanieum.conik.domain.chat.exception.ChatErrorType;
 import hanieum.conik.domain.chat.exception.ChatException;
 import hanieum.conik.domain.member.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ public class ChatModifyService implements ChatSaver {
     private final MemberFinder memberFinder;
     private final ChatFinder chatFinder;
     private final ChatMessageRepository chatMessageRepository; // Mongo
+
+    private final ApplicationEventPublisher eventPublisher;
 
     private final StringRedisTemplate stringRedisTemplate;     // seq 발급용(INCR)
     private final SimpMessagingTemplate messagingTemplate;     // STOMP 브로드캐스트
@@ -78,7 +82,7 @@ public class ChatModifyService implements ChatSaver {
 
             // ChatRoomSummary 생성
             ChatMessageDto chatMessageDto = ChatMessageDto.fromEntity(chatMessage, sender.getName());
-            messagingTemplate.convertAndSend(".v1/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, roomName, unread, chatMessageDto));
+            messagingTemplate.convertAndSend("/v1/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, roomName, unread, chatMessageDto));
             log.info("📡 [convertAndSend] 개인 토픽 전송: /v1/topic/user.{}.room-summary", memberId);
         }
 
@@ -188,7 +192,7 @@ public class ChatModifyService implements ChatSaver {
             long deleted = chatMessageRepository.deleteByRoomId(roomId);
             log.info("[CHAT] deleted messages for room {} = {}", roomId, deleted);
 
-            chatRoomRepository.deleteById(roomId);
+            eventPublisher.publishEvent(new ChatRoomDeletedEvent(roomId));
         }
     }
 

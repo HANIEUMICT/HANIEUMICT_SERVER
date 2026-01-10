@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.Collections;
+import java.util.List;
+
 @Service
 @Transactional
 @Validated
@@ -75,5 +78,13 @@ public class MemberFinderService implements MemberFinder {
                 .orElseThrow(() -> new MemberException(MemberErrorType.MEMBER_NOT_FOUND));
 
         return MemberInfoResponse.from(member);
+    }
+
+    @Override
+    public List<Member> findAllByIds(List<Long> memberIds) {
+        if (memberIds == null || memberIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return memberRepository.findAllById(memberIds);
     }
 }

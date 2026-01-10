@@ -7,6 +7,8 @@ import hanieum.conik.domain.common.email.Email;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * 회원을 조회한다
  */
@@ -17,4 +19,5 @@ public interface MemberFinder {
     Long findCompanyIdByMemberId(Long memberId);
     MemberAddressResponse findAddress(Long memberId, Long addressId);
     MemberInfoResponse getMemberInfo(Long memberId);
+    List<Member> findAllByIds(List<Long> memberIds);
 }
