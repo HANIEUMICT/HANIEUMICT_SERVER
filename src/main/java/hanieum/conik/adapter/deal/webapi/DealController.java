@@ -1,6 +1,7 @@
 package hanieum.conik.adapter.deal.webapi;
 
 import hanieum.conik.adapter.deal.dto.response.DealSummaryResponse;
+import hanieum.conik.adapter.deal.dto.response.DealTimelineResponse;
 import hanieum.conik.application.deal.provided.DealFinder;
 import hanieum.conik.global.adapter.security.AuthDetails;
 import hanieum.conik.global.apiPayload.response.ApiResponse;
@@ -14,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,4 +42,19 @@ public class DealController {
         return ApiResponse.success(dealFinder.getDeals(authDetails, pageable));
     }
 
+    @Operation( summary = "거래 상세 진행 타임라인 조회", description = """
+    ## 거래(Deal)의 전체 진행 단계를 타임라인 형태로 조회합니다.
+    - DealStep 전체를 순서대로 반환합니다.
+    - 각 단계별 상세 정보가 없을 경우 detail은 null로 반환됩니다.
+    """
+    )
+    @GetMapping("/{dealId}")
+    public ApiResponse<DealTimelineResponse> getDealTimeline(
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @PathVariable Long dealId
+    ) {
+        return ApiResponse.success(
+                dealFinder.getDealTimeline(dealId)
+        );
+    }
 }
