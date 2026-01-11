@@ -1,5 +1,6 @@
 package hanieum.conik.domain.chat.dto;
 
+import hanieum.conik.adapter.chat.dto.ChatMessageRequest;
 import hanieum.conik.domain.chat.entity.ChatMessage;
 import hanieum.conik.domain.chat.enumerate.MessageType;
 import org.bson.Document;
@@ -31,6 +32,21 @@ public record ChatMessageDto(
                 chatMessage.getFileName(),
                 chatMessage.getFileSize(),
                 chatMessage.getCreatedAt()
+        );
+    }
+
+    public static ChatMessageDto fromRequest(Long roomId, ChatMessageRequest request) {
+        return new ChatMessageDto(
+                0L, // seq는 저장 후에 할당되므로 임시로 0L 사용
+                roomId,
+                request.senderId(),
+                request.type(),
+                null, // senderName은 나중에 채워질 수 있음
+                request.content(),
+                request.fileUrl(),
+                request.fileName(),
+                request.fileSize(),
+                null  // createdAt은 저장 후에 할당되므로 임시로 null 사용
         );
     }
 

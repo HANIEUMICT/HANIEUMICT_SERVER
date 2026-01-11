@@ -38,8 +38,9 @@ public class ChatModifyService implements ChatSaver {
 
     private final ApplicationEventPublisher eventPublisher;
 
+    private final SimpMessagingTemplate messagingTemplate;
     private final StringRedisTemplate stringRedisTemplate;     // seq 발급용(INCR)
-    private final SimpMessagingTemplate messagingTemplate;     // STOMP 브로드캐스트
+    private final RedisPubSubService redisPubSubService;
 
     @Override
     public ChatMessage sendMessage(Long roomId, ChatMessageRequest request) {
@@ -65,7 +66,8 @@ public class ChatModifyService implements ChatSaver {
         updateLastRead(request.roomId(), request.senderId(), seq);
 
         // STOMP 채팅방으로 브로드캐스트
-        messagingTemplate.convertAndSend("/v1/topic/chat/room/" + request.roomId(), toPayload(chatMessage, sender.getName()));
+        ChatMessageDto chatMessageDto = ChatMessageDto.fromEntity(chatMessage, sender.getName());
+        redisPubSubService.publish(chatMessageDto);
 
         // 채팅방 요약 정보 개인 토픽으로 전송
         List<ChatRoomMember> chatRoomMembers = chatFinder.findRoomMembers(request.roomId());
@@ -78,9 +80,7 @@ public class ChatModifyService implements ChatSaver {
             long unread = calculateUnreadMessage(request, m, memberId, seq);
             String roomName = roomNameMap.getOrDefault(memberId, "채팅");
 
-            // ChatRoomSummary 생성
-            ChatMessageDto chatMessageDto = ChatMessageDto.fromEntity(chatMessage, sender.getName());
-            messagingTemplate.convertAndSend("/v1/topic/user." + memberId + ".room-summary", ChatRoomSummary.of(chatRoom, roomName, unread, chatMessageDto));
+            redisPubSubService.publishSummary(memberId, ChatRoomSummary.of(chatRoom, roomName, unread, chatMessageDto));
             log.info("📡 [convertAndSend] 개인 토픽 전송: /v1/topic/user.{}.room-summary", memberId);
         }
 
