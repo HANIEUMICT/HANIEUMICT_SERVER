@@ -1,5 +1,6 @@
 package hanieum.conik.application.favorite;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import hanieum.conik.application.company.required.CompanyRepository;
 import hanieum.conik.application.favorite.provided.FavoriteFinder;
 import hanieum.conik.application.favorite.provided.FavoriteSaver;
@@ -10,14 +11,18 @@ import hanieum.conik.domain.favorite.Favorite;
 import hanieum.conik.domain.favorite.dto.FavoriteRequest;
 import hanieum.conik.domain.favorite.exception.FavoriteException;
 import hanieum.conik.domain.project.ProjectFixtures;
-import hanieum.conik.domain.project.entity.Project;
 import hanieum.conik.domain.project.exception.ProjectException;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -27,9 +32,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
-@Transactional
+/**
+ * @DataJpaTest: JPA 관련 부품만 로드하여 Redis/Chat 관련 의존성을 원천 차단합니다.
+ * @Import: 테스트 대상인 Service 구현체들을 명시적으로 로드합니다. (구현체 클래스 이름을 확인해주세요)
+ */
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({FavoriteFinderService.class, FavoriteModifyService.class})
 public class FavoriteServiceJpaTest {
+
     @Autowired FavoriteFinder favoriteFinder;
     @Autowired FavoriteSaver favoriteSaver;
     @Autowired FavoriteRepository favoriteRepository;
@@ -37,11 +48,21 @@ public class FavoriteServiceJpaTest {
 
     @MockBean CompanyRepository companyRepository;
 
-    /***
-     * =================================================================================================================
-     * save - 관련 테스트
-     */
+    // Querydsl 사용 시 필요한 JPAQueryFactory 설정을 수동으로 추가
+    @TestConfiguration
+    static class TestConfig {
+        @PersistenceContext
+        private EntityManager entityManager;
 
+        @Bean
+        public JPAQueryFactory jpaQueryFactory() {
+            return new JPAQueryFactory(entityManager);
+        }
+    }
+
+    /***
+     * save - 관련 테스트 (기존 로직 동일)
+     */
     @Test
     @DisplayName("save: 정상 저장 시 id 반환")
     void save_success() {
@@ -85,10 +106,8 @@ public class FavoriteServiceJpaTest {
     }
 
     /***
-     * =================================================================================================================
      * findFavoriteProjects - 관련 테스트
      */
-
     @Test
     @DisplayName("findFavoriteProjects: 회사 존재 -> 페이징된 즐겨찾기 반환")
     void findFavoriteProjects_success() {
@@ -105,10 +124,8 @@ public class FavoriteServiceJpaTest {
 
         var pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-        // when
         var page = favoriteFinder.findFavoriteProjects(1L, pageable);
 
-        // then
         assertThat(page.getTotalElements()).isEqualTo(2);
         assertThat(page.getContent())
                 .extracting(fav -> fav.project().projectId())
@@ -139,10 +156,8 @@ public class FavoriteServiceJpaTest {
     }
 
     /***
-     * =================================================================================================================
      * delete - 관련 테스트
      */
-
     @Test
     @DisplayName("delete: 삭제 성공")
     void delete_success() {
