@@ -10,6 +10,10 @@ import hanieum.conik.domain.company.exception.CompanyException;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,13 +28,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class CompanyFinderServiceTest {
-    @Autowired
+    @InjectMocks
     CompanyFinderService companyFinderService;
 
-    @MockBean
+    @Mock
     CompanyRepository companyRepository;
 
     // ─────────────────────────── findAllCompanySummaries ───────────────────────────
@@ -200,20 +203,26 @@ class CompanyFinderServiceTest {
     @Test
     @DisplayName("기업 상세 단건 조회: 없으면 예외")
     void findCompanyWithDetail_notFound_throws() {
-        Long id = 100L;
-        given(companyRepository.findWithDetailById(id)).willReturn(Optional.empty());
+        // findCompany 내부에서 실제로 호출하는 리포지토리 메서드로 맞춰줘야 합니다.
+        // 만약 findCompany가 findById를 쓴다면 findById로,
+        // findWithDetailById를 쓴다면 findWithDetailById로 이름을 맞춰주세요.
+        given(companyRepository.findById(anyLong())).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> companyFinderService.findCompanyWithDetail(id))
+        assertThatThrownBy(() -> companyFinderService.findCompanyWithDetail(100L))
                 .isInstanceOf(CompanyException.class);
     }
 
     @Test
-    @DisplayName("기업 상세 단건 조회: 상세가 null이면 예외")
+    @DisplayName("기업 상세 단건 조회: 상세 정보가 null이면 예외")
     void findCompanyWithDetail_detailNull_throws() {
         Long id = 100L;
         Company company = mock(Company.class);
+
+        // 1. findCompany 내부에서 호출할 메서드 설정
+        given(companyRepository.findById(id)).willReturn(Optional.of(company));
+
+        // 2. 그 결과로 나온 company의 detail이 null인 상황 설정
         given(company.getCompanyDetail()).willReturn(null);
-        given(companyRepository.findWithDetailById(id)).willReturn(Optional.of(company));
 
         assertThatThrownBy(() -> companyFinderService.findCompanyWithDetail(id))
                 .isInstanceOf(CompanyException.class);

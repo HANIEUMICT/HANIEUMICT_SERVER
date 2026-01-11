@@ -34,12 +34,10 @@ public class ChatModifyService implements ChatSaver {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final MemberFinder memberFinder;
     private final ChatFinder chatFinder;
+
     private final ChatMessageRepository chatMessageRepository; // Mongo
-
     private final ApplicationEventPublisher eventPublisher;
-
-    private final SimpMessagingTemplate messagingTemplate;
-    private final StringRedisTemplate stringRedisTemplate;     // seq 발급용(INCR)
+    private final StringRedisTemplate stringRedisTemplate;
     private final RedisPubSubService redisPubSubService;
 
     @Override
