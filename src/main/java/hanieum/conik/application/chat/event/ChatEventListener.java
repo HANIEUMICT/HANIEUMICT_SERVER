@@ -1,6 +1,7 @@
 package hanieum.conik.application.chat.event;
 
 import hanieum.conik.application.chat.required.ChatMessageRepository;
+import hanieum.conik.domain.chat.exception.ChatException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Backoff;
@@ -18,7 +19,7 @@ public class ChatEventListener {
     private final ChatMessageRepository chatMessageRepository;
 
     @Async
-    @Retryable(retryFor = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+    @Retryable(retryFor = ChatException.class, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDeleteChatRoomMessages(ChatRoomDeletedEvent event) {
         Long roomId = event.roomId();
