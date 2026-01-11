@@ -22,13 +22,8 @@ public class ChatEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleDeleteChatRoomMessages(ChatRoomDeletedEvent event) {
         Long roomId = event.roomId();
-
-        try {
-            long deleted = chatMessageRepository.deleteByRoomId(roomId);
-            log.info("[CHAT] Transaction Committed. Deleted MongoDB messages for room {} = {}", roomId, deleted);
-        } catch (Exception e) {
-            log.error("[CHAT] Failed to delete MongoDB messages for room {}", roomId, e);
-        }
+        long deleted = chatMessageRepository.deleteByRoomId(roomId);
+        log.info("[CHAT] Transaction Committed. Deleted MongoDB messages for room {} = {}", roomId, deleted);
     }
 
     /**

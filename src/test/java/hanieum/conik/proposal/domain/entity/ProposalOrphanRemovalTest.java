@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * RedisConfig, ChatController 등은 로드 범위에서 제외되므로 관련 에러가 발생하지 않습니다.
  */
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 실제 DB 설정을 사용하거나 H2를 자동으로 사용
 @Import(QueryDslTestConfig.class)
 class ProposalOrphanRemovalTest {
 
