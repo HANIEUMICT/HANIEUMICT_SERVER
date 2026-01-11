@@ -1,6 +1,7 @@
 package hanieum.conik.domain.member;
 
 import hanieum.conik.adapter.member.persistence.EmailAttributeConverter;
+import hanieum.conik.domain.chat.entity.ChatRoomMember;
 import hanieum.conik.domain.common.email.Email;
 import hanieum.conik.domain.member.dto.MemberSignUpRequest;
 import hanieum.conik.domain.member.enumerate.MemberRole;

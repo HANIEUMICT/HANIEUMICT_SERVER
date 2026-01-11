@@ -21,6 +21,21 @@ services:
     networks:
       - conik_network
 
+  mongodb:
+    container_name: conik-mongo
+    image: mongo:7.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: chatdb
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - conik_network
+
 networks:
   conik_network:
     driver: bridge
+
+volumes:
+  mongo_data:

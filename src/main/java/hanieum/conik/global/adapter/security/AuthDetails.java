@@ -30,7 +30,7 @@ public class AuthDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return "";
+        return String.valueOf(member.getId());
     }
 
     @Override

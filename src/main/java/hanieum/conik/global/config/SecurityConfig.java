@@ -31,7 +31,7 @@ public class SecurityConfig {
                 .sessionManagement(configure -> configure.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 기반 인증이므로 세션을 아예 생성하지 않음
                 .authorizeHttpRequests(authorize ->
                         authorize
-                                .requestMatchers(HttpMethod.OPTIONS, "/v1/**").permitAll()
+                                .requestMatchers(HttpMethod.OPTIONS, "/v1/**", "/**").permitAll()
                                 .requestMatchers(
                                         "/v1/auth/signup/**",
                                         "/actuator/health/readiness",
@@ -46,7 +46,9 @@ public class SecurityConfig {
                                 .requestMatchers(
                                         "/swagger-ui.html",
                                         "/swagger-ui/**",
-                                        "/v1/api-docs/**"
+                                        "/v1/api-docs/**",
+                                        "/v1/connect/**"
+//                                        "/v1/publish/**"
                                 ).permitAll()
                                 .requestMatchers(
                                         "/v1/company",

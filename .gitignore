@@ -44,5 +44,7 @@ out/
 /src/test/resources/application.yml
 /도메인모델.md
 
+.env
+
 ### Mac OS
 .DS_Store

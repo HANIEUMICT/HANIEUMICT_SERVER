@@ -15,6 +15,9 @@ public enum AuthErrorType implements ErrorType {
     SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 에러입니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND,     "존재하지 않는 사용자입니다."),
     UNAUTHORIZED_MEMBER_ACCESS(HttpStatus.FORBIDDEN, "권한이 없는 사용자입니다."),
+    UNAUTHORIZED_SUBSCRIBE (HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."),
+    INVALID_DESTINATION(HttpStatus.BAD_REQUEST, "잘못된 목적지입니다."),
+    UNAUTHORIZED_ROOM_MEMBER (HttpStatus.UNAUTHORIZED,"해당 room에 권한이 없습니다.")
     ;
 
     private final HttpStatus status;
