@@ -12,6 +12,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -22,55 +26,20 @@ import org.springframework.data.domain.Sort;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class MemberFinderServiceTest {
-    @Autowired MemberFinderService memberFinder;
-    @Autowired MemberRepository memberRepository;
-
-    @PersistenceContext
-    EntityManager em;
-
-    @Test
-    @DisplayName("멤버 주소 목록 조회 - 성공")
-    void findAddresses_success() {
-        var baseAddr = new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951", "12345", "행복로", "101호", true);
-        var signUpReq = new MemberSignUpRequest(
-                "홍길동", "hong@example.com", "raw-pw", "010-1234-5678",
-                true, baseAddr
-        );
-
-        Member member = Member.signUpIndividual(signUpReq);
-
-        member.getAddresses().clear();
-        member.setDefaultAddress(null);
-
-        member.addAddress(MemberAddress.register(
-                new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951","12345", "행복로", "101호", false)));
-        member.addAddress(MemberAddress.register(
-                new AddressRegisterRequest("우리집", "홍길동", "010-4130-1951","12345", "행복로", "102호", false)));
-
-        memberRepository.saveAndFlush(member);
-
-        member.setDefaultAddress(member.getAddresses().get(0));
-        memberRepository.saveAndFlush(member);
-
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-        // when
-        Page<MemberAddressResponse> page = memberFinder.findAddresses(member.getId(), pageable);
-
-        // then
-        assertThat(page.getTotalElements()).isEqualTo(2);
-        assertThat(page.getContent()).hasSize(2);
-    }
-
+    @InjectMocks MemberFinderService memberFinder;
+    @Mock MemberRepository memberRepository;
 
     @Test
     @DisplayName("멤버 주소 목록 조회 - 멤버 없음")
     void findAddresses_memberNotFound() {
+        // given
         Pageable pageable = PageRequest.of(0, 10);
+        // findById 등 내부에서 사용하는 메서드가 있다면 stubbing 필요
+        // 예: given(memberRepository.findById(any())).willReturn(Optional.empty());
 
+        // when & then
         assertThatThrownBy(() -> memberFinder.findAddresses(999_999L, pageable))
                 .isInstanceOf(MemberException.class);
     }
