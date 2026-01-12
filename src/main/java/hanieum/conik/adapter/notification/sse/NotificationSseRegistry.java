@@ -47,7 +47,7 @@ public class NotificationSseRegistry implements NotificationPort {
 
         for (SseEmitter emitter : memberEmitters) {
             try {
-                emitter.send(SseEmitter.event()
+                safeSend(emitter, SseEmitter.event()
                         .name("notification")
                         .data(payload, MediaType.APPLICATION_JSON));
                 log.info("SSE push sent (memberId={}, type={}, title={})",
@@ -70,7 +70,7 @@ public class NotificationSseRegistry implements NotificationPort {
             }
             for (SseEmitter emitter : memberEmitters) {
                 try {
-                    emitter.send(SseEmitter.event()
+                    safeSend(emitter, SseEmitter.event()
                             .name("ping")
                             .data("ok", MediaType.TEXT_PLAIN));
                 } catch (IOException ex) {
@@ -89,6 +89,12 @@ public class NotificationSseRegistry implements NotificationPort {
         memberEmitters.remove(emitter);
         if (memberEmitters.isEmpty()) {
             emitters.remove(memberId);
+        }
+    }
+
+    private void safeSend(SseEmitter emitter, SseEmitter.SseEventBuilder event) throws IOException {
+        synchronized (emitter) {
+            emitter.send(event);
         }
     }
 }
