@@ -25,14 +25,14 @@ public record ReviewCreateReqDto(
         @NotNull(message = "평점은 필수입니다.")
         Double rating
 ) {
-    public Review toEntity(ReviewCreateReqDto requestDto, Member member, Long companyId) {
+    public Review toEntity(Member member, Long companyId) {
         return Review.create(
                 companyId,
                 member,
-                requestDto.content(),
-                requestDto.tags(),
-                requestDto.imageUrls(),
-                requestDto.rating()
+                this.content(),
+                this.tags(),
+                this.imageUrls(),
+                this.rating()
         );
     }
 }

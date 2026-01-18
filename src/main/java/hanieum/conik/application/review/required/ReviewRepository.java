@@ -7,18 +7,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    @Query("SELECT r FROM Review r " +
-            "JOIN FETCH r.member " +
+    @Query("SELECT r.id FROM Review r " +
             "WHERE r.companyId = :companyId")
-    Page<Review> findByCompanyIdWithMember(@Param("companyId") Long companyId, Pageable pageable);
+    Page<Long> findReviewIdsByCompanyId(@Param("companyId") Long companyId, Pageable pageable);
+
+    @Query("SELECT r.id FROM Review r " +
+            "WHERE r.member.id = :memberId")
+    Page<Long> findReviewIdsByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     @Query("SELECT r FROM Review r " +
             "JOIN FETCH r.member " +
-            "WHERE r.member.id = :memberId")
-    Page<Review> findByMemberId(Long memberId, Pageable pageable);
+            "WHERE r.id IN :ids")
+    List<Review> findByIdsWithMember(@Param("ids") List<Long> ids);
 
     @Query("SELECT r FROM Review r " +
             "JOIN FETCH r.member " +

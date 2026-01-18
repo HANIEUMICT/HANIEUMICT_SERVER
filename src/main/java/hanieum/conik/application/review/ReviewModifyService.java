@@ -29,7 +29,7 @@ public class ReviewModifyService implements ReviewSaver {
         // 회원 검증
         Member member = memberFinder.findById(memberId);
 
-        Review review = requestDto.toEntity(requestDto, member, companyId);
+        Review review = requestDto.toEntity(member, companyId);
         Review savedReview = reviewRepository.save(review);
         return savedReview.getId();
     }

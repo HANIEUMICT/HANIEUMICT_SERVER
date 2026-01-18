@@ -34,7 +34,7 @@ public class Review extends AbstractEntity {
     )
     @Column(name = "tag")
     @Enumerated(EnumType.STRING)
-    private List<ReviewTag> tags;
+    private List<ReviewTag> tags = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(
@@ -51,19 +51,21 @@ public class Review extends AbstractEntity {
         this.companyId = companyId;
         this.member = member;
         this.content = content;
-        this.tags = tags;
-        this.imageUrls = imageUrls;
+        this.tags = (tags == null) ? new ArrayList<>() : tags;
+        this.imageUrls = (imageUrls == null) ? new ArrayList<>() : imageUrls;
         this.rating = rating;
     }
 
     public static Review create(Long companyId, Member member, String content, List<ReviewTag> tags, List<String> imageUrls, Double rating) {
         validateReviewData(companyId, member, content, tags, rating);
-
         return new Review(companyId, member, content, tags, imageUrls, rating);
     }
 
     public void update(String content, List<ReviewTag> tags, List<String> imageUrls, Double rating) {
-        if(content != null) this.content = content;
+        if(content != null) {
+            if(content.isBlank()) throw new ReviewException(ReviewErrorType.CONTENT_IS_INVALID);
+            this.content = content;
+        }
         if(tags != null) {
             if(tags.size() > 3) throw new ReviewException(ReviewErrorType.TOO_MANY_TAGS);
             this.tags = tags;

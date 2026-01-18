@@ -30,7 +30,7 @@ public class ReviewController {
     public ApiResponse<?> updateReview(
             @AuthenticationPrincipal AuthDetails authDetails,
             @PathVariable Long reviewId,
-            ReviewUpdateReqDto reviewUpdateReqDto
+            @RequestBody ReviewUpdateReqDto reviewUpdateReqDto
     ) {
         reviewSaver.updateReview(reviewId, authDetails.getMemberId(), reviewUpdateReqDto);
         return ApiResponse.success("리뷰 수정 성공");
