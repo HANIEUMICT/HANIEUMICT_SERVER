@@ -57,8 +57,9 @@ public class Review extends AbstractEntity {
     }
 
     public static Review create(Long companyId, Member member, String content, List<ReviewTag> tags, List<String> imageUrls, Double rating) {
-        validateReviewData(companyId, member, content, tags, rating);
-        return new Review(companyId, member, content, tags, imageUrls, rating);
+        List<ReviewTag> safeTags = (tags == null) ? new ArrayList<>() : tags;
+        validateReviewData(companyId, member, content, safeTags, rating);
+        return new Review(companyId, member, content, safeTags, imageUrls, rating);
     }
 
     public void update(String content, List<ReviewTag> tags, List<String> imageUrls, Double rating) {
