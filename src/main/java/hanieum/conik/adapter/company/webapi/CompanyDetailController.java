@@ -5,6 +5,10 @@ import hanieum.conik.adapter.company.response.CompanyProfileResponse;
 import hanieum.conik.application.company.provided.CompanyFinder;
 import hanieum.conik.application.company.provided.CompanySaver;
 import hanieum.conik.application.member.provided.MemberFinder;
+import hanieum.conik.application.review.dto.ReviewCreateReqDto;
+import hanieum.conik.application.review.dto.ReviewResDto;
+import hanieum.conik.application.review.provided.ReviewFinder;
+import hanieum.conik.application.review.provided.ReviewSaver;
 import hanieum.conik.domain.company.dto.*;
 import hanieum.conik.domain.company.entity.Company;
 import hanieum.conik.domain.company.exception.CompanyErrorType;
@@ -40,6 +44,8 @@ public class CompanyDetailController {
     private final CompanyFinder companyFinder;
     private final CompanySaver companySaver;
     private final MemberFinder memberFinder;
+    private final ReviewSaver reviewSaver;
+    private final ReviewFinder reviewFinder;
 
     @Operation(summary = "기업 상세 정보 등록", description = """
                 ## 기업 회원이 기업의 상세 정보를 등록합니다.
@@ -111,7 +117,6 @@ public class CompanyDetailController {
         long epochMilli = response.detail().modifiedAt().toInstant(ZoneOffset.UTC).toEpochMilli();
 
         return ResponseEntity.ok().eTag("\"" + epochMilli + "\"").body(ApiResponse.success(response));
-
     }
 
     @Operation(summary = "기업 프로필 목록 조회(필터 적용)", description = """
@@ -144,5 +149,46 @@ public class CompanyDetailController {
         } catch (NumberFormatException e) {
             throw new GlobalException(GlobalErrorType.INVALID_REQUEST_ARGUMENT);
         }
+    }
+
+    // !! 리뷰 관련 API
+    @Operation(summary = "특정 회사의 리뷰 목록 조회", description = """
+            ## 특정 회사에 작성된 리뷰 목록을 조회합니다.
+            - 페이징 처리가 적용되어 있습니다.
+            - 정렬은 생성일자 내림차순으로 고정되어 있습니다.
+            """)
+    @GetMapping("/{companyId}/reviews")
+    public ApiResponse<Page<ReviewResDto>> getCompanyReviews(
+            @PathVariable Long companyId,
+            @ParameterObject @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ApiResponse.success(reviewFinder.findCompanyReviews(companyId, pageable));
+    }
+
+    // 특정 회사에 리뷰 작성
+    @Operation(summary = "특정 회사에 리뷰 작성", description = """
+            ## 특정 회사에 리뷰를 작성합니다.
+            - 인증된 회원(가입한 회원)만 접근할 수 있습니다.
+            """)
+    @PostMapping("/{companyId}/reviews")
+    public ApiResponse<Long> createReview(
+            @PathVariable Long companyId,
+            @AuthenticationPrincipal AuthDetails authDetails,
+            @Valid @RequestBody ReviewCreateReqDto reviewCreateReqDto
+    ) {
+        Long savedId = reviewSaver.saveReview(reviewCreateReqDto, authDetails.getMemberId(), companyId);
+        return ApiResponse.success(savedId);
+    }
+
+    // 특정 회사의 특정 리뷰 상세 조회
+    @Operation(summary = "특정 회사의 특정 리뷰 상세 조회", description = """
+            ## 특정 회사에 작성된 특정 리뷰의 상세 정보를 조회합니다.
+            """)
+    @GetMapping("/{companyId}/reviews/{reviewId}")
+    public ApiResponse<ReviewResDto> getReview(
+            @PathVariable Long companyId,
+            @PathVariable Long reviewId
+    ) {
+        return ApiResponse.success(reviewFinder.findReview(reviewId));
     }
 }
