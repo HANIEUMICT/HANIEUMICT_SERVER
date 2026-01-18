@@ -1,27 +1,266 @@
-language: ko-KR
-
+language: "ko-KR" # 리뷰 언어를 한국어로 설정
+early_access: true # 최신 기능을 미리 사용해 생산성 향상
 enable_free_tier: true
 
 reviews:
-  profile: chill
+  profile: "chill" # "assertive"는 너무 깐깐할 수 있으므로 "chill"로 설정하되 툴을 통해 품질 보장
   request_changes_workflow: false
-  high_level_summary: true
-  high_level_summary_placeholder: '@coderabbitai 요약'
-  auto_title_placeholder: '@coderabbitai'
-  poem: false
-  review_status: true
-  collapse_walkthrough: false
-  abort_on_close: true
-  auto_review:
-    enabled: true
-    review_status: true
-    auto_incremental_review: true
-    drafts: true
-chat:
-  auto_reply: true
+  high_level_summary: true # PR 내용을 자동으로 요약하여 히스토리 관리 용이
+  high_level_summary_in_walkthrough: true # 워크스루(상세 리뷰)에 요약 포함
+  auto_title_placeholder: "@coderabbitai" # PR 제목 자동 생성 트리거
 
-knowledge_base:
-  learnings:
-    scope: auto
-  issues:
-    scope: auto
+  # 시각화 및 문서화 도움
+  sequence_diagrams: true # 복잡한 로직을 시퀀스 다이어그램으로 시각화
+  changed_files_summary: true # 변경된 파일 요약
+  collapse_walkthrough: false # 리뷰 내용을 바로 볼 수 있도록 펼쳐둠
+
+  # 재미 요소 제거
+  poem: false
+  in_progress_fortune: false
+
+  # 라벨링 자동화 (이슈 트래킹 용이)
+  suggested_labels: true
+  auto_apply_labels: true
+
+  # 제외할 파일들 (노이즈 제거)
+  path_filters:
+    - "!**/build/**"
+    - "!**/gradle/**"
+    - "!**/test/**" # 테스트 코드는 리뷰 생략하거나 필요시 제거
+    - "!**/swagger.yaml"
+    - "!**/README.md"
+
+
+  # [핵심] 커스텀 리뷰 가이드라인
+  path_instructions:
+    # ========================================
+    #  헥사고날 아키텍처 관련 리뷰
+    # ========================================
+
+    # 1. Domain Layer (핵심 비즈니스 로직)
+    - path: "**/domain/**/*.java"
+      instructions: >
+        **[Hexagonal Architecture - Domain Layer]**
+        
+        Domain 계층은 외부 의존성이 없는 순수한 비즈니스 로직이어야 합니다.
+        
+        **필수 확인 사항:**
+        1. **의존성 방향 위반 체크**: Domain 계층에서 Application이나 Adapter 계층을 import하고 있다면 **심각한 아키텍처 위반**입니다. "Domain 계층은 외부 계층에 의존해서는 안 됩니다"라는 경고를 남겨주세요.
+        
+        2. **외부 라이브러리 의존성**: Spring Framework (`@Service`, `@Component`, `@Autowired` 등), JPA (`@Entity` 제외), Jackson 등 외부 프레임워크 어노테이션이나 클래스를 사용하고 있다면 경고해주세요. Domain은 순수 Java(+JPA Entity는 허용)여야 합니다.
+        
+        3. **비즈니스 로직 검증**: 
+           - Entity에 비즈니스 규칙이 잘 캡슐화되어 있는지 확인
+           - Setter 대신 의미 있는 메서드명 사용 (예: `changeName()`, `updateStatus()`)
+           - 불변성(immutability)이 적절히 보장되는지
+        
+        4. **ID 타입 강제**: `@Id`가 붙은 PK 필드나, `_id`/`Id`로 끝나는 외래키(FK)성 필드는 반드시 `Long` (Wrapper Class) 타입을 사용해야 합니다. `int`, `Integer`를 사용했다면 `Long`으로 변경하라고 경고해주세요.
+        
+        5. **FK 제약조건**: 물리적인 FK 제약조건(Constraint)을 걸지 않는 것을 선호합니다. `@ForeignKey` 어노테이션 사용을 제안하지 마세요.
+        
+        **경고 형식**: 위반 시 "[Hexagonal - Domain Violation]" 또는 "[DB Convention]"을 붙여주세요.
+
+    # 2. Application Layer (Use Case / Service)
+    - path: "**/application/**/*.java"
+      instructions: >
+        **[Hexagonal Architecture - Application Layer]**
+        
+        Application 계층은 비즈니스 유스케이스를 조율하는 계층입니다.
+        
+        **필수 확인 사항:**
+        1. **의존성 방향 체크**: 
+           - Application은 Domain을 의존할 수 있습니다
+           - Application이 Adapter 계층(Controller, Repository 구현체 등)을 직접 의존하면 **아키텍처 위반**입니다 
+           - Port(인터페이스)를 통해 Adapter와 통신해야 합니다
+        
+        2. **Port 사용 확인**:
+           - Repository, 외부 API 호출 등은 Port(인터페이스)를 통해 접근하는지 확인
+           - 구현체(`*Impl`, `*Adapter`)를 직접 의존하면 안 됩니다
+        
+        3. **트랜잭션 범위**: `@Transactional` 어노테이션이 적절히 사용되었는지 확인
+        
+        4. **DTO 사용**: Application 계층에서 Domain Entity를 직접 반환하지 않고, DTO로 변환하는지 확인
+        
+        5. **비즈니스 로직 위치**: 복잡한 비즈니스 로직이 Application에 있다면, Domain Entity로 이동을 제안해주세요.
+        
+        **경고 형식**: "[Hexagonal - Application Violation]"
+
+    # 3. Adapter Layer (Infrastructure)
+    - path: "**/adapter/**/*.java"
+      instructions: >
+        **[Hexagonal Architecture - Adapter Layer]**
+        
+        Adapter 계층은 외부 세계와의 연결을 담당합니다.
+        
+        **필수 확인 사항:**
+        1. **의존성 방향 체크**:
+           - Adapter는 Domain과 Application을 의존할 수 있습니다
+           - 다른 Adapter를 직접 의존하면 안 됩니다 (필요시 Application을 통해)
+        
+        2. **Controller (Driving Adapter)**:
+           - REST API 설계 원칙 준수 (아래 REST API 섹션 참조)
+           - Request/Response DTO 사용
+           - Application Service(Use Case)를 호출하는 얇은 계층인지 확인
+           - 비즈니스 로직이 Controller에 있으면 안 됩니다
+        
+        3. **Repository/External API (Driven Adapter)**:
+           - Port 인터페이스를 구현하고 있는지 확인
+           - JPA Repository는 Adapter 계층에 위치해야 함
+           - Domain Entity와 외부 시스템 Model 간 변환 로직 포함
+        
+        4. **Security/Config**:
+           - 인증/인가 로직이 적절히 분리되어 있는지
+           - 설정 클래스가 Adapter 계층에 위치하는지
+        
+        **경고 형식**: "[Hexagonal - Adapter Violation]"
+
+    # 4. REST API 설계 원칙 (Controller 전용)
+    - path: "**/*Controller.java"
+      instructions: >
+        **[REST API Design]**
+        
+        Spring Boot Controller의 API 엔드포인트를 다음 가이드라인에 맞춰 리뷰해주세요.
+        
+        ### Richardson Maturity Model (RMM)
+        - 적절한 HTTP 메서드(GET, POST, PUT, DELETE, PATCH)가 사용되었는지 확인해주세요.
+        
+        ### URI Naming Convention
+        - URI는 **kebab-case**를 사용해야 합니다. (예: `/api/v1/user-profiles`)
+        - Resource는 복수형 명사를 사용합니다. (예: `/users` instead of `/user`)
+        - URI에 동사(create, get 등)가 포함되지 않도록 합니다. (단, 복잡한 컨트롤러 로직인 경우 예외 허용)
+        - Body나 Parameter는 **camelCase**를 사용해야 합니다.
+        
+        ### Response Type
+        - 반환 타입은 `ApiResponse<T>` 형태의 통일된 응답 포맷을 권장합니다.
+        
+        ### RESTful Resource Hierarchy
+        - 리소스 계층 구조가 명확한지 확인 (예: `/companies/{companyId}/reviews`)
+        - `@PathVariable`과 `@RequestParam` 사용이 적절한지 확인
+        
+        **경고 형식**: "[REST API Convention]"
+
+    # 5. 코드 스타일 - 첫 줄 띄어쓰기
+    - path: "**/*.java"
+      instructions: >
+        **[Code Style - 첫 줄 띄어쓰기 금지]**
+        
+        **중요한 코드 스타일 규칙:**
+        
+        클래스나 메서드(함수)의 첫 줄은 무조건 띄지 않고 바로 붙여 써야 합니다.
+        
+        **잘못된 예시:**
+        ```java
+        public class Review {
+        
+            private Long id;  //첫 줄을 띄움
+        }
+        
+        public void createReview() {
+        
+            Member member = ...;  //첫 줄을 띄움
+        }
+        ```
+        
+        **올바른 예시:**
+        ```java
+        public class Review {
+            private Long id;  // 첫 줄을 바로 시작
+        }
+        
+        public void createReview() {
+            Member member = ...;  // 첫 줄을 바로 시작
+        }
+        ```
+        
+        클래스나 메서드 선언 바로 다음에 빈 줄이 있으면 제거하도록 제안해주세요.
+        
+        **경고 형식**: "[Code Style] 클래스/메서드의 첫 줄은 띄지 않고 바로 시작해야 합니다."
+
+    # 6. JPA & Database 관련
+    - path: "**/{Repository,repository}/**/*.java"
+      instructions: >
+        **[JPA & Database]**
+        
+        **쿼리 성능 및 N+1 문제 체크:**
+        1. **N+1 문제**: 
+           - `@OneToMany`, `@ManyToOne` 관계에서 Lazy Loading 시 N+1 문제 발생 가능성 체크
+           - Fetch Join 또는 @EntityGraph 사용 권장
+        
+        2. **@Query 최적화**:
+           - 필요한 컬럼만 SELECT하는지 (DTO 프로젝션 활용)
+           - COUNT 쿼리가 별도로 최적화되어 있는지
+        
+        3. **LazyLoading 문제 체크**:
+          - 컬렉션 조회 시점에서 LazyInitializationException 발생 가능성 점검
+
+    # 7. 날짜/시간 및 예외 처리
+    - path: "**/*.java"
+      instructions: >
+        **[TimeZone & Error Handling]**
+        
+        **날짜/시간 처리:**
+        1. **TimeZone 이슈 방지**: `LocalDateTime`을 파라미터로 받거나 반환할 때, 프론트엔드와의 시차 문제(+9시간)가 발생할 가능성이 있는지 확인해주세요. 
+        2. `OffsetDateTime` 또는 `ZonedDateTime` 사용을 권장하거나, UTC 처리가 명확한지 로직을 점검해주세요.
+        
+        **예외 처리:**
+        1. Custom Exception이 적절히 사용되고 있는지
+        2. 예외 메시지가 명확한지 (ErrorType enum 활용)
+        3. Global Exception Handler로 일관된 에러 응답 제공하는지
+
+chat:
+  auto_reply: true # 댓글을 달면 즉시 반응하도록 설정
+
+# 코드 생성 및 자동화
+code_generation:
+  docstrings:
+    path_instructions:
+      - path: "**/*Controller.java"
+        instructions: "Swagger 어노테이션(@Operation, @Schema)에 들어갈 설명을 포함하여 JavaDoc을 작성해주세요."
+      - path: "**/application/**/*Service.java"
+        instructions: "비즈니스 로직의 예외 케이스와 트랜잭션 범위를 명시하는 JavaDoc을 작성해주세요."
+  unit_tests:
+    path_instructions:
+      - path: "**/application/**/*.java"
+        instructions: "JUnit 5와 Mockito를 사용하여 단위 테스트 코드를 제안해주세요. 특히 비즈니스 로직의 엣지 케이스를 포함해주세요."
+
+# 병합 전 체크 (스스로를 위한 안전장치)
+pre_merge_checks:
+  title:
+    mode: "warning"
+  description:
+    mode: "warning"
+  docstrings:
+    mode: "warning"
+    threshold: 50 # 문서화 커버리지 50% 권장
+  issue_assessment:
+    mode: "warning" # 연결된 이슈 해결 여부 확인
+
+# 툴 설정 (정적 분석 및 보안)
+tools:
+  # 보안 필수
+  gitleaks:
+    enabled: true
+  osv-scanner: # 의존성 취약점 스캔
+    enabled: true
+
+  # Java 정적 분석
+  pmd:
+    enabled: true
+
+  # 인프라 (Docker)
+  hadolint:
+    enabled: true # Dockerfile 린트
+  checkov:
+    enabled: true # IaC 보안 점검
+
+  # 기타 유용한 툴
+  markdownlint:
+    enabled: true
+  actionlint:
+    enabled: true # GitHub Actions 린트
+  yamllint:
+    enabled: true
+
+  # GitHub Checks 통합 (PR 하단에서 상태 확인 가능)
+  github-checks:
+    enabled: true
