@@ -61,7 +61,6 @@ public class SecurityConfig {
                                         "/v1/proposal/project/*"
                                 ).permitAll()
                                 .requestMatchers(HttpMethod.POST, "/v1/bucket/presigned", "/v1/bucket/presigned/public").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/v1/company/detail/**").hasAuthority("OWNER")
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
