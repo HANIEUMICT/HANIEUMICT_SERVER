@@ -43,6 +43,15 @@ public class DealQueryService implements DealFinder {
 
     @Override
     public Page<DealSummaryResponse> getDeals(AuthDetails authDetails, Pageable pageable) {
+        if (!authDetails.isCompanyMember()) {
+            throw new DealException(DealErrorType.INVALID_DEAL_ACCESS);
+        }
+
+        Long companyId = authDetails.getCompanyId();
+        if (companyId == null) {
+            throw new DealException(DealErrorType.COMPANY_NOT_ASSIGNED);
+        }
+
         // 거래 수락된 Deal 조회
         List<DealStep> acceptedSteps =
                 Arrays.stream(DealStep.values())
