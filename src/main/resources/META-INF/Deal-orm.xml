@@ -10,8 +10,8 @@
             <basic name="projectId">
                 <column name="project_id"/>
             </basic>
-            <basic name="progressStep">
-                <column name="progress_step"/>
+            <basic name="dealStep">
+                <column name="deal_step"/>
                 <enumerated>STRING</enumerated>
             </basic>
             <basic name="deliveryStatus">
