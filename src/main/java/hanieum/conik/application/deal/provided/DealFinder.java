@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface DealFinder {
 
-    Page<DealSummaryResponse> getDeals( AuthDetails authDetails, Pageable pageable);
+    Page<DealSummaryResponse> getDeals(AuthDetails authDetails, Pageable pageable);
 
-    DealTimelineResponse getDealTimeline(Long dealId);
+    DealTimelineResponse getDealTimeline(AuthDetails authDetails, Long dealId);
 }

@@ -94,10 +94,23 @@ public class DealQueryService implements DealFinder {
     }
 
     @Override
-    public DealTimelineResponse getDealTimeline(Long dealId) {
+    public DealTimelineResponse getDealTimeline(AuthDetails authDetails, Long dealId) {
 
         Deal deal = dealRepository.findById(dealId)
                 .orElseThrow(() -> new DealException(DealErrorType.DEAL_NOT_FOUND));
+
+        boolean authorized = deal.getBuyerId().equals(authDetails.getMemberId()); // 소상공인 검증
+
+        // 기업 회원 검증
+        if (authDetails.isCompanyMember()
+                && authDetails.getCompanyId() != null
+                && deal.getCompanyId().equals(authDetails.getCompanyId())) {
+            authorized = true;
+        }
+
+        if (!authorized) {
+            throw new DealException(DealErrorType.INVALID_DEAL_ACCESS);
+        }
 
         List<DealStepDetailResponse> timeline = new ArrayList<>();
 

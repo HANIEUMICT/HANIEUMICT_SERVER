@@ -54,7 +54,7 @@ public class DealController {
             @PathVariable Long dealId
     ) {
         return ApiResponse.success(
-                dealFinder.getDealTimeline(dealId)
+                dealFinder.getDealTimeline(authDetails, dealId)
         );
     }
 }
