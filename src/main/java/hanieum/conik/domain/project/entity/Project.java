@@ -2,6 +2,7 @@ package hanieum.conik.domain.project.entity;
 
 import hanieum.conik.adapter.project.dto.request.BidStatusUpdateRequest;
 import hanieum.conik.adapter.project.dto.request.ProjectRegisterRequest;
+import hanieum.conik.domain.deal.enumerate.DealStep;
 import hanieum.conik.domain.project.enumerate.*;
 import hanieum.conik.global.domain.AbstractEntity;
 import jakarta.persistence.*;
@@ -57,7 +58,7 @@ public class Project extends AbstractEntity {
     private ProjectBidStatus projectBidStatus = ProjectBidStatus.PRE_BID;
 
     @Enumerated(EnumType.STRING)
-    private ProjectProgressStep currentStep = ProjectProgressStep.OPEN;
+    private DealStep currentStep = DealStep.OPEN;
 
     @BatchSize(size = 250)
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -66,7 +67,7 @@ public class Project extends AbstractEntity {
     public static Project create(Long userId, String projectTitle, String category, String categoryDetail, String categoryDetailEtc,
                                  String purpose, String purposeEtc, Integer projectQuantity, String projectRequests,
                                  LocalDate projectDeadline, boolean canDeadlineChange, Integer projectRequestEstimate, LocalDate projectPublicUntil,
-                                 ProjectStatus projectStatus, ConsultType consultType, boolean canPhoneConsult, Long addressId, ProjectProgressStep currentStep
+                                 ProjectStatus projectStatus, ConsultType consultType, boolean canPhoneConsult, Long addressId, DealStep currentStep
     ) {
         Project project = new Project();
         project.memberId            = userId;
@@ -139,7 +140,7 @@ public class Project extends AbstractEntity {
     public void finalizeDrawingFiles() { this.drawingFiles.forEach(ProjectDrawingFile::finalizeFile); }
 
     // TODO : Progress 변경 시 currentStep도 함께 갱신되도록 수정 (데이터 일관성 유지)
-    public void updateCurrentStep(ProjectProgressStep step) {
+    public void updateCurrentStep(DealStep step) {
         this.currentStep = step;
     }
 }

@@ -1,6 +1,7 @@
 package hanieum.conik.global.adapter.security;
 
 import hanieum.conik.domain.member.Member;
+import hanieum.conik.domain.member.enumerate.MemberRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +17,13 @@ public class AuthDetails implements UserDetails {
         this.member = member;
     }
 
-    public Long getMemberId() {return member.getId();}
+    public Long getMemberId() { return member.getId(); }
+
+    public Long getCompanyId() { return member.getCompanyId(); }
+
+    public boolean isCompanyMember() { return member.isCompanyMember(); }
+
+    public MemberRole getRole() { return member.getRole(); }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

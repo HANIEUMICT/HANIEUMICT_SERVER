@@ -1,4 +1,4 @@
-package hanieum.conik.domain.project.enumerate;
+package hanieum.conik.domain.deal.enumerate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

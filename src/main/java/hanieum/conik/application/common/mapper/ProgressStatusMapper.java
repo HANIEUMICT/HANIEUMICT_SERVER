@@ -1,7 +1,7 @@
 package hanieum.conik.application.common.mapper;
 
+import hanieum.conik.domain.deal.enumerate.DealStep;
 import hanieum.conik.domain.project.enumerate.ProgressStatus;
-import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -10,23 +10,23 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public final class ProgressStatusMapper {
 
-    public static List<ProjectProgressStep> map(ProgressStatus status) {
+    public static List<DealStep> map(ProgressStatus status) {
         return switch (status) {
-            case BEFORE -> List.of(ProjectProgressStep.OPEN, ProjectProgressStep.REQUESTED);
+            case BEFORE -> List.of(DealStep.OPEN, DealStep.REQUESTED);
             case IN_PROGRESS -> List.of(
-                    ProjectProgressStep.CONTRACT_CONFIRMED,
-                    ProjectProgressStep.COMPANY_INSPECTION_COMPLETED,
-                    ProjectProgressStep.SAMPLE_PRODUCTION,
-                    ProjectProgressStep.SAMPLE_PRODUCTION_COMPLETED,
-                    ProjectProgressStep.SAMPLE_DELIVERY,
-                    ProjectProgressStep.SAMPLE_DELIVERED,
-                    ProjectProgressStep.SAMPLE_APPROVED,
-                    ProjectProgressStep.SAMPLE_REJECTED,
-                    ProjectProgressStep.MASS_PRODUCTION,
-                    ProjectProgressStep.MASS_PRODUCTION_COMPLETED,
-                    ProjectProgressStep.PRODUCT_DELIVERY
+                    DealStep.CONTRACT_CONFIRMED,
+                    DealStep.COMPANY_INSPECTION_COMPLETED,
+                    DealStep.SAMPLE_PRODUCTION,
+                    DealStep.SAMPLE_PRODUCTION_COMPLETED,
+                    DealStep.SAMPLE_DELIVERY,
+                    DealStep.SAMPLE_DELIVERED,
+                    DealStep.SAMPLE_APPROVED,
+                    DealStep.SAMPLE_REJECTED,
+                    DealStep.MASS_PRODUCTION,
+                    DealStep.MASS_PRODUCTION_COMPLETED,
+                    DealStep.PRODUCT_DELIVERY
             );
-            case COMPLETED -> List.of(ProjectProgressStep.CLOSED);
+            case COMPLETED -> List.of(DealStep.CLOSED);
         };
     }
 

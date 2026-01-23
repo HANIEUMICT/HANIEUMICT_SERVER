@@ -2,13 +2,13 @@ package hanieum.conik.application.proposal;
 
 import hanieum.conik.adapter.proposal.dto.response.ProposalDetailResponse;
 import hanieum.conik.application.common.mapper.ProgressStatusMapper;
+import hanieum.conik.application.deal.required.DealRepository;
 import hanieum.conik.application.member.provided.MemberFinder;
-import hanieum.conik.application.project.required.ProjectProgressRepository;
 import hanieum.conik.application.proposal.provided.ProposalFinder;
 import hanieum.conik.application.proposal.required.ProposalRepository;
+import hanieum.conik.domain.deal.enumerate.DealStep;
 import hanieum.conik.domain.member.Member;
 import hanieum.conik.domain.project.enumerate.ProgressStatus;
-import hanieum.conik.domain.project.enumerate.ProjectProgressStep;
 import hanieum.conik.domain.project.enumerate.SubmitStatus;
 import hanieum.conik.domain.project.exception.ProjectErrorType;
 import hanieum.conik.domain.project.exception.ProjectException;
@@ -29,7 +29,7 @@ import java.util.List;
 public class ProposalQueryService implements ProposalFinder {
     private final MemberFinder memberFinder;
     private final ProposalRepository proposalRepository;
-    private final ProjectProgressRepository projectProgressRepository;
+    private final DealRepository dealRepository;
 
     @Override
     public Proposal findProposal(Long proposalId) {
@@ -62,10 +62,10 @@ public class ProposalQueryService implements ProposalFinder {
 
         List<Long> companyIds;
         if (progressStatus != null) {
-            List<ProjectProgressStep> steps = ProgressStatusMapper.map(progressStatus);
-            companyIds = projectProgressRepository.findCompanyIdsByProjectIdAndProgressStepIn(projectId, steps);
+            List<DealStep> steps = ProgressStatusMapper.map(progressStatus);
+            companyIds = dealRepository.findCompanyIdsByProjectIdAndProgressStepIn(projectId, steps);
         } else {
-            companyIds = projectProgressRepository.findCompanyIdsByProjectId(projectId);
+            companyIds = dealRepository.findCompanyIdsByProjectId(projectId);
         }
 
         return proposalRepository.findBySubmitStatusAndProjectIdAndCompanyIdIn(SubmitStatus.SUBMIT, projectId, companyIds, pageable);

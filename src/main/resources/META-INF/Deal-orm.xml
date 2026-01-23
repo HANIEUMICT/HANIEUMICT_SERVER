@@ -5,13 +5,13 @@
                                      https://hibernate.org/xsd/orm/mapping/mapping-3.1.0.xsd">
     <access>FIELD</access>
 
-    <entity class="hanieum.conik.domain.project.entity.ProjectProgress">
+    <entity class="hanieum.conik.domain.deal.entity.Deal">
         <attributes>
             <basic name="projectId">
                 <column name="project_id"/>
             </basic>
-            <basic name="progressStep">
-                <column name="progress_step"/>
+            <basic name="dealStep">
+                <column name="deal_step"/>
                 <enumerated>STRING</enumerated>
             </basic>
             <basic name="deliveryStatus">

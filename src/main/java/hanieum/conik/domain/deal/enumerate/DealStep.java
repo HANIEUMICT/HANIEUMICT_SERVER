@@ -1,11 +1,11 @@
-package hanieum.conik.domain.project.enumerate;
+package hanieum.conik.domain.deal.enumerate;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ProjectProgressStep {
+public enum DealStep {
 
     OPEN("거래 오픈", 0),
     REQUESTED("거래 요청", 0),
