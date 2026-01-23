@@ -40,7 +40,7 @@ public class Deal extends AbstractEntity {
         return deal;
     }
 
-    // 요청 상채로 변경 (Proposal 최종 제출 시)
+    // 요청 상태로 변경 (Proposal 최종 제출 시)
     public void request() {
         if (this.dealStep != DealStep.OPEN) {
             throw new DealException(DealErrorType.INVALID_DEAL_STEP);
