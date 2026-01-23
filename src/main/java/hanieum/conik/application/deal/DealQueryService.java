@@ -71,6 +71,10 @@ public class DealQueryService implements DealFinder {
             Project project = projectMap.get(deal.getProjectId());
             Company company = companyMap.get(deal.getCompanyId());
 
+            if (project == null || company == null) {
+                throw new DealException(DealErrorType.DATA_INTEGRITY_VIOLATION);
+            }
+
             return DealSummaryResponse.from(deal, project, company);
         });
     }
