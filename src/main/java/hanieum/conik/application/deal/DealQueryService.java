@@ -43,22 +43,27 @@ public class DealQueryService implements DealFinder {
 
     @Override
     public Page<DealSummaryResponse> getDeals(AuthDetails authDetails, Pageable pageable) {
-        if (!authDetails.isCompanyMember()) {
-            throw new DealException(DealErrorType.INVALID_DEAL_ACCESS);
-        }
-
-        Long companyId = authDetails.getCompanyId();
-        if (companyId == null) {
-            throw new DealException(DealErrorType.COMPANY_NOT_ASSIGNED);
-        }
-
         // 거래 수락된 Deal 조회
         List<DealStep> acceptedSteps =
                 Arrays.stream(DealStep.values())
                         .filter(step -> step.getStep() >= 1)
                         .toList();
-        Page<Deal> deals =
-                dealRepository.findAcceptedDeals(acceptedSteps, pageable);
+
+        Page<Deal> deals;
+
+        if (authDetails.isCompanyMember()) {
+            Long companyId = authDetails.getCompanyId();
+            if (companyId == null) {
+                throw new DealException(DealErrorType.COMPANY_NOT_ASSIGNED);
+            }
+
+            deals = dealRepository.findByCompanyIdAndDealStepIn(companyId, acceptedSteps, pageable);
+
+        } else {
+            Long memberId = authDetails.getMemberId();
+
+            deals = dealRepository.findByBuyerIdAndDealStepIn(memberId, acceptedSteps, pageable);
+        }
 
         // Deal에 연관된 Project 일괄 조회
         Set<Long> projectIds = deals.stream()

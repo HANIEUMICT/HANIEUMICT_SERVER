@@ -26,4 +26,8 @@ public interface DealRepository extends JpaRepository<Deal, Long>, JpaSpecificat
     Page<Deal> findAcceptedDeals(@Param("steps") List<DealStep> steps, Pageable pageable);
 
     Optional<Deal> findByProjectId(Long projectId);
+
+    Page<Deal> findByCompanyIdAndDealStepIn(Long companyId, List<DealStep> acceptedSteps, Pageable pageable);
+
+    Page<Deal> findByBuyerIdAndDealStepIn(Long memberId, List<DealStep> acceptedSteps, Pageable pageable);
 }
